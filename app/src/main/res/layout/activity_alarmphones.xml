@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@color/colorBackground"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <GridLayout
+        android:id="@+id/gridLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alignmentMode="alignMargins"
+        android:columnCount="2"
+        android:rowCount="3"
+        android:layout_gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        android:useDefaultMargins="true"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- First Image + Text -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Międzynarodowy telefon alarmowy"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#070707"/>
+
+            <ImageView
+                android:id="@+id/phone1"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center"
+                android:background="#4CAF50"
+                android:contentDescription="Image 1"
+                android:src="@android:drawable/stat_sys_phone_call" />
+        </LinearLayout>
+
+        <!-- Second Image + Text -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="187dp"
+            android:layout_columnWeight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="112"
+                android:textColor="#070707"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/copy1"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center"
+                android:background="#494747"
+                android:contentDescription="Image 2"
+                app:srcCompat="?attr/actionModeCopyDrawable"
+                app:tint="#FFFFFF" />
+        </LinearLayout>
+
+        <!-- Third Image + Text -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="GOPR"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#070707" />
+
+            <ImageView
+                android:id="@+id/phone2"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="#4CAF50"
+                android:layout_gravity="center"
+
+                android:contentDescription="Image 1"
+                android:src="@android:drawable/stat_sys_phone_call" />
+        </LinearLayout>
+
+        <!-- Fourth Image + Text -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="985"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#070707" />
+
+            <ImageView
+                android:id="@+id/copy2"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center"
+                android:background="#494747"
+                android:contentDescription="Image 2"
+                app:srcCompat="?attr/actionModeCopyDrawable"
+                app:tint="#FFFFFF" />
+        </LinearLayout>
+
+        <!-- Fifth Image + Text -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="TOPR"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#070707" />
+
+            <ImageView
+                android:id="@+id/phone3"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="#4CAF50"
+                android:layout_gravity="center"
+                android:contentDescription="Image 1"
+                android:src="@android:drawable/stat_sys_phone_call" />
+        </LinearLayout>
+
+        <!-- Sixth Image + Text -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="601 100 300"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#070707" />
+
+            <ImageView
+                android:id="@+id/copy3"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="#494747"
+                android:layout_gravity="center"
+                android:contentDescription="Image 2"
+                app:srcCompat="?attr/actionModeCopyDrawable"
+                app:tint="#FFFFFF" />
+        </LinearLayout>
+
+    </GridLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

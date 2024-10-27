@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorBackground"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/editTextName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Imię" />
+
+    <EditText
+        android:id="@+id/editTextEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email"
+        android:inputType="textEmailAddress" />
+
+    <Button
+        android:id="@+id/buttonAddUser"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Dodaj użytkownika"
+        style="@style/WhiteButtonStyle"/>
+    <Button
+        android:id="@+id/buttonViewUsers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pokaż użytkowników"
+        style="@style/WhiteButtonStyle"/>
+
+    <EditText
+        android:id="@+id/editTextType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="User" />
+
+    <EditText
+        android:id="@+id/editTextDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Dystans"/>
+
+    <EditText
+        android:id="@+id/editTextLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Day" />
+
+    <Button
+        android:id="@+id/buttonAddDanger"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Dodaj zgłoszenie"
+        style="@style/WhiteButtonStyle"/>
+    <Button
+        android:id="@+id/buttonViewDangers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pokaż zagłoszenia"
+        style="@style/WhiteButtonStyle"/>
+    <Button
+        android:id="@+id/buttonDelete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Usuń baze danych"
+        style="@style/WhiteButtonStyle"/>
+    <Button
+        android:id="@+id/buttonLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Zaloguj"
+        style="@style/WhiteButtonStyle"/>
+
+    <Button
+        android:id="@+id/buttonTelefon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Telefony alarmowe"
+        style="@style/WhiteButtonStyle"/>
+
+    <Button
+        android:id="@+id/buttonMap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mapa"
+        style="@style/WhiteButtonStyle"/>
+
+</LinearLayout>

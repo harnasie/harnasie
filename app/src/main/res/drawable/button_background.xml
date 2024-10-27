@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Kształt tła przycisku -->
+    <solid android:color="#FFFFFF"/> <!-- Białe tło -->
+
+    <!-- Czarna obwódka -->
+    <stroke
+        android:color="#000000"
+        android:width="2dp"/> <!-- Grubość obwódki -->
+
+    <!-- Zaokrąglone rogi przycisku (opcjonalnie) -->
+    <corners android:radius="4dp"/>
+</shape>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+        <!-- Kolor czerwony dla paska stanu -->
+        <color name="colorStatusBar">#D32F2F</color>
+        <!-- Kolor granatowy dla paska nawigacyjnego -->
+        <color name="colorNavigationBar">#2C3E50</color> <!-- Granatowy, możesz dostosować kolor -->
+    <color name="colorBackground">#B0BEC5</color>
+        <!-- Kolory aplikacji -->
+        <color name="colorPrimary">#D32F2F</color> <!-- Kolor główny -->
+        <color name="colorPrimaryDark">#B71C1C</color> <!-- Ciemniejszy odcień czerwonego -->
+        <color name="colorAccent">#FFEB3B</color> <!-- Akcent kolor -->
+    <color name="colorButton">#FFFFFFFF</color> <!-- Akcent kolor -->
+
+    </resources>
+
