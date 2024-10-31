@@ -326,56 +326,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         });
 
 
-
-
-
-
-        //Button route = findViewById(R.id.btnNavigate);
-        /*route.setOnClickListener(v -> {
-            markerView.setVisibility(View.GONE);
-            // Pobierz lokalizację i rozpocznij żądanie trasy
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
-                    if (location != null) {
-                        currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-
-                        // Sprawdzamy, czy pierwsza lokalizacja jest ustawiona
-                        if (firstLocation == null) {
-                            firstLocation = currentLocation;
-                        } else {
-                            // Porównujemy wartości współrzędnych, aby upewnić się, że lokalizacja się zmieniła
-                            if (firstLocation.latitude != currentLocation.latitude || firstLocation.longitude != currentLocation.longitude) {
-                                // Usuń poprzednią trasę
-                                clearPreviousRoute();
-
-                                // Zaktualizuj pierwszą lokalizację na nową
-                                firstLocation = currentLocation;
-                            }
-                        }
-                        String url = "";
-                        // Budujemy URL dla nowej trasy
-                        List<LatLng> waypointsList = new ArrayList<>();
-                        if (stop1_location != null){
-                            waypointsList.add(stop1_location);
-                        }
-                        if (stop2_location != null){
-                            waypointsList.add(stop2_location);
-                        }
-                        if (stop3_location != null){
-                            waypointsList.add(stop3_location);
-                        }
-                        url = getDirectionsUrlWITH(skad_location, dokad_location,waypointsList);
-
-                        Log.d("linkurl", url);
-                        new FetchDirectionsTask().execute(url);
-                    }
-                });
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
-            }
-        });*/
-
-
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
