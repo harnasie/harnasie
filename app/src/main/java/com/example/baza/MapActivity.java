@@ -332,6 +332,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 if (locationResult == null) {
                     return;
                 }
+
                 for (Location location : locationResult.getLocations()) {
                     // Update the map with the user's location
                     LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
