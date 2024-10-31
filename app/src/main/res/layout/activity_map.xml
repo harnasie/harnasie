@@ -36,122 +36,170 @@
             android:visibility="gone"/>
     </RelativeLayout>
 
-
-    <TextView
-        android:id="@+id/instructionTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Instrukcje nawigacji"
-        android:padding="16dp"
-        android:textSize="16sp" />
-
-    <Button
-        android:id="@+id/btnNavigate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Start Navigation" />
-
-
     <Button
         android:id="@+id/btnRoute"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/btnNavigate"
         android:text="Wyznacz trase" />
 
-    <Button
-        android:id="@+id/btnMarker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnRoute"
-        android:text="Marker" />
-
-    <Button
-        android:id="@+id/btnSetMarker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnMarker"
-        android:text="Set" />
 
     <Button
         android:id="@+id/btnSchroniska"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/btnSetMarker"
+        android:layout_below="@id/btnRoute"
         android:text="Schroniska" />
 
-
-    <TextView
-        android:id="@+id/percent_complete"
+    <Button
+        android:id="@+id/btnSzczyty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:text="Procent pokonanej trasy: 0%"
-        android:textSize="18sp"
-        android:textColor="#000000"/>
-
-    <!-- Pokonany dystans -->
-    <TextView
-        android:id="@+id/distance_travelled"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/percent_complete"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:text="Pokonany dystans: 0 m"
-        android:textSize="18sp"
-        android:textColor="#000000"/>
-    <TextView
-        android:id="@+id/timer_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/distance_travelled"
-        android:text="00:00:00"
-        android:textSize="18sp"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"/>
+        android:layout_below="@id/btnSchroniska"
+        android:text="Szczyty" />
 
     <Button
-        android:id="@+id/start_navigation_button"
+        android:id="@+id/btnStawy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start Navigation"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="16dp"/>
+        android:layout_below="@id/btnSzczyty"
+        android:text="Stawy" />
+
 
     <LinearLayout
         android:id="@+id/route_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_alignParentBottom="true"
-        android:visibility="gone"
-        android:layout_marginBottom="80dp">
+        android:background="#D3FFFFFF"
+        android:orientation="vertical"
+        android:visibility="gone">
 
-        <EditText
-            android:id="@+id/place1"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Skad" />
+            android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/place2"
+            <EditText
+                android:id="@+id/place1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Skąd"
+                android:focusable="false"/>
+
+            <Button
+                android:id="@+id/button_skad_set"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ustaw" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Dokad" />
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/placestop1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="przystanek1"
+                android:visibility="gone"
+                android:focusable="false"/>
+
+            <Button
+                android:id="@+id/button_stop1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ustaw"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/placestop2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="przystanek2"
+                android:visibility="gone"
+                android:focusable="false"/>
+
+            <Button
+                android:id="@+id/button_stop2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ustaw"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/placestop3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="przystanek3"
+                android:visibility="gone"
+                android:focusable="false"/>
+
+            <Button
+                android:id="@+id/button_stop3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ustaw"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/place2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Dokąd"
+                android:focusable="false"/>
+
+            <Button
+                android:id="@+id/button_dokad_set"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ustaw" />
+        </LinearLayout>
+
+
+        <Button
+            android:id="@+id/button_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="16dp"
+            android:text="Dodaj przystanek" />
 
         <Button
             android:id="@+id/btnConfirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Confirm"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:text="Confirm" />
 
-   </LinearLayout>
+    </LinearLayout>
 
 </RelativeLayout>

@@ -3,6 +3,8 @@ package com.example.baza;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,8 +12,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -31,6 +35,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -106,36 +111,37 @@ import java.util.Map;
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private List<LatLng> trasa = new ArrayList<>();
-    private List<Polyline> polylines = new ArrayList<>();
-
     private List<Marker> schroniska = new ArrayList<>();
+    private List<Marker> szczyty = new ArrayList<>();
+    private List<Marker> stawy = new ArrayList<>();
     private LocationCallback mLocationCallback;
     private LatLng lastLocation = null;
     private LatLng firstLocation = null;
     private int lastTraversedIndex = -1;
-    private TextView percentCompleteTextView;
-    private TextView distanceTravelledTextView;
-    private float totalRouteDistance = 0; // Całkowita długość trasy
-    private float distanceTravelled = 0;  // Dystans pokonany przez użytkownika
-    private Marker marker;
-    private int ile = 1;
-    private ImageView markerView;
+    private List<LatLng> przystanki = new ArrayList<>();
+    private List<LatLng> waypointsList = new ArrayList<>();
+    private Map<String, Marker> markers = new HashMap<>();
 
+    private int ile = 1;
+    private Button btnskad, btndokad, btnstop1, btnstop2, btnstop3;
+    private int ileszczyty = 1;
+    private int ilestawy = 1;
+    private ImageView markerView;
+    private LatLng currentLocation = null, skad_location = null, dokad_location = null,
+            stop1_location = null, stop2_location = null, stop3_location = null;
     private long navigationStartTime = 0;
     private Handler timerHandler = new Handler();
     private Runnable timerRunnable;
-    private TextView timerTextView;
-
-    private List<LatLng> traversedPoints = new ArrayList<>();
-    private List<Integer> traversedSegments = new ArrayList<>();
-
+    private EditText skad_et, dokad_et, stop1, stop2, stop3;
+    private Button button_addstop, btnconfirm;
     private PolylineOptions lineOptions; // = new PolylineOptions();
     private static final double DISTANCE_THRESHOLD_METERS = 2.0; // 1 meter
     private FusedLocationProviderClient mFusedLocationClient;
     private TextToSpeech tts;
     private Handler handler;
     private boolean widoczne = false;
+    private boolean widoczneszczyty = false;
+    private boolean widocznestawy = false;
     private ArrayList<LatLng> points = new ArrayList<>();
     private LatLng destination = new LatLng(51.27447, 22.55371);// Zakopane
     private LatLng destination1 = new LatLng(49.2598, 19.9667);//20.09156,49.23821
@@ -143,9 +149,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private List<LatLng> routePoints = new ArrayList<>();
     private List<Polyline> routePolylines = new ArrayList<>();
     private Polyline currentRoutePolyline = null;
-    private boolean isNavigationStarted = false;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 101;
-    private LatLng markerCoordinates = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,11 +170,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             }
         });
 
-        percentCompleteTextView = findViewById(R.id.percent_complete);
-        distanceTravelledTextView = findViewById(R.id.distance_travelled);
-        timerTextView = findViewById(R.id.timer_text_view);
         markerView = findViewById(R.id.marker_view);
-
 
         Button SchroniskaButton = findViewById(R.id.btnSchroniska);
         SchroniskaButton.setOnClickListener(v -> {
@@ -183,53 +183,161 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 marker.setVisible(widoczne);
             }
         });
-        // Inicjalizacja przycisku startu nawigacji
-        Button startNavigationButton = findViewById(R.id.start_navigation_button);
-        startNavigationButton.setOnClickListener(v -> {
-            if (!isNavigationStarted) {
-                startNavigation();
-            } else {
-                Toast.makeText(this, "Nawigacja już rozpoczęta", Toast.LENGTH_SHORT).show();
+
+        Button SzczytyButton = findViewById(R.id.btnSzczyty);
+        SzczytyButton.setOnClickListener(v -> {
+            ileszczyty++;
+            Log.d("ile", String.valueOf(ileszczyty));
+            widoczne = ileszczyty % 2 == 0;
+
+            // Zaktualizuj widoczność wszystkich markerów
+            for (Marker marker : szczyty) {
+                marker.setVisible(widoczne);
             }
         });
+        Button StawyButton = findViewById(R.id.btnStawy);
+        StawyButton.setOnClickListener(v -> {
+            ilestawy++;
+            Log.d("ile", String.valueOf(ilestawy));
+            widoczne = ilestawy % 2 == 0;
+
+            // Zaktualizuj widoczność wszystkich markerów
+            for (Marker marker : stawy) {
+                marker.setVisible(widoczne);
+            }
+        });
+        // Inicjalizacja przycisku startu nawigacji
 
         Button RouteButton = findViewById(R.id.btnRoute);
         LinearLayout routeInputLayout = findViewById(R.id.route_input_layout);
-        RouteButton.setOnClickListener(new View.OnClickListener() {
+        RouteButton.setOnClickListener(v -> {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+                    if (location != null) {
+                        currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                        skad_et.setText(getCityAndStreetFromCoordinates(currentLocation));
+                        skad_location=currentLocation;
+                    }
+                });
+            }
+
+            // To jest zewnętrzny click listener dla RouteButton
+            if (routeInputLayout.getVisibility() == View.GONE) {
+                routeInputLayout.setVisibility(View.VISIBLE); // Pokazuje layout
+            } else {
+                routeInputLayout.setVisibility(View.GONE); // Ukrywa layout
+            }
+        });
+
+        skad_et = findViewById(R.id.place1);
+        dokad_et = findViewById(R.id.place2);
+        btnskad = findViewById(R.id.button_skad_set);
+        btnskad.setOnClickListener(v -> {
+            skad_location = addMarkerAtCenter("start");
+            if(skad_location != null){
+                skad_et.setText(getCityAndStreetFromCoordinates(skad_location));
+            }
+            addMarkerAtCurrentPosition(false);
+
+        });
+        btndokad = findViewById(R.id.button_dokad_set);
+        btndokad.setOnClickListener(v -> {
+            dokad_location = addMarkerAtCenter("koniec");
+            if(dokad_location != null){
+                dokad_et.setText(getCityAndStreetFromCoordinates(dokad_location));
+            }
+            addMarkerAtCurrentPosition(false);
+
+        });
+
+        btnconfirm = findViewById(R.id.btnConfirm);
+        btnconfirm.setOnClickListener(v -> {
+            markerView.setVisibility(View.GONE);
+            String url = "";
+            if(waypointsList == null) {
+                url = getDirectionsUrl(skad_location, dokad_location);
+            }
+            else{
+                url = getDirectionsUrlWITH(skad_location, dokad_location, waypointsList);
+
+            }
+            Log.d("linkurl", url);
+            new FetchDirectionsTask().execute(url);
+            // }
+            //});
+            //} else {
+            //    ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+            //}
+
+        });
+        stop1 = findViewById(R.id.placestop1);
+        stop2 = findViewById(R.id.placestop2);
+        stop3 = findViewById(R.id.placestop3);
+        btnstop1 = findViewById(R.id.button_stop1);
+        btnstop2 = findViewById(R.id.button_stop2);
+        btnstop3 = findViewById(R.id.button_stop3);
+
+        skad_et.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (routeInputLayout.getVisibility() == View.GONE) {
-                    routeInputLayout.setVisibility(View.VISIBLE);// Pokazuje layout
-                } else {
-                    routeInputLayout.setVisibility(View.GONE); // Ukrywa layout
+                addMarkerAtCurrentPosition(true);
+            }
+        });
+        dokad_et.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                addMarkerAtCurrentPosition(true);
+            }
+            return false; // Zwróć false, aby umożliwić dalsze przetwarzanie zdarzenia dotykowego
+        });
+
+
+        button_addstop = findViewById(R.id.button_stop);
+        button_addstop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText[] stops = {stop1, stop2, stop3};
+                Button[] buttons = {btnstop1, btnstop2, btnstop3};
+                LatLng[] locations = {stop1_location, stop2_location, stop3_location};
+
+                for (int i = 0; i < stops.length; i++) {
+                    if (stops[i].getVisibility() == View.GONE) {
+                        stops[i].setVisibility(View.VISIBLE);
+                        buttons[i].setVisibility(View.VISIBLE);
+                        stops[i].setOnClickListener(v1 -> {
+                            addMarkerAtCurrentPosition(true);
+                        });
+
+                        int index = i; // Musisz stworzyć lokalną zmienną, aby nie stracić odniesienia w lambdach
+                        buttons[i].setOnClickListener(v12-> {
+                            LatLng stopLocation = addMarkerAtCenter("przystanek"+(index+1));
+                            Log.d("locationnnnnn", String.valueOf(stopLocation));
+                            if (stopLocation != null) {
+                                stops[index].setText(getCityAndStreetFromCoordinates(stopLocation));
+                                waypointsList.add(stopLocation);
+
+                            }
+                            addMarkerAtCurrentPosition(false);
+                            Log.d("location", String.valueOf(stopLocation));
+                        });
+                        break; // Wyjdź z pętli po ustawieniu widoczności
+                    }
                 }
             }
         });
 
-        Button MarkerButton = findViewById(R.id.btnMarker);
-        MarkerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addMarkerAtCurrentPosition();
-            }
-        });
-        Button btnSetMarker = findViewById(R.id.btnSetMarker);
-        btnSetMarker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                confirmMarkerPosition();
-            }
-        });
 
 
-        Button route = findViewById(R.id.btnNavigate);
-        route.setOnClickListener(v -> {
+
+
+
+        //Button route = findViewById(R.id.btnNavigate);
+        /*route.setOnClickListener(v -> {
             markerView.setVisibility(View.GONE);
             // Pobierz lokalizację i rozpocznij żądanie trasy
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
                     if (location != null) {
-                        LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                        currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
                         // Sprawdzamy, czy pierwsza lokalizacja jest ustawiona
                         if (firstLocation == null) {
@@ -246,23 +354,18 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                         }
                         String url = "";
                         // Budujemy URL dla nowej trasy
-                        if(trasa.size() == 1){
-                            url = getDirectionsUrl(currentLocation, trasa.get(0));
+                        List<LatLng> waypointsList = new ArrayList<>();
+                        if (stop1_location != null){
+                            waypointsList.add(stop1_location);
                         }
-                        else if(trasa.size() == 2){
-                            url = getDirectionsUrl(trasa.get(0), trasa.get(1));
+                        if (stop2_location != null){
+                            waypointsList.add(stop2_location);
                         }
-                        else{
-                            List<LatLng> waypointsList = new ArrayList<>();
-                            Log.d("tras1", String.valueOf(trasa.get(0)));
-                            Log.d("trasaooo", String.valueOf(trasa.get(trasa.size()-1)));
-                            for(int i=1;i<trasa.size()-1;i++ )
-                            {
-                                waypointsList.add(trasa.get(i));
-                                Log.d("tras", String.valueOf(trasa.get(i)));
-                            }
-                            url = getDirectionsUrlWITH(trasa.get(0), trasa.get(trasa.size()-1),waypointsList);
+                        if (stop3_location != null){
+                            waypointsList.add(stop3_location);
                         }
+                        url = getDirectionsUrlWITH(skad_location, dokad_location,waypointsList);
+
                         Log.d("linkurl", url);
                         new FetchDirectionsTask().execute(url);
                     }
@@ -270,25 +373,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
             }
-        });
+        });*/
 
-        timerRunnable = new Runnable() {
-            @Override
-            public void run() {
-                long elapsedMillis = System.currentTimeMillis() - navigationStartTime;
-                int seconds = (int) (elapsedMillis / 1000);
-                int minutes = seconds / 60;
-                int hours = minutes / 60;
-                seconds = seconds % 60;
-                minutes = minutes % 60;
-
-                // Aktualizacja TextView
-                timerTextView.setText(String.format(Locale.getDefault(), "%02d:%02d:%02d", hours, minutes, seconds));
-
-                // Uruchomenie co sekundę
-                timerHandler.postDelayed(this, 1000);
-            }
-        };
 
         mLocationCallback = new LocationCallback() {
             @Override
@@ -302,16 +388,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     mMap.addMarker(new MarkerOptions().position(userLocation).title("You are here"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
                     if (lastLocation == null || !userLocation.equals(lastLocation)) {
-                        if (lastLocation != null) {
-                            distanceTravelled += calculateDistance(lastLocation, userLocation); // Oblicz dystans pokonany między poprzednią a nową lokalizacją
-                            Log.e("dystans", String.valueOf(distanceTravelled));
-
-                            updateDistanceText();
-                        }
                         lastLocation = userLocation;
                         updateLocationOnMap(userLocation);
                         showCurrentSegment(userLocation);
-                        updatePercentComplete(userLocation);
                     }
                 }
             }
@@ -331,23 +410,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
 
-        //test();
-        //loadKmlLayer();
-        //setUpMapClickListener22();
         loadKmlLayers();
-        //loadKmlLayersclick();
-        //addExampleRoute();
 
-        // Skonfiguruj nasłuchiwacz kliknięć
-        //setUpMapClickListener();
-        //loadKmlLayer();
-        //test();
-        /*try {
-            KmlLayer kmlLayer = new KmlLayer(mMap, R.raw.czerwony_dolina_panszczyca, getApplicationContext());
-            kmlLayer.addLayerToMap();
-        } catch (XmlPullParserException | IOException e) {
-            e.printStackTrace();
-        }*/
         Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.home);
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 85, 85, false);
         BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap);
@@ -376,27 +440,219 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         LatLng schonisko_chocholowska = new LatLng(49.2360599,19.7874255);
         schroniska.add(googleMap.addMarker(new MarkerOptions().position(schonisko_chocholowska).title("Schronisko PTTK na Polanie Chochołowskiej")
                 .icon(icon).visible(widoczne)));
+        originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.snowed_mountains);
+        scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 85, 85, false);
+        icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap);
+        LatLng rysy = new LatLng(49.179548, 20.088064);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(rysy)
+                .title("Rysy")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng mnich = new LatLng(49.192500, 20.055000);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(mnich)
+                .title("Mnich")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng swinica = new LatLng(49.219408, 20.009282);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(swinica)
+                .title("Świnica")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng koziWierch = new LatLng(49.218412, 20.028901);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(koziWierch)
+                .title("Kozi Wierch")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+
+        LatLng kasprowyWierch = new LatLng(49.232164, 19.981798);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(kasprowyWierch)
+                .title("Kasprowy Wierch")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng krzesanica = new LatLng(49.232490, 19.912055);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(krzesanica)
+                .title("Krzesanica")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng rakon = new LatLng(49.215934, 19.758468);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(rakon)
+                .title("Rakoń")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng wolowiec = new LatLng(49.207515, 19.763092);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(wolowiec)
+                .title("Wołowiec")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng konczystyWierch = new LatLng(49.205654, 19.807529);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(konczystyWierch)
+                .title("Kończysty Wierch")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng lopata = new LatLng(49.205009, 19.778566);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(lopata)
+                .title("Łopata")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng nosal = new LatLng(49.276698, 19.989603);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(nosal)
+                .title("Nosal")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng miguszowieckiSzczytWielki = new LatLng(49.187222, 20.060000);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(miguszowieckiSzczytWielki)
+                .title("Mięguszowiecki Szczyt Wielki")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng gesiaSzyja = new LatLng(49.259014, 20.076474);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(gesiaSzyja)
+                .title("Gęsia Szyja")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng kopieniecWielki = new LatLng(49.271639, 20.016197);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(kopieniecWielki)
+                .title("Kopieniec Wielki")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng sarniaSkala = new LatLng(49.264735, 19.941708);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(sarniaSkala)
+                .title("Sarnia Skała")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng krokiew = new LatLng(49.267103, 19.964372);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(krokiew)
+                .title("Krokiew (Tatry)")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng kondrackaKopa = new LatLng(49.236256, 19.932193);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(kondrackaKopa)
+                .title("Kondracka Kopa")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng goryczkowaCzuba = new LatLng(49.232354, 19.956923);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(goryczkowaCzuba)
+                .title("Goryczkowa Czuba")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng przeleczZawrat = new LatLng(49.219160, 20.016535);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(przeleczZawrat)
+                .title("Przełęcz Zawrat (2159 m n.p.m.)")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        LatLng giewont = new LatLng(49.251002, 19.934035);
+        szczyty.add(googleMap.addMarker(new MarkerOptions()
+                .position(giewont)
+                .title("Giewont")
+                .icon(icon)
+                .visible(widoczneszczyty)));
+
+        originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.location_pin);
+        scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 85, 85, false);
+        icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap);
+        LatLng czarnyStawPolski = new LatLng(49.204640, 20.025915);
+        stawy.add(googleMap.addMarker(new MarkerOptions()
+                .position(czarnyStawPolski)
+                .title("Czarny Staw Polski")
+                .icon(icon)
+                .visible(widocznestawy)));
+
+        LatLng wielkiStaw = new LatLng(49.208623, 20.039697);
+        stawy.add(googleMap.addMarker(new MarkerOptions()
+                .position(wielkiStaw)
+                .title("Wielki Staw")
+                .icon(icon)
+                .visible(widocznestawy)));
+
+        LatLng morskieOko = new LatLng(49.197141, 20.070087);
+        stawy.add(googleMap.addMarker(new MarkerOptions()
+                .position(morskieOko)
+                .title("Morskie Oko")
+                .icon(icon)
+                .visible(widocznestawy)));
+
+        LatLng czarnyStawPodRysami = new LatLng(49.190285, 20.073716);
+        stawy.add(googleMap.addMarker(new MarkerOptions()
+                .position(czarnyStawPodRysami)
+                .title("Czarny Staw pod Rysami")
+                .icon(icon)
+                .visible(widocznestawy)));
+
+        LatLng dolinaPieciuStawow = new LatLng(49.210956, 20.046530);
+        stawy.add(googleMap.addMarker(new MarkerOptions()
+                .position(dolinaPieciuStawow)
+                .title("Dolina Pięciu Stawów Polskich")
+                .icon(icon)
+                .visible(widocznestawy)));
+
+        LatLng zadniStawPolski = new LatLng(49.213177, 20.013175);
+        stawy.add(googleMap.addMarker(new MarkerOptions()
+                .position(zadniStawPolski)
+                .title("Zadni Staw Polski")
+                .icon(icon)
+                .visible(widocznestawy)));
+
     }
 
-    private void addMarkerAtCenter() {
+    private LatLng addMarkerAtCenter(String name) {
         // Pobranie obecnego widoku mapy i dodanie markera
         LatLng center = mMap.getCameraPosition().target;
 
-        // Sprawdzenie, czy marker został już dodany
-        if (markerCoordinates == null) {
-            markerCoordinates = center; // Zapisanie współrzędnych markera
-
-            // Dodanie markera
-            mMap.addMarker(new MarkerOptions().position(center).title("Twój Marker"));
-
-            // Wyświetlenie komunikatu o zapisaniu współrzędnych
-            Toast.makeText(this, "Marker dodany na: " + center, Toast.LENGTH_SHORT).show();
-
-            // Logowanie współrzędnych markera
-            Log.d("MainActivity", "Współrzędne markera: " + markerCoordinates);
-        } else {
-            Toast.makeText(this, "Marker już dodany!", Toast.LENGTH_SHORT).show();
+        Marker existingMarker = markers.get(name);
+        Log.d("sdfghjk", String.valueOf(existingMarker));
+        if (existingMarker != null) {
+            // Usunięcie istniejącego markera
+            existingMarker.remove();
         }
+
+        // Dodanie markera
+        Marker newMarker = mMap.addMarker(new MarkerOptions().position(center).title(name));
+        // Zapisanie nowego markera w mapie
+        markers.put(name, newMarker);
+        // Wyświetlenie komunikatu o zapisaniu współrzędnych
+        Toast.makeText(this, "Marker dodany na: " + center, Toast.LENGTH_SHORT).show();
+
+        // Logowanie współrzędnych markera
+        Log.d("MainActivity", "Współrzędne markera: " + center);
+
+        return center;
     }
 
 
@@ -448,6 +704,40 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         // Zwrócenie pełnego URL-a
         return "https://maps.googleapis.com/maps/api/directions/json?" + parametersBuilder.toString();
     }
+
+    private String getCityAndStreetFromCoordinates(LatLng place) {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        StringBuilder addressString = new StringBuilder();
+
+        try {
+            List<Address> addresses = geocoder.getFromLocation(place.latitude, place.longitude, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                String street = address.getThoroughfare(); // Ulica
+                String city = address.getLocality(); // Miasto
+
+                // Sprawdzenie, czy miasto jest dostępne
+                if (city != null) {
+                    addressString.append(city);
+                } else {
+                    return "Miasto nieznane"; // Jeśli miasto jest niedostępne
+                }
+
+                // Dodanie ulicy, jeśli dostępna
+                if (street != null) {
+                    addressString.append(", ").append(street);
+                }
+            } else {
+                return "Brak adresu dla podanych współrzędnych"; // Jeśli brak adresu
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Błąd przy uzyskiwaniu adresu";
+        }
+
+        return addressString.toString(); // Zwraca adres jako string
+    }
+
 
     // Funkcja do kodowania wartości lat/long w formacie odpowiednim dla URL
     private String encodeLatLng(LatLng point) {
@@ -520,6 +810,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         protected void onPostExecute(List<List<HashMap<String, String>>> result) {
             routePoints.clear();
             ArrayList<LatLng> points = new ArrayList<>();
+            HashSet<LatLng> uniquePoints = new HashSet<>(); // Zestaw do śledzenia unikalnych punktów
             PolylineOptions lineOptions = new PolylineOptions();
             routePolylines.clear(); // Upewnij się, że lista jest czyszczona przed dodaniem nowych polilinii
 
@@ -529,14 +820,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     double lat = Double.parseDouble(point.get("lat"));
                     double lng = Double.parseDouble(point.get("lng"));
                     LatLng position = new LatLng(lat, lng);
-                    points.add(position);
+                    Log.d("punkty", String.valueOf(position));
+
+                    // Sprawdź, czy punkt jest unikalny
+                    if (uniquePoints.add(position)) { // Jeśli dodanie do zestawu się powiedzie, to punkt jest unikalny
+                        points.add(position);
+                    }
                 }
             }
 
-            totalRouteDistance = 0;
-            for (int i = 0; i < points.size() - 1; i++) {
-                totalRouteDistance += calculateDistance(points.get(i), points.get(i + 1));
-            }
 
             lineOptions.addAll(points);
             lineOptions.width(15);
@@ -551,90 +843,19 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 routePoints.clear();
                 routePoints.addAll(points);
 
-                // Dodaj nowe polilinii do mapy i do listy routePolylines
-                /*for (int i = 0; i < points.size() - 1; i++) {
-                    LatLng startPoint = points.get(i);
-                    LatLng endPoint = points.get(i + 1);
-
-                    PolylineOptions segmentOptions = new PolylineOptions()
-                            .add(startPoint, endPoint)
-                            .width(15)
-                            .color(Color.RED);
-
-                    Polyline polyline = mMap.addPolyline(segmentOptions);
-                    routePolylines.add(polyline);
-                }
-
-                routePoints.addAll(points);*/
+                // Ustaw kamerę na ostatni punkt, jeśli punkty są dostępne
                 if (!routePoints.isEmpty()) {
-                    LatLng startPoint = routePoints.get(0);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startPoint, 15));
+                    LatLng endPoint = routePoints.get(routePoints.size() - 1); // Ostatni punkt
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(endPoint, 15));
                 }
             }
-
-
-        }
-    }
-
-    private void startNavigation() {
-        if (routePoints.isEmpty()) {
-            Toast.makeText(this, "Nie znaleziono trasy, spróbuj ponownie", Toast.LENGTH_SHORT).show();
-            return;
         }
 
-        //stopNavigation();
-
-        // Rozpoczęcie śledzenia czasu
-        navigationStartTime = System.currentTimeMillis();
-        timerHandler.post(timerRunnable);
-
-        startLocationUpdates();
-        Toast.makeText(this, "Rozpoczęto nawigację", Toast.LENGTH_SHORT).show();
-        isNavigationStarted = true;
     }
 
-    private void startLocationUpdates() {
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(5000);
-        locationRequest.setFastestInterval(2000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        Log.e("77777sdfghujiko", String.valueOf(6));
-
-        LocationCallback locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    return;
-                }
-                for (Location location : locationResult.getLocations()) {
-                    LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                    if (lastLocation == null || !userLocation.equals(lastLocation)) {
-                        lastLocation = userLocation;
-                        //updateLocationOnMap(userLocation);
-                        updateTraversedPoints(userLocation);
-                        updateTraversedSegments(userLocation);
-                        Log.e("sdfghujiko", String.valueOf(6));
-                        //showCurrentSegment(userLocation);
-                    }
-                }
-            }
-        };
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
-        }
-    }
 
     private void updateLocationOnMap(LatLng userLocation) {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 20));
-    }
-
-    private void stopNavigation() {
-        //if (isNavigationStarted) {
-        timerHandler.removeCallbacks(timerRunnable);
-        //Toast.makeText(this, "Nawigacja zatrzymana", Toast.LENGTH_SHORT).show();
-        //isNavigationStarted = false;
-        //}
     }
 
     @Override
@@ -643,50 +864,32 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         timerHandler.removeCallbacks(timerRunnable); // Zatrzymaj licznik, gdy aplikacja zostanie zamknięta
     }
 
-    private void addMarkerAtCurrentPosition() {
+    private void addMarkerAtCurrentPosition(boolean sign) {
         // Wyświetlenie widoku markera w odpowiedniej pozycji na mapie
         // Przeliczanie współrzędnych GPS na pozycję na ekranie
-        markerView.setVisibility(View.VISIBLE);
+        if(sign == true){
+            markerView.setVisibility(View.VISIBLE);
+        }
+        else{
+            markerView.setVisibility(View.GONE);
+        }
         markerView.setTranslationX(0); // Przesunięcie w osi X
         markerView.setTranslationY(0);
     }
 
+
     private void confirmMarkerPosition() {
         // Pobranie bieżącej pozycji kamery
         LatLng currentPosition = mMap.getCameraPosition().target;
-        trasa.add(currentPosition);
+        //trasa.add(currentPosition);
         // Ustawienie współrzędnych markera
-        markerCoordinates = currentPosition;
+        //markerCoordinates = currentPosition;
         mMap.addMarker(new MarkerOptions().position(currentPosition).title("Twój Marker"));
-        Toast.makeText(this, "Marker dodany na: " + markerCoordinates, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Marker dodany na: " + markerCoordinates, Toast.LENGTH_SHORT).show();
 
     }
 
-    private float getScreenXFromLatLng(LatLng latLng) {
-        // Obliczanie pozycji X w pikselach
-        return (float) (mMap.getProjection().toScreenLocation(latLng).x);
-    }
 
-    private float getScreenYFromLatLng(LatLng latLng) {
-        // Obliczanie pozycji Y w pikselach
-        return (float) (mMap.getProjection().toScreenLocation(latLng).y);
-    }
-
-
-
-    private void handlePolylineClick(Polyline polyline) {
-        String name = (String) polyline.getTag();
-        // Dodaj polilinię do listy klikniętych, jeśli nie jest już w niej
-        if (!clickedPolylines.contains(polyline)) {
-            clickedPolylines.add(polyline);
-        }
-
-        // Sprawdź, czy liczba klikniętych polilinii wynosi 3
-        if (clickedPolylines.size() == 3) {
-            combinePolylines();
-            clickedPolylines.clear(); // Wyczyść listę po połączeniu
-        }
-    }
     private void drawPolylinesFromKml(KmlLayer kmlLayer) {
         for (KmlContainer container : kmlLayer.getContainers()) {
             for (KmlPlacemark placemark : container.getPlacemarks()) {
@@ -715,140 +918,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 }
             }
         }
-    }
-
-    private void combinePolylines() {
-        List<LatLng> combinedPoints = new ArrayList<>();
-
-        // Zbieranie punktów z klikniętych polilinii
-        for (Polyline polyline : clickedPolylines) {
-            combinedPoints.addAll(polyline.getPoints());
-        }
-
-        // Rysowanie nowej polilinii
-        PolylineOptions combinedPolylineOptions = new PolylineOptions()
-                .color(Color.BLUE) // Ustaw kolor nowej polilinii
-                .width(8f)
-                .addAll(combinedPoints);
-
-        mMap.addPolyline(combinedPolylineOptions);
-    }
-    private void loadKmlLayer() {
-        try {
-            // Wczytaj warstwę KML
-            KmlLayer kmlLayer = new KmlLayer(mMap, R.raw.czerwony_dolina_trzydniowianska, getApplicationContext());
-            // Dodaj warstwę do mapy
-            kmlLayer.addLayerToMap();
-            drawPolylinesFromKml(kmlLayer);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void setUpMapClickListener() {
-        mMap.setOnMapClickListener(latLng -> {
-            // Iteruj przez wszystkie polilinie
-            for (Polyline polyline : polylines) {
-                // Sprawdź, czy kliknięcie jest w pobliżu polilinii
-                if (PolyUtil.isLocationOnPath(latLng, polyline.getPoints(), false, 50.0)) {
-                    // Pobierz nazwę trasy
-                    String routeName = (String) polyline.getTag();
-
-                    // Wyświetl powiadomienie Toast z nazwą trasy
-                    Toast.makeText(this, "Trasa: " + routeName, Toast.LENGTH_SHORT).show();
-                    return; // Zatrzymaj dalsze przeszukiwanie
-                }
-            }
-        });
-    }
-
-
-    /*private void test(){
-        try {
-            // Wczytaj jedną warstwę KML
-            KmlLayer kmlLayer = new KmlLayer(mMap, R.raw.czarny_gubalowka, getApplicationContext());
-            kmlLayer.addLayerToMap();
-            Log.d("KML", "Warstwa KML dodana.");
-
-            // Sprawdź, czy kmlLayer zawiera jakieś elementy
-            if (kmlLayer.getContainers().size() > 0) {
-                // Pobierz pierwszy kontener (zakładając, że masz tylko jeden)
-                KmlContainer container = kmlLayer.getContainers().get(0);
-
-                // Pobierz pierwszy placemark z kontenera
-                KmlPlacemark placemark = container.getPlacemarks().get(0);
-
-                // Pobierz nazwę trasy
-                String nazwaTrasy = placemark.getProperty("name");
-                Log.d("KML", "Nazwa trasy: " + nazwaTrasy);
-
-                // Sprawdź, czy geometria to linia
-                if (placemark.getGeometry() instanceof KmlLineString) {
-                    KmlLineString lineString = (KmlLineString) placemark.getGeometry();
-                    List<LatLng> coordinates = lineString.getGeometryObject();
-                    Log.d("KML", "Współrzędne: " + coordinates.toString());
-
-                    // Utwórz Polyline i dodaj ją do mapy
-                    Polyline polyline = mMap.addPolyline(new PolylineOptions()
-                            .addAll(coordinates)
-                            .width(12)
-                            .color(Color.GRAY)
-                            .clickable(true));
-                    Log.d("KML", "Dodano Polyline dla: " + nazwaTrasy);
-
-                    // Ustawienie tagu dla Polyline
-                    polyline.setTag(nazwaTrasy);
-                }
-            }
-        } catch (Exception e) {
-            Log.e("KML", "Błąd przy dodawaniu KML: ", e);
-        }
-    }*/
-    private Polyline examplePolyline;
-
-    private void addExampleRoute() {
-        // Lista punktów tworzących trasę
-        List<LatLng> routePoints = Arrays.asList(
-                new LatLng(49.2992, 19.9486), // Centrum Zakopanego
-                new LatLng(49.2791, 19.9815), // Dolina Kościeliska
-                new LatLng(49.2591, 19.9831), // Hala Ornak
-                new LatLng(49.2432, 20.0060)  // Dolina Chochołowska
-        );
-
-        // Dodaj linię na mapie
-        examplePolyline = mMap.addPolyline(new PolylineOptions()
-                .addAll(routePoints)
-                .width(10)
-                .color(Color.BLUE));
-
-        // Ustaw nazwę trasy (można dodać inne właściwości, jeśli potrzebne)
-        examplePolyline.setTag("Przykładowa Trasa");
-    }
-    private void setUpMapClickListener1() {
-        mMap.setOnMapClickListener(latLng -> {
-            // Sprawdź, czy kliknięcie jest w pobliżu trasy (w odległości 50 metrów)
-            if (examplePolyline != null && PolyUtil.isLocationOnPath(latLng, examplePolyline.getPoints(), false, 50.0)) {
-                // Pobierz nazwę trasy
-                String routeName = (String) examplePolyline.getTag();
-
-                // Wyświetl powiadomienie Toast z nazwą trasy
-                Toast.makeText(this, "Trasa: " + routeName, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void setUpMapClickListener22() {
-        mMap.setOnMapClickListener(latLng -> {
-            Log.d("MapClick", "Clicked at: " + latLng);
-
-            for (Polyline polyline : polylines) {
-                if (PolyUtil.isLocationOnPath(latLng, polyline.getPoints(), false, 50.0)) {
-                    String routeName = (String) polyline.getTag();
-                    Toast.makeText(this, "Trasa: " + routeName, Toast.LENGTH_SHORT).show();
-                    return; // Zatrzymaj dalsze przeszukiwanie
-                }
-            }
-        });
     }
 
 
@@ -981,101 +1050,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
 
 
-    // Funkcja do aktualizacji kolorów odcinków na podstawie pozycji użytkownika
-    /*private void updateTraversedSegments() {
-        if (routePoints.isEmpty() || routePolylines.isEmpty()) {
-            return;
-        }
 
-        for (int i = 0; i < routePoints.size() - 1; i++) {
-            LatLng startPoint = routePoints.get(i);
-            LatLng endPoint = routePoints.get(i + 1);
-
-            boolean isTraversed = false;
-
-            for (LatLng traversedPoint : traversedPoints) {
-                if (isPointOnSegment(traversedPoint, startPoint, endPoint)) {
-                    isTraversed = true;
-                    break;
-                }
-            }
-
-            Polyline polyline = routePolylines.get(i);
-
-            if (isTraversed) {
-                if (polyline.getColor() != Color.GRAY) {
-                    polyline.setColor(Color.GRAY);
-                }
-            } else {
-                if (polyline.getColor() != Color.GRAY) {
-                    polyline.setColor(Color.RED);
-                }
-            }
-        }
-    }*/
-
-    // Funkcja do obliczenia odległości punktu (użytkownik) od odcinka trasy
-    private double getDistanceFromPointToLineSegment(LatLng point, LatLng start, LatLng end) {
-        // Sprawdzenie odległości między punktami za pomocą Google Maps API
-        double distanceStartToPoint = SphericalUtil.computeDistanceBetween(start, point);
-        double distanceEndToPoint = SphericalUtil.computeDistanceBetween(end, point);
-
-        double distanceStartToEnd = SphericalUtil.computeDistanceBetween(start, end);
-
-        // Obliczamy projekcję punktu na odcinek (lub dystans od najbliższego końca, jeśli poza odcinkiem)
-        double area = Math.abs(
-                (start.latitude * (end.longitude - point.longitude) +
-                        end.latitude * (point.longitude - start.longitude) +
-                        point.latitude * (start.longitude - end.longitude)) / 2.0);
-
-        double segmentLength = SphericalUtil.computeDistanceBetween(start, end);
-
-        return (2 * area) / segmentLength; // Odległość punktu od linii w metrach
-    }
-
-
-    private boolean isPointNearLineSegment(LatLng point, LatLng start, LatLng end) {
-        float[] results = new float[1];
-
-        // Odległość między punktem a początkiem odcinka
-        Location.distanceBetween(point.latitude, point.longitude, start.latitude, start.longitude, results);
-        float startToPoint = results[0];
-
-        // Odległość między punktem a końcem odcinka
-        Location.distanceBetween(point.latitude, point.longitude, end.latitude, end.longitude, results);
-        float endToPoint = results[0];
-
-        // Odległość między początkiem a końcem odcinka
-        Location.distanceBetween(start.latitude, start.longitude, end.latitude, end.longitude, results);
-        float segmentLength = results[0];
-
-        // Odległość do linii odcinka
-        float lineDistance = (float) (Math.abs((end.longitude - start.longitude) * (start.latitude - point.latitude) - (end.latitude - start.latitude) * (start.longitude - point.longitude)) / (float) Math.sqrt(Math.pow(end.longitude - start.longitude, 2) + Math.pow(end.latitude - start.latitude, 2)));
-
-        // Sprawdzamy, czy punkt znajduje się blisko odcinka
-        return lineDistance < 15; // Możesz dostosować ten próg w zależności od wymagań
-    }
-
-    private void updateTraversedPoints(LatLng userLocation) {
-        if (routePoints.isEmpty()) {
-            return;
-        }
-
-        LatLng previousPoint = null;
-
-        for (LatLng currentPoint : routePoints) {
-            if (previousPoint != null) {
-                double distance = SphericalUtil.computeDistanceBetween(userLocation, previousPoint);
-                if (distance < DISTANCE_THRESHOLD_METERS) {
-                    // Add points that are near the user's location to the traversed list
-                    if (!traversedPoints.contains(previousPoint)) {
-                        traversedPoints.add(previousPoint);
-                    }
-                }
-            }
-            previousPoint = currentPoint;
-        }
-    }
 
     private boolean isPointOnSegment(LatLng point, LatLng start, LatLng end) {
         double distanceToStart = SphericalUtil.computeDistanceBetween(point, start);
@@ -1090,90 +1065,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         if (currentRoutePolyline != null) {
             currentRoutePolyline.remove();
             timerHandler.removeCallbacks(timerRunnable); // Zatrzymaj timer
-            timerTextView.setText("00:00:00");
             currentRoutePolyline = null;
         }
         routePoints.clear();
     }
 
-    private void updateTraversedSegments(LatLng userLocation) {
-        if (routePoints.isEmpty() || routePolylines.isEmpty()) {
-            return;
-        }
-
-        // Clear previous traversed segments
-        traversedSegments.clear();
-
-        // Check if the route is completed
-        LatLng startPointOfRoute = routePoints.get(0);
-        LatLng endPointOfRoute = routePoints.get(routePoints.size() - 1);
-
-        double distanceToStart = SphericalUtil.computeDistanceBetween(userLocation, startPointOfRoute);
-        double routeLength = SphericalUtil.computeDistanceBetween(startPointOfRoute, endPointOfRoute);
-
-        if (distanceToStart > routeLength) {
-            traversedPoints.add(startPointOfRoute); // Ensure the entire route is marked
-        }
-
-        boolean inTraversedSegment = false;
-
-        for (int i = 0; i < routePoints.size() - 1; i++) {
-            LatLng startPoint = routePoints.get(i);
-            LatLng endPoint = routePoints.get(i + 1);
-
-            // Determine if the segment should be marked as traversed
-            boolean isTraversed = false;
-            boolean isBetweenStartAndUser = false;
-
-            for (LatLng traversedPoint : traversedPoints) {
-                if (isPointOnSegment(traversedPoint, startPoint, endPoint)) {
-                    isTraversed = true;
-                    traversedSegments.add(i);
-                    break;
-                }
-            }
-
-            // Check if user is on or beyond the start of this segment
-            if (SphericalUtil.computeDistanceBetween(userLocation, startPoint) <= DISTANCE_THRESHOLD_METERS) {
-                inTraversedSegment = true;
-            }
-
-            // Get the polyline for the segment
-            Polyline polyline = routePolylines.get(i);
-
-            if (isTraversed || inTraversedSegment) {
-                polyline.setColor(Color.BLUE);
-            } else {
-                polyline.setColor(Color.RED);
-            }
-        }
-    }
-
-    private void updatePercentComplete(LatLng userLocation) {
-        if (routePoints.isEmpty() || totalRouteDistance == 0) {
-            return;
-        }
-
-        LatLng closestPoint = findClosestPoint(userLocation);
-        float distanceToClosestPoint = 0;
-
-        // Obliczenie dystansu od początku trasy do najbliższego punktu
-        for (int i = 0; i < routePoints.indexOf(closestPoint); i++) {
-            distanceToClosestPoint += calculateDistance(routePoints.get(i), routePoints.get(i + 1));
-        }
-
-        // Obliczenie procentu trasy
-        float percentComplete = (distanceToClosestPoint / totalRouteDistance) * 100;
-        percentCompleteTextView.setText(String.format("Procent pokonanej trasy: %.2f%%", percentComplete));
-    }
-    private void updateDistanceText() {
-        distanceTravelledTextView.setText(String.format("Pokonany dystans: %.2f m", distanceTravelled));
-    }
-    private float calculateDistance(LatLng start, LatLng end) {
-        float[] results = new float[1];
-        Location.distanceBetween(start.latitude, start.longitude, end.latitude, end.longitude, results);
-        return results[0]*100; // Dystans w metrach
-    }
 
     private void showCurrentSegment(LatLng userLocation) {
         if (routePoints.isEmpty()) {
