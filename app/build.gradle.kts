@@ -55,4 +55,4 @@ dependencies {
 }
 
 // Dodaj konfigurację Google Services do synchronizacji z Firebase
-//apply(plugin = "com.google.gms.google-services")
+apply(plugin = "com.google.gms.google-services")

@@ -24,13 +24,18 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class UserActivity extends AppCompatActivity {
     private TextView welcomeTextView;
@@ -38,7 +43,7 @@ public class UserActivity extends AppCompatActivity {
     EditText editDescription, editLocation;
     DangerDatabaseHelper dbHelper;
     TextView type_tv, description_tv;
-
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
     Spinner sp;
     private LineChart lineChart;
 
@@ -120,7 +125,7 @@ public class UserActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String description = editDescription.getText().toString();
                 String location = editLocation.getText().toString();
-                String name = userName;
+                //String name = userName;
                 String type = sp.getSelectedItem().toString();
                 if (description.isEmpty()) {
                     Toast.makeText(UserActivity.this, "Pole opis nie może być puste", Toast.LENGTH_SHORT).show();
@@ -129,15 +134,16 @@ public class UserActivity extends AppCompatActivity {
                 }
                 // Sprawdzanie poprawności formatu e-mail
                 else {
+                    addDanger(description,location,type);
                     // Jeśli walidacja jest poprawna, dodaj użytkownika do bazy danych
-                    boolean isInserted = dbHelper.addDanger(type, location, description, name);
+                    /*boolean isInserted = dbHelper.addDanger(type, location, description, name);
                     if (isInserted) {
                         Toast.makeText(UserActivity.this, "Dodano zgłoszenie", Toast.LENGTH_SHORT).show();
                         editDescription.setText("");
                         editLocation.setText("");
                     } else {
                         Toast.makeText(UserActivity.this, "Błąd przy dodawaniu zgłoszenia", Toast.LENGTH_SHORT).show();
-                    }
+                    }*/
                 }
             }
         });
@@ -234,5 +240,26 @@ public class UserActivity extends AppCompatActivity {
         YAxis rightAxis = lineChart.getAxisRight();
         rightAxis.setEnabled(false); // Wyłączenie prawej osi Y (opcjonalne)
     }
+
+    private void addDanger(String description,String location, String type) {
+        String generatedId = db.collection("dangers").document().getId();
+        Map<String, Object> danger = new HashMap<>();
+        danger.put("id", generatedId);
+        danger.put("description", description);
+        danger.put("location", location);
+        danger.put("type", type);
+        danger.put("creationAt", Timestamp.now());  // Automatyczna data utworzenia
+
+        // Dodaj dokument do kolekcji "students" i zapisz automatycznie wygenerowane ID
+        db.collection("dangers").document(generatedId)
+                .set(danger)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Dodano studenta z ID: " + generatedId, Toast.LENGTH_SHORT).show();
+                    // Możesz wywołać loadStudents() lub inną metodę, jeśli chcesz
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Błąd przy zapisie studenta: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+
 
 }

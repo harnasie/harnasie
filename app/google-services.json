@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "783364516951",
+    "project_id": "harnasie-2239a",
+    "storage_bucket": "harnasie-2239a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:783364516951:android:aea7aa14dc22716d800712",
+        "android_client_info": {
+          "package_name": "com.example.baza"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGAJ6ezrVuhoKcBDsggnGsq-64BE0cZOs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:783364516951:android:c6d6bd763096e84e800712",
+        "android_client_info": {
+          "package_name": "com.example.google"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGAJ6ezrVuhoKcBDsggnGsq-64BE0cZOs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
