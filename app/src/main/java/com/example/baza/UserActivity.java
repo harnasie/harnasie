@@ -1,7 +1,7 @@
 package com.example.baza;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,40 +12,38 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class UserActivity extends AppCompatActivity {
     private TextView welcomeTextView;
-    Button btnAddDanger, btnViewDangers, btnDelete;
-    EditText editDescription, editLocation;
+    Button btnAddDanger, btnViewDangers, btnDelete, btnMapa;
+    EditText editDescription;
     DangerDatabaseHelper dbHelper;
     TextView type_tv, description_tv;
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseFirestore db;
     Spinner sp;
     private LineChart lineChart;
+    private LatLng currentLocation = null;
+    private FusedLocationProviderClient mFusedLocationClient;
 
 
     @Override
@@ -61,10 +59,12 @@ public class UserActivity extends AppCompatActivity {
         btnAddDanger = findViewById(R.id.buttonAddDanger);
         btnViewDangers = findViewById(R.id.buttonViewDangers);
         btnDelete = findViewById(R.id.buttonDelete);
+        btnMapa = findViewById(R.id.buttonMapa);
         editDescription = findViewById(R.id.editTextDescription);
-        editLocation = findViewById(R.id.editTextLocation);
         lineChart = findViewById(R.id.lineChart);
         loadDistanceDataForChart();
+        db = FirebaseFirestore.getInstance();
+
         // Odbieranie nazwy użytkownika przekazanej z LoginActivity
         Intent intent = getIntent();
         String userName = intent.getStringExtra("username");
@@ -124,17 +124,14 @@ public class UserActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String description = editDescription.getText().toString();
-                String location = editLocation.getText().toString();
                 //String name = userName;
                 String type = sp.getSelectedItem().toString();
                 if (description.isEmpty()) {
                     Toast.makeText(UserActivity.this, "Pole opis nie może być puste", Toast.LENGTH_SHORT).show();
-                } else if (location.isEmpty()) {
-                    Toast.makeText(UserActivity.this, "Pole lokalizacja nie może być puste", Toast.LENGTH_SHORT).show();
                 }
                 // Sprawdzanie poprawności formatu e-mail
                 else {
-                    addDanger(description,location,type);
+                    addDanger(description,type);
                     // Jeśli walidacja jest poprawna, dodaj użytkownika do bazy danych
                     /*boolean isInserted = dbHelper.addDanger(type, location, description, name);
                     if (isInserted) {
@@ -152,6 +149,14 @@ public class UserActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(UserActivity.this, ViewDangerActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        btnMapa.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserActivity.this, MapActivity.class);
                 startActivity(intent);
             }
         });
@@ -241,23 +246,31 @@ public class UserActivity extends AppCompatActivity {
         rightAxis.setEnabled(false); // Wyłączenie prawej osi Y (opcjonalne)
     }
 
-    private void addDanger(String description,String location, String type) {
-        String generatedId = db.collection("dangers").document().getId();
+    private void addDanger(String description, String type) {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+                if (location != null) {
+                    currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                }
+            });
+        }
+        Log.d("lokalizacja", String.valueOf(currentLocation));
         Map<String, Object> danger = new HashMap<>();
-        danger.put("id", generatedId);
+        //danger.put("id", uid);
         danger.put("description", description);
-        danger.put("location", location);
+        danger.put("location",currentLocation);
         danger.put("type", type);
-        danger.put("creationAt", Timestamp.now());  // Automatyczna data utworzenia
+        //danger.put("user", ...);
+        danger.put("createdAt", Timestamp.now());
 
-        // Dodaj dokument do kolekcji "students" i zapisz automatycznie wygenerowane ID
-        db.collection("dangers").document(generatedId)
-                .set(danger)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Dodano studenta z ID: " + generatedId, Toast.LENGTH_SHORT).show();
-                    // Możesz wywołać loadStudents() lub inną metodę, jeśli chcesz
-                })
-                .addOnFailureListener(e -> Toast.makeText(this, "Błąd przy zapisie studenta: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        db.collection("dangers").add(danger)
+                .addOnSuccessListener(documentReference ->
+                        Toast.makeText(UserActivity.this, "Danger added with ID: " + documentReference.getId(), Toast.LENGTH_SHORT).show()
+                )
+                .addOnFailureListener(e -> {
+                    Log.e("FirestoreError", "Error adding danger", e);
+                    Toast.makeText(UserActivity.this, "Error adding danger: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
 
