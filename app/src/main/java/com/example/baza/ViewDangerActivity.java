@@ -31,7 +31,7 @@ public class ViewDangerActivity extends AppCompatActivity {
         dangerList = new ArrayList<>();
         adapter = new DangerAdapter(this, dangerList);
         listViewDangers.setAdapter(adapter);
-
+        setTitle("Zgłoszenia");
         loadDangers();
     }
 

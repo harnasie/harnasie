@@ -1,5 +1,6 @@
 package com.example.baza;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -27,6 +28,7 @@ public class SignUpActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        setTitle("Rejestracja");
 
         EditText etEmail = findViewById(R.id.et_email);
         EditText etPassword = findViewById(R.id.et_password);
@@ -58,7 +60,6 @@ public class SignUpActivity extends AppCompatActivity {
                         }
                     });
         });
-
     }
 
     private void addUserToFirestore(String uid, String email, String username) {

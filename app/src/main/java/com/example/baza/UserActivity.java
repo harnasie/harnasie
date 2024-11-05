@@ -54,6 +54,8 @@ public class UserActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
+        setTitle("Konto użytkownika");
+
         dbHelper = new DangerDatabaseHelper(this);
         // Znalezienie TextView do wyświetlania wiadomości powitalnej
         sp = findViewById(R.id.spinnertype);
@@ -69,7 +71,7 @@ public class UserActivity extends AppCompatActivity {
         loadDistanceDataForChart();
         db = FirebaseFirestore.getInstance();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        checkLocationPermission();
+        //checkLocationPermission();
         // Odbieranie nazwy użytkownika przekazanej z LoginActivity
         Intent intent = getIntent();
         String userName = intent.getStringExtra("username");
@@ -262,6 +264,7 @@ public class UserActivity extends AppCompatActivity {
     }
 
     private void addDanger(String description, String type, String uid) {
+        checkLocationPermission();
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "Brak uprawnień do lokalizacji.", Toast.LENGTH_SHORT).show();
             return;
