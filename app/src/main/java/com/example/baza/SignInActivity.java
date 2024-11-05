@@ -61,10 +61,11 @@ public class SignInActivity extends AppCompatActivity {
                         DocumentSnapshot document = task.getResult();
                         if (document != null && document.exists()) {
                             String username = document.getString("username");
-
+                            String id = document.getId();
                             // Redirect to HomeActivity, passing the username
                             Intent intent = new Intent(SignInActivity.this, UserActivity.class);
                             intent.putExtra("username", username);
+                            intent.putExtra("uid",id);
                             startActivity(intent);
                             finish();
                         } else {

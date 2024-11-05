@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -24,6 +25,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -44,6 +46,8 @@ public class UserActivity extends AppCompatActivity {
     private LineChart lineChart;
     private LatLng currentLocation = null;
     private FusedLocationProviderClient mFusedLocationClient;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 101;
+    private String uid = null;
 
 
     @Override
@@ -64,10 +68,13 @@ public class UserActivity extends AppCompatActivity {
         lineChart = findViewById(R.id.lineChart);
         loadDistanceDataForChart();
         db = FirebaseFirestore.getInstance();
-
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        checkLocationPermission();
         // Odbieranie nazwy użytkownika przekazanej z LoginActivity
         Intent intent = getIntent();
         String userName = intent.getStringExtra("username");
+        uid = intent.getStringExtra("uid");
+        Log.d("iertyu",uid);
         //Cursor res = dbHelper.getAllDistances();
         /*dbHelper.addDistance("Magda", "1000", "2023-09-01");
         dbHelper.addDistance("Magda", "4000", "2023-09-02");
@@ -131,7 +138,7 @@ public class UserActivity extends AppCompatActivity {
                 }
                 // Sprawdzanie poprawności formatu e-mail
                 else {
-                    addDanger(description,type);
+                    addDanger(description,type,uid);
                     // Jeśli walidacja jest poprawna, dodaj użytkownika do bazy danych
                     /*boolean isInserted = dbHelper.addDanger(type, location, description, name);
                     if (isInserted) {
@@ -173,6 +180,14 @@ public class UserActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+
+    private void checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Jeśli brak uprawnienia, prosimy o jego przyznanie
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        }
     }
 
     // Metoda do wczytywania danych do wykresu
@@ -246,33 +261,56 @@ public class UserActivity extends AppCompatActivity {
         rightAxis.setEnabled(false); // Wyłączenie prawej osi Y (opcjonalne)
     }
 
-    private void addDanger(String description, String type) {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
-                if (location != null) {
-                    currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                }
-            });
+    private void addDanger(String description, String type, String uid) {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Brak uprawnień do lokalizacji.", Toast.LENGTH_SHORT).show();
+            return;
         }
-        Log.d("lokalizacja", String.valueOf(currentLocation));
-        Map<String, Object> danger = new HashMap<>();
-        //danger.put("id", uid);
-        danger.put("description", description);
-        danger.put("location",currentLocation);
-        danger.put("type", type);
-        //danger.put("user", ...);
-        danger.put("createdAt", Timestamp.now());
 
-        db.collection("dangers").add(danger)
-                .addOnSuccessListener(documentReference ->
-                        Toast.makeText(UserActivity.this, "Danger added with ID: " + documentReference.getId(), Toast.LENGTH_SHORT).show()
-                )
-                .addOnFailureListener(e -> {
-                    Log.e("FirestoreError", "Error adding danger", e);
-                    Toast.makeText(UserActivity.this, "Error adding danger: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        // Pobieramy ostatnią lokalizację
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+            if (location != null) {
+                currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                Log.d("lokalizacja", String.valueOf(currentLocation));
+
+                // Pobieramy dokument użytkownika, aby uzyskać jego dane
+                db.collection("users").document(uid).get().addOnSuccessListener(userDoc -> {
+                    if (userDoc.exists()) {
+                        // Tworzymy mapę `userMap` z danymi użytkownika
+                        Map<String, Object> userMap = new HashMap<>();
+                        userMap.put("email", userDoc.getString("email"));
+                        userMap.put("username", userDoc.getString("username"));
+                        userMap.put("uid", uid);
+
+                        // Tworzymy mapę danych dla `danger`
+                        Map<String, Object> danger = new HashMap<>();
+                        danger.put("description", description);
+                        danger.put("location", currentLocation);
+                        danger.put("type", type);
+                        danger.put("user", userMap); // Zagnieżdżamy obiekt `userMap` w `danger`
+                        danger.put("createdAt", Timestamp.now());
+
+                        // Zapisujemy dane do kolekcji "dangers" w Firestore
+                        db.collection("dangers").add(danger)
+                                .addOnSuccessListener(documentReference -> {
+                                    Toast.makeText(UserActivity.this, "Dodano zagrożenie z ID: " + documentReference.getId(), Toast.LENGTH_SHORT).show();
+                                    Log.d("Firestore", "Dodano dokument o ID: " + documentReference.getId());
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("FirestoreError", "Błąd przy dodawaniu zagrożenia", e);
+                                    Toast.makeText(UserActivity.this, "Błąd przy dodawaniu zagrożenia: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
+                    } else {
+                        Toast.makeText(this, "Nie znaleziono użytkownika.", Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnFailureListener(e -> {
+                    Log.e("FirestoreError", "Błąd przy pobieraniu danych użytkownika", e);
+                    Toast.makeText(this, "Błąd przy pobieraniu danych użytkownika: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
+            } else {
+                Toast.makeText(UserActivity.this, "Nie można uzyskać bieżącej lokalizacji.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
-
-
 
 }
