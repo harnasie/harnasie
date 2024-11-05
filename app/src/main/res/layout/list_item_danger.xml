@@ -2,29 +2,36 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="8dp">
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:background="?android:attr/selectableItemBackground">
 
+    <!-- Opis zagrożenia -->
     <TextView
-        android:id="@+id/textDanger"
-        android:layout_width="0dp"
+        android:id="@+id/textViewType"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="20sp"
-        android:text="Przykładowy tekst" />
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:paddingBottom="4dp"
+        android:lineSpacingExtra="4dp"
+        android:ellipsize="end"
+        android:maxLines="3"/>
 
+    <!-- Typ zagrożenia -->
+    <TextView
+        android:id="@+id/textViewDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray"
+        android:paddingBottom="4dp"/>
+
+    <!-- Przycisk akceptacji -->
     <Button
-        android:id="@+id/buttonAccept"
+        android:id="@+id/buttonAcceptDanger"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:enabled="true"
-        android:text="Akceptuj" />
-
-    <Button
-        android:id="@+id/buttonReject"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:enabled="true"
-        android:text="Odrzuć" />
-
+        android:text="Akceptuj"
+        android:layout_gravity="end"/>
 </LinearLayout>

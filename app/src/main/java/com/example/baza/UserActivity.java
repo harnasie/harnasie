@@ -289,6 +289,8 @@ public class UserActivity extends AppCompatActivity {
                         danger.put("type", type);
                         danger.put("user", userMap); // Zagnieżdżamy obiekt `userMap` w `danger`
                         danger.put("createdAt", Timestamp.now());
+                        danger.put("accepted", false);
+
 
                         // Zapisujemy dane do kolekcji "dangers" w Firestore
                         db.collection("dangers").add(danger)
