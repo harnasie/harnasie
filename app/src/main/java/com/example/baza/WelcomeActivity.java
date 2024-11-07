@@ -25,6 +25,10 @@ public class WelcomeActivity extends AppCompatActivity {
             Intent signInIntent = new Intent(WelcomeActivity.this, SignInActivity.class);
             startActivity(signInIntent);
         });
+        //KMLDownloader kmlDownloader = new KMLDownloader(this);
+        //kmlDownloader.downloadKMLFiles();
+        //kmlDownloader.viewdownloadKMLFile();
+
     }
 }
 

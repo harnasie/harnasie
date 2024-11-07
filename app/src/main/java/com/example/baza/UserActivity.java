@@ -37,9 +37,8 @@ import java.util.Map;
 
 public class UserActivity extends AppCompatActivity {
     private TextView welcomeTextView;
-    Button btnAddDanger, btnViewDangers, btnDelete, btnMapa;
+    Button btnAddDanger, btnViewDangers, btnDelete, btnMapa, btnTelephone;
     EditText editDescription;
-    DangerDatabaseHelper dbHelper;
     TextView type_tv, description_tv;
     FirebaseFirestore db;
     Spinner sp;
@@ -56,7 +55,6 @@ public class UserActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user);
         setTitle("Konto użytkownika");
 
-        dbHelper = new DangerDatabaseHelper(this);
         // Znalezienie TextView do wyświetlania wiadomości powitalnej
         sp = findViewById(R.id.spinnertype);
         type_tv = findViewById(R.id.type_tv);
@@ -64,11 +62,11 @@ public class UserActivity extends AppCompatActivity {
         welcomeTextView = findViewById(R.id.welcomeTextView);
         btnAddDanger = findViewById(R.id.buttonAddDanger);
         btnViewDangers = findViewById(R.id.buttonViewDangers);
+        btnTelephone = findViewById(R.id.buttonTelephone);
         btnDelete = findViewById(R.id.buttonDelete);
         btnMapa = findViewById(R.id.buttonMapa);
         editDescription = findViewById(R.id.editTextDescription);
         lineChart = findViewById(R.id.lineChart);
-        loadDistanceDataForChart();
         db = FirebaseFirestore.getInstance();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         //checkLocationPermission();
@@ -82,7 +80,7 @@ public class UserActivity extends AppCompatActivity {
         dbHelper.addDistance("Magda", "4000", "2023-09-02");
         dbHelper.addDistance("Magda", "9000", "2023-09-03");
 */
-        Cursor res = dbHelper.getAllDistances();
+/*        Cursor res = dbHelper.getAllDistances();
         // Budujemy stringa zawierającego wszystkie dane
         StringBuilder stringBuffer = new StringBuilder();
         while (res.moveToNext()) {
@@ -91,7 +89,7 @@ public class UserActivity extends AppCompatActivity {
             Log.d("Database", "DISTANCE: " + res.getString(2));
             Log.d("Database", "DAY: " + res.getString(3));
         }
-
+*/
         // Wyświetlenie powitania z nazwą użytkownika
         if (userName != null) {
             welcomeTextView.setText("Witaj, " + userName + "!");
@@ -162,6 +160,14 @@ public class UserActivity extends AppCompatActivity {
             }
         });
 
+        btnTelephone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserActivity.this, TelefonActivity.class);
+                startActivity(intent);
+            }
+        });
+
         btnMapa.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -193,7 +199,7 @@ public class UserActivity extends AppCompatActivity {
     }
 
     // Metoda do wczytywania danych do wykresu
-    private void loadDistanceDataForChart() {
+    /*private void loadDistanceDataForChart() {
         // Pobierz dane dystansów i dat z bazy danych
         Cursor cursor = dbHelper.getAllDistances(); // Zakładam, że masz metodę, która pobiera wszystkie rekordy
         Log.e("dziala", String.valueOf(4));
@@ -262,7 +268,7 @@ public class UserActivity extends AppCompatActivity {
         YAxis rightAxis = lineChart.getAxisRight();
         rightAxis.setEnabled(false); // Wyłączenie prawej osi Y (opcjonalne)
     }
-
+*/
     private void addDanger(String description, String type, String uid) {
         checkLocationPermission();
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

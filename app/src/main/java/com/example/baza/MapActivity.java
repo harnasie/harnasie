@@ -362,8 +362,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
 
-        loadKmlLayers();
-
+        //loadKmlLayers();
+        KMLDownloader kmlDownloader = new KMLDownloader(this, mMap); // 'this' to kontekst, np. Activity
+        kmlDownloader.processKMLFiles();
         Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.home);
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 85, 85, false);
         BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap);

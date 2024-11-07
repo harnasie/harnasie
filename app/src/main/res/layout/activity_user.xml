@@ -84,6 +84,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Mapa" />
+    <Button
+        android:id="@+id/buttonTelephone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Telefony Alarmowe" />
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/lineChart"

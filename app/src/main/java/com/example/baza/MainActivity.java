@@ -33,7 +33,6 @@ import java.util.regex.Pattern;
 public class MainActivity extends AppCompatActivity {
 
     //UserDatabaseHelper dbHelper;
-    DangerDatabaseHelper dbHelper;
     boolean isDeleted;
     EditText editName, editEmail, editDay, editDistance, editUser;
     private static final Pattern EMAIL_PATTERN =
@@ -60,45 +59,7 @@ public class MainActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.buttonLogin);
         btnTelefon = findViewById(R.id.buttonTelefon);
         btnMap = findViewById(R.id.buttonMap);
-        dbHelper = new DangerDatabaseHelper(this);
-        //FirebaseApp.initializeApp(this);
-        //database = new Database(this);
         // Dodawanie użytkownika
-        btnAddUser.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String name = editName.getText().toString();
-                String email = editEmail.getText().toString();
-
-                if (name.isEmpty()) {
-                    Toast.makeText(MainActivity.this, "Pole imię nie może być puste", Toast.LENGTH_SHORT).show();
-                } else if (email.isEmpty()) {
-                    Toast.makeText(MainActivity.this, "Pole email nie może być puste", Toast.LENGTH_SHORT).show();
-                }
-                // Sprawdzanie poprawności formatu e-mail
-                else if (!EMAIL_PATTERN.matcher(email).matches()) {
-                    Toast.makeText(MainActivity.this, "Nieprawidłowy format adresu email", Toast.LENGTH_SHORT).show();
-                } else {
-                    // Jeśli walidacja jest poprawna, dodaj użytkownika do bazy danych Firestore
-                    dbHelper.addUser(name, email);
-
-                    // Obsługa w listenerze w metodzie `addUser`
-                    Toast.makeText(MainActivity.this, "Dodano użytkownika", Toast.LENGTH_SHORT).show();
-                    editName.setText("");
-                    editEmail.setText("");
-                }
-            }
-        });
-
-
-        // Przejście do listy użytkowników
-        btnViewUsers.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ViewUsersActivity.class);
-                startActivity(intent);
-            }
-        });
 
         btnMap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
                 else {
                     // Jeśli walidacja jest poprawna, dodaj użytkownika do bazy danych
                     //boolean isInserted = dbHelper.addDistance(user, distance, day);
-                    dbHelper.addDistance(user,distance,day);
                     Toast.makeText(MainActivity.this, "Dodano zgłoszenie", Toast.LENGTH_SHORT).show();
                     editUser.setText("");
                     editDistance.setText("");
