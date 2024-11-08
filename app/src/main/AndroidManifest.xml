@@ -19,7 +19,6 @@
         <activity
             android:name=".StartActivity"
             android:exported="false" />
-        <activity android:name=".ViewUsersActivity" />
         <activity android:name=".ViewDangerActivity" />
         <activity
             android:name=".MainActivity"
@@ -29,6 +28,7 @@
         <activity android:name=".UserActivity" />
         <activity android:name=".TelefonActivity" />
         <activity android:name=".MapActivity" />
+        <activity android:name=".DangerActivity" />
         <activity android:name=".WelcomeActivity"
             android:exported="true">
             <intent-filter>

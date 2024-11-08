@@ -51,6 +51,10 @@ public class SignUpActivity extends AppCompatActivity {
                             FirebaseUser user = auth.getCurrentUser();
                             if (user != null) {
                                 addUserToFirestore(user.getUid(), email, username);
+                                /*Intent intent = new Intent(SignUpActivity.this, UserActivity.class);
+                                intent.putExtra("username", username);
+                                startActivity(intent);
+                                finish();*/
                             }
                         } else {
                             // Log the error to get details on why sign-up failed
@@ -76,6 +80,7 @@ public class SignUpActivity extends AppCompatActivity {
         db.collection("users").document(uid).set(userMap)
                 .addOnSuccessListener(aVoid ->
                         Toast.makeText(SignUpActivity.this, "User added to Firestore", Toast.LENGTH_SHORT).show()
+
                 )
                 .addOnFailureListener(e -> {
                     // Log the error for debugging

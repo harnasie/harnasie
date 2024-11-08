@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/type_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Typ zagrożenia"
+            android:textSize="16sp"
+            android:layout_marginEnd="20dp"/>
+
+        <Spinner
+            android:id="@+id/spinnertype"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/type_array" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/description_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Opis zagrożenia"
+            android:textSize="16sp"/>
+
+        <EditText
+            android:id="@+id/editTextDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Podaj szczegóły zagrożenia"
+            android:padding="12dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/rectangle_border"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/buttonAddDanger"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Dodaj zgłoszenie" />
+
+    <Button
+        android:id="@+id/buttonViewDangers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pokaż zagłoszenia" />
+
+</LinearLayout>

@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,16 +38,14 @@ import java.util.Map;
 
 public class UserActivity extends AppCompatActivity {
     private TextView welcomeTextView;
-    Button btnAddDanger, btnViewDangers, btnDelete, btnMapa, btnTelephone;
-    EditText editDescription;
-    TextView type_tv, description_tv;
+    Button btnViewDangers, btnGoDanger, btnMapa, btnTelephone, btnDanger;
     FirebaseFirestore db;
-    Spinner sp;
     private LineChart lineChart;
     private LatLng currentLocation = null;
     private FusedLocationProviderClient mFusedLocationClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 101;
     private String uid = null;
+    private LinearLayout routeInputLayout;
 
 
     @Override
@@ -56,17 +55,14 @@ public class UserActivity extends AppCompatActivity {
         setTitle("Konto użytkownika");
 
         // Znalezienie TextView do wyświetlania wiadomości powitalnej
-        sp = findViewById(R.id.spinnertype);
-        type_tv = findViewById(R.id.type_tv);
-        description_tv = findViewById(R.id.description_tv);
         welcomeTextView = findViewById(R.id.welcomeTextView);
-        btnAddDanger = findViewById(R.id.buttonAddDanger);
         btnViewDangers = findViewById(R.id.buttonViewDangers);
         btnTelephone = findViewById(R.id.buttonTelephone);
-        btnDelete = findViewById(R.id.buttonDelete);
+        btnGoDanger = findViewById(R.id.buttonGoDanger);
         btnMapa = findViewById(R.id.buttonMapa);
-        editDescription = findViewById(R.id.editTextDescription);
         lineChart = findViewById(R.id.lineChart);
+        routeInputLayout = findViewById(R.id.route_input_layout);
+        btnDanger = findViewById(R.id.buttonDanger);
         db = FirebaseFirestore.getInstance();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         //checkLocationPermission();
@@ -115,40 +111,11 @@ public class UserActivity extends AppCompatActivity {
         // Odśwież wykres
         lineChart.invalidate();*/
 
-        sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selecteType = parent.getItemAtPosition(position).toString();
-                Log.d("wybrano:", selecteType);            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Niezbędna metoda, ale nie musimy nic robić, jeśli nic nie jest wybrane
-            }
-        });
-
-        btnAddDanger.setOnClickListener(new View.OnClickListener() {
+        btnDanger.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String description = editDescription.getText().toString();
-                //String name = userName;
-                String type = sp.getSelectedItem().toString();
-                if (description.isEmpty()) {
-                    Toast.makeText(UserActivity.this, "Pole opis nie może być puste", Toast.LENGTH_SHORT).show();
-                }
-                // Sprawdzanie poprawności formatu e-mail
-                else {
-                    addDanger(description,type,uid);
-                    // Jeśli walidacja jest poprawna, dodaj użytkownika do bazy danych
-                    /*boolean isInserted = dbHelper.addDanger(type, location, description, name);
-                    if (isInserted) {
-                        Toast.makeText(UserActivity.this, "Dodano zgłoszenie", Toast.LENGTH_SHORT).show();
-                        editDescription.setText("");
-                        editLocation.setText("");
-                    } else {
-                        Toast.makeText(UserActivity.this, "Błąd przy dodawaniu zgłoszenia", Toast.LENGTH_SHORT).show();
-                    }*/
-                }
+                Intent intent = new Intent(UserActivity.this, ViewDangerActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -176,15 +143,11 @@ public class UserActivity extends AppCompatActivity {
             }
         });
 
-        btnDelete.setOnClickListener(new View.OnClickListener() {
+        btnGoDanger.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean isDeleted = getApplicationContext().deleteDatabase("harnas.db");
-                if (isDeleted) {
-                    Toast.makeText(UserActivity.this, "Baza danych została usunięta", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(UserActivity.this, "Błąd przy usuwaniu bazy danych", Toast.LENGTH_SHORT).show();
-                }
+                Intent intent = new Intent(UserActivity.this, DangerActivity.class);
+                startActivity(intent);
             }
         });
 
