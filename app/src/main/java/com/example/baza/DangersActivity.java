@@ -1,5 +1,8 @@
 package com.example.baza;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -43,54 +46,63 @@ public class DangersActivity extends AppCompatActivity {
         btnSaveDanger = findViewById(R.id.btn_submit);
 
         // Button to save danger
-        btnSaveDanger.setOnClickListener(v -> {
-            if (currentUser != null) {
+        btnSaveDanger.setOnClickListener(v -> {saveDangerToDatabase();
+            /*if (currentUser != null) {
                 saveDangerToDatabase();
             } else {
                 Toast.makeText(DangersActivity.this, "User not authenticated.", Toast.LENGTH_SHORT).show();
-            }
+            }*/
         });
 
         // Fetch collections
         fetchCollection("users");
-        fetchCollection("dangers");
+        fetchCollection("dangers"); //user3@gmail.com
     }
 
     private void saveDangerToDatabase() {
-        // Get input data from form
-        String type = etType.getText().toString().trim();
-        String location = etLocation.getText().toString().trim();
-        String description = etDescription.getText().toString().trim();
-        String userId = currentUser.getUid();
-        String timeCreated = String.valueOf(System.currentTimeMillis());
-        boolean accepted = false;
+        Toast.makeText(this, "Rozpoczynam zapis", Toast.LENGTH_SHORT).show();
 
-        if (type.isEmpty() || location.isEmpty() || description.isEmpty()) {
-            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+        if (!isConnectedToInternet()) {
+            Log.d("Brak połączenia z Internetem. Spróbuj ponowni", String.valueOf(4));
+            Toast.makeText(this, "Brak połączenia z Internetem. Spróbuj ponownie później.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Create a new danger map
-        Map<String, Object> dangerData = new HashMap<>();
-        dangerData.put("type", type);
-        dangerData.put("location", location);
-        dangerData.put("description", description);
-        dangerData.put("user", userId);
-        dangerData.put("timeCreated", timeCreated);
-        dangerData.put("accepted", accepted);
+        String type = etType.getText().toString().trim();
+        String location = etLocation.getText().toString().trim();
+        String description = etDescription.getText().toString().trim();
+        Log.d("Brem. Spróbuj ponowni", String.valueOf(4));
 
-        // Add the new danger to the "dangers" collection
-        db.collection("dangers")
-                .add(dangerData)
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(DangersActivity.this, "Danger saved successfully!", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "Danger added with ID: " + documentReference.getId());
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(DangersActivity.this, "Error saving danger", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "Error adding danger", e);
-                });
+        if (type.isEmpty() || location.isEmpty() || description.isEmpty()) {
+            Toast.makeText(this, "Proszę uzupełnić wszystkie pola.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            Map<String, Object> dangerData = new HashMap<>();
+            dangerData.put("type", type);
+            dangerData.put("location", location);
+            dangerData.put("description", description);
+            dangerData.put("user", currentUser.getUid());  // Upewnij się, że `currentUser` nie jest null
+            dangerData.put("timeCreated", String.valueOf(System.currentTimeMillis()));
+            dangerData.put("accepted", false);
+
+            db.collection("dangers")
+                    .add(dangerData)
+                    .addOnSuccessListener(documentReference -> {
+                        Toast.makeText(DangersActivity.this, "Zgłoszenie zapisane pomyślnie!", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "Zgłoszenie dodane z ID: " + documentReference.getId());
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(DangersActivity.this, "Błąd zapisu zgłoszenia", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Błąd dodawania zgłoszenia", e);
+                    });
+        } catch (Exception e) {
+            Toast.makeText(this, "Wystąpił błąd podczas zapisu", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Błąd wewnątrz saveDangerToDatabase", e);
+        }
     }
+
 
     private void fetchCollection(String collectionName) {
         CollectionReference collectionRef = db.collection(collectionName);
@@ -109,4 +121,11 @@ public class DangersActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    private boolean isConnectedToInternet() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
 }

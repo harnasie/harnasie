@@ -8,6 +8,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.speech.tts.TextToSpeech;
@@ -28,6 +29,7 @@ import androidx.fragment.app.FragmentActivity;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -84,6 +86,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.maps.android.PolyUtil;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.data.Geometry;
@@ -121,6 +125,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private List<LatLng> przystanki = new ArrayList<>();
     private List<LatLng> waypointsList = new ArrayList<>();
     private Map<String, Marker> markers = new HashMap<>();
+    private static final String TAG = "KMLDownloader";
+
+    private FirebaseStorage storage;
 
     private int ile = 1;
     private Button btnskad, btndokad, btnstop1, btnstop2, btnstop3;
@@ -363,8 +370,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         mMap.getUiSettings().setCompassEnabled(true);
 
         //loadKmlLayers();
-        KMLDownloader kmlDownloader = new KMLDownloader(this, mMap); // 'this' to kontekst, np. Activity
-        kmlDownloader.processKMLFiles();
+        //KMLDownloader kmlDownloader = new KMLDownloader(this, mMap); // 'this' to kontekst, np. Activity
+        //kmlDownloader.processKMLFiles();
+        //kmlDownloader.copyKMLFilesFromAssets();
+        KLMFiles kmlfiles = new KLMFiles(this,mMap);
+        //downloadAllKMLFiles();
+        kmlfiles.processKMLFiles();
         Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.home);
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 85, 85, false);
         BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap);
@@ -1076,4 +1087,5 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
         return closestPoint;
     }
+
 }
