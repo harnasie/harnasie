@@ -1,3 +1,4 @@
+/*
 package com.example.baza;
 
 import android.content.Context;
@@ -200,3 +201,4 @@ public class KMLDownloader {
 
 
 }
+*/

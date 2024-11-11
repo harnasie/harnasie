@@ -27,7 +27,6 @@
             android:name=".MainActivity"
             android:exported="true">
         </activity>
-        <activity android:name=".LoginActivity" />
         <activity android:name=".UserActivity" />
         <activity android:name=".TelefonActivity" />
         <activity android:name=".MapActivity" />
@@ -41,7 +40,6 @@
         </activity>
         <activity android:name=".SignInActivity"/>
         <activity android:name=".SignUpActivity"/>
-        <activity android:name=".DangersActivity"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

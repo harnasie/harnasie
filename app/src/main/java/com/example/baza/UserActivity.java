@@ -67,10 +67,11 @@ public class UserActivity extends AppCompatActivity {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         //checkLocationPermission();
         // Odbieranie nazwy użytkownika przekazanej z LoginActivity
-        Intent intent = getIntent();
-        String userName = intent.getStringExtra("username");
-        uid = intent.getStringExtra("uid");
+        Intent getintent = getIntent();
+        String userName = getintent.getStringExtra("username");
+        uid = getintent.getStringExtra("uid");
         Log.d("iertyu",uid);
+
         //Cursor res = dbHelper.getAllDistances();
         /*dbHelper.addDistance("Magda", "1000", "2023-09-01");
         dbHelper.addDistance("Magda", "4000", "2023-09-02");
@@ -147,6 +148,7 @@ public class UserActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(UserActivity.this, DangerActivity.class);
+                intent.putExtra("uid",uid);
                 startActivity(intent);
             }
         });

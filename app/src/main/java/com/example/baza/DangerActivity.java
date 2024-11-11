@@ -1,7 +1,11 @@
 package com.example.baza;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -52,8 +56,9 @@ public class DangerActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         Intent intent = getIntent();
-        String userName = intent.getStringExtra("username");
-        uid = intent.getStringExtra("uid");        Log.d("emmmmmmmmm" , String.valueOf(8));
+        //String userName = intent.getStringExtra("username");
+        uid = intent.getStringExtra("uid");
+        Log.d("emmmmmmmmm" , String.valueOf(uid));
         btnViewDangers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,66 +115,118 @@ public class DangerActivity extends AppCompatActivity {
         });
     }
 
-    private void addDanger(String description, String type, String uid) {
-        checkLocationPermission();
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "Brak uprawnień do lokalizacji.", Toast.LENGTH_SHORT).show();
-            return;
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (isInternetAvailable()) {
+            sendStoredDanger();  // Jeśli połączenie jest dostępne, próbujemy wysłać zgłoszenie zapisane lokalnie
         }
-
-        // Pobieramy ostatnią lokalizację
-        mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
-            if (location != null) {
-                currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                Log.d("lokalizacja", String.valueOf(currentLocation));
-
-                // Pobieramy dokument użytkownika, aby uzyskać jego dane
-                db.collection("users").document(uid).get().addOnSuccessListener(userDoc -> {
-                    if (userDoc.exists()) {
-                        // Tworzymy mapę `userMap` z danymi użytkownika
-                        Map<String, Object> userMap = new HashMap<>();
-                        userMap.put("email", userDoc.getString("email"));
-                        userMap.put("username", userDoc.getString("username"));
-                        userMap.put("uid", uid);
-
-                        // Tworzymy mapę danych dla `danger`
-                        Map<String, Object> danger = new HashMap<>();
-                        danger.put("description", description);
-                        danger.put("location", currentLocation);
-                        danger.put("type", type);
-                        danger.put("user", userMap); // Zagnieżdżamy obiekt `userMap` w `danger`
-                        danger.put("createdAt", Timestamp.now());
-                        danger.put("accepted", false);
-
-
-                        // Zapisujemy dane do kolekcji "dangers" w Firestore
-                        db.collection("dangers").add(danger)
-                                .addOnSuccessListener(documentReference -> {
-                                    Toast.makeText(DangerActivity.this, "Dodano zagrożenie z ID: " + documentReference.getId(), Toast.LENGTH_SHORT).show();
-                                    Log.d("Firestore", "Dodano dokument o ID: " + documentReference.getId());
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.e("FirestoreError", "Błąd przy dodawaniu zagrożenia", e);
-                                    Toast.makeText(DangerActivity.this, "Błąd przy dodawaniu zagrożenia: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                });
-                    } else {
-                        Toast.makeText(this, "Nie znaleziono użytkownika.", Toast.LENGTH_SHORT).show();
-                    }
-                }).addOnFailureListener(e -> {
-                    Log.e("FirestoreError", "Błąd przy pobieraniu danych użytkownika", e);
-                    Toast.makeText(this, "Błąd przy pobieraniu danych użytkownika: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
-            } else {
-                Toast.makeText(DangerActivity.this, "Nie można uzyskać bieżącej lokalizacji.", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
+
+    private void addDanger(String description, String type, String uid) {
+        if (!isInternetAvailable()) {
+            // Brak połączenia z internetem - zapisujemy dane lokalnie
+            saveDangerLocally(description, type, uid);
+        } else {
+            // Sprawdzanie uprawnień do lokalizacji
+            checkLocationPermission();
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Brak uprawnień do lokalizacji.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Pobieramy ostatnią lokalizację
+            mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+                if (location != null) {
+                    currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    Log.d("lokalizacja", String.valueOf(currentLocation));
+
+                    // Pobieramy dokument użytkownika, aby uzyskać jego dane
+                    db.collection("users").document(uid).get().addOnSuccessListener(userDoc -> {
+                        if (userDoc.exists()) {
+                            // Tworzymy mapę `userMap` z danymi użytkownika
+                            Map<String, Object> userMap = new HashMap<>();
+                            userMap.put("email", userDoc.getString("email"));
+                            userMap.put("username", userDoc.getString("username"));
+                            userMap.put("uid", uid);
+
+                            // Tworzymy mapę danych dla `danger`
+                            Map<String, Object> danger = new HashMap<>();
+                            danger.put("description", description);
+                            danger.put("location", currentLocation);
+                            danger.put("type", type);
+                            danger.put("user", userMap); // Zagnieżdżamy obiekt `userMap` w `danger`
+                            danger.put("createdAt", Timestamp.now());
+                            danger.put("accepted", false);
+
+                            // Zapisujemy dane do kolekcji "dangers" w Firestore
+                            db.collection("dangers").add(danger)
+                                    .addOnSuccessListener(documentReference -> {
+                                        Toast.makeText(DangerActivity.this, "Dodano zagrożenie z ID: " + documentReference.getId(), Toast.LENGTH_SHORT).show();
+                                        Log.d("Firestore", "Dodano dokument o ID: " + documentReference.getId());
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.e("FirestoreError", "Błąd przy dodawaniu zagrożenia", e);
+                                        Toast.makeText(DangerActivity.this, "Błąd przy dodawaniu zagrożenia: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    });
+                        } else {
+                            Toast.makeText(this, "Nie znaleziono użytkownika.", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(e -> {
+                        Log.e("FirestoreError", "Błąd przy pobieraniu danych użytkownika", e);
+                        Toast.makeText(this, "Błąd przy pobieraniu danych użytkownika: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+                } else {
+                    Toast.makeText(DangerActivity.this, "Nie można uzyskać bieżącej lokalizacji.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
 
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Jeśli brak uprawnienia, prosimy o jego przyznanie
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         }
+    }
+
+    private void sendStoredDanger() {
+        SharedPreferences preferences = getSharedPreferences("danger_data", MODE_PRIVATE);
+        String description = preferences.getString("description", null);
+        String type = preferences.getString("type", null);
+        String uid = preferences.getString("uid", null);
+
+        if (description != null && type != null && uid != null) {
+            long timestamp = preferences.getLong("timestamp", 0);
+            if (System.currentTimeMillis() - timestamp > 60000) {  // Przykładowa logika: jeżeli zgłoszenie było zapisane dłużej niż minutę, to nie wysyłaj
+                return;
+            }
+
+            // Wywołanie addDanger, by spróbować wysłać zgłoszenie do Firestore
+            addDanger(description, type, uid);
+
+            // Po udanym wysłaniu, usuwamy zapisane dane lokalne
+            preferences.edit().clear().apply();
+        }
+    }
+
+    private void saveDangerLocally(String description, String type, String uid) {
+        SharedPreferences preferences = getSharedPreferences("danger_data", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("description", description);
+        editor.putString("type", type);
+        editor.putString("uid", uid);
+        editor.putLong("timestamp", System.currentTimeMillis());
+        editor.apply();
+        Toast.makeText(this, "Brak połączenia z Internetem. Zgłoszenie zapisane lokalnie.", Toast.LENGTH_SHORT).show();
+    }
+
+    private boolean isInternetAvailable() {
+        // Sprawdzanie dostępności internetu
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnected();
     }
 
 }

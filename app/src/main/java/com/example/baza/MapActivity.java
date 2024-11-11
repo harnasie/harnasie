@@ -86,6 +86,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.maps.android.PolyUtil;
@@ -126,6 +128,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private List<LatLng> waypointsList = new ArrayList<>();
     private Map<String, Marker> markers = new HashMap<>();
     private static final String TAG = "KMLDownloader";
+    private FirebaseFirestore db;
 
     private FirebaseStorage storage;
 
@@ -163,6 +166,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
             setTitle("Mapa");
+        db = FirebaseFirestore.getInstance();
 
         // Inicjalizacja mapy
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.id_map);
@@ -376,6 +380,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         KLMFiles kmlfiles = new KLMFiles(this,mMap);
         //downloadAllKMLFiles();
         kmlfiles.processKMLFiles();
+        getAcceptedDangersLocations();
         Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.home);
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 85, 85, false);
         BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap);
@@ -1087,5 +1092,69 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
         return closestPoint;
     }
+
+    private void updateMapWithAcceptedDangers(List<LatLng> locations) {
+        // Załóżmy, że masz instancję GoogleMap
+        for (LatLng location : locations) {
+            // Dodaj marker na mapie dla każdej lokalizacji
+            mMap.addMarker(new MarkerOptions().position(location).title("Zagrożenie"));
+        }
+        // Możesz również przesunąć kamerę na pierwszą lokalizację lub wszystkie
+        if (!locations.isEmpty()) {
+            LatLng firstLocation = locations.get(0);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstLocation, 10));  // Przesuwamy kamerę do pierwszego zgłoszenia
+        }
+    }
+
+    private void getAcceptedDangersLocations() {
+        // Pobieramy kolekcję "dangers" z Firestore
+        db.collection("dangers")
+                .whereEqualTo("accepted", true)  // Filtrujemy tylko zaakceptowane zgłoszenia
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots != null && !queryDocumentSnapshots.isEmpty()) {
+                        // Lista, w której przechowamy lokalizacje zaakceptowanych zgłoszeń
+                        List<LatLng> locations = new ArrayList<>();
+                        // Iterujemy przez dokumenty i wyciągamy lokalizacje
+                        for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            // Sprawdzamy, czy dokument zawiera dane o lokalizacji
+                            if (documentSnapshot.contains("location")) {
+                                Map<String, Object> locationmap = (Map<String, Object>) documentSnapshot.get("location");
+
+                                if (locationmap != null) {
+                                    // Jeśli pole "location" istnieje, pobieramy współrzędne
+                                    double latitude = (double) locationmap.get("latitude");
+                                    double longitude = (double) locationmap.get("longitude");
+
+                                    // Tworzymy LatLng i dodajemy do listy
+                                    LatLng location = new LatLng(latitude, longitude);
+                                    locations.add(location);
+
+                                    // Możemy tu dodać dodatkowe działania z lokalizacjami, np. wyświetlanie na mapie
+                                    Log.d("Accepted Danger", "Location: " + latitude + ", " + longitude);
+                                }
+                            }
+                        }
+
+                        // Po zakończeniu możemy np. wyświetlić lokalizacje na mapie lub zrobić coś innego
+                        if (!locations.isEmpty()) {
+                            // Tutaj możesz zrobić coś z listą lokalizacji
+                            // Na przykład, zaktualizować mapę
+                            updateMapWithAcceptedDangers(locations);
+                        } else {
+                            Toast.makeText(MapActivity.this, "Brak zaakceptowanych zgłoszeń.", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(MapActivity.this, "Brak zgłoszeń w bazie.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(MapActivity.this, "Błąd przy pobieraniu zgłoszeń: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("FirestoreError", "Błąd przy pobieraniu zaakceptowanych zgłoszeń", e);
+                });
+    }
+
+
+
 
 }
