@@ -381,7 +381,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         //downloadAllKMLFiles();
         kmlfiles.processKMLFiles();
         getAcceptedDangersLocations();
-        Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.home);
+        /*Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.home);
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 85, 85, false);
         BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap);
         LatLng schonisko_murowaniec = new LatLng(49.2433878,20.0071087);
@@ -596,10 +596,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 .position(zadniStawPolski)
                 .title("Zadni Staw Polski")
                 .icon(icon)
-                .visible(widocznestawy)));
+                .visible(widocznestawy)));*/
 
     }
-
     private LatLng addMarkerAtCenter(String name) {
         // Pobranie obecnego widoku mapy i dodanie markera
         LatLng center = mMap.getCameraPosition().target;
@@ -847,18 +846,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     }
 
 
-    private void confirmMarkerPosition() {
-        // Pobranie bieżącej pozycji kamery
-        LatLng currentPosition = mMap.getCameraPosition().target;
-        //trasa.add(currentPosition);
-        // Ustawienie współrzędnych markera
-        //markerCoordinates = currentPosition;
-        mMap.addMarker(new MarkerOptions().position(currentPosition).title("Twój Marker"));
-        //Toast.makeText(this, "Marker dodany na: " + markerCoordinates, Toast.LENGTH_SHORT).show();
-
-    }
-
-
     private void drawPolylinesFromKml(KmlLayer kmlLayer) {
         for (KmlContainer container : kmlLayer.getContainers()) {
             for (KmlPlacemark placemark : container.getPlacemarks()) {
@@ -887,147 +874,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 }
             }
         }
-    }
-
-
-    private void loadKmlLayers() {
-        int[] kmlResources = {
-                R.raw.czerwony_nedzowka, R.raw.czerwony_dolina_trzydniowianska, R.raw.czerwony_dolina_panszczyca,
-                R.raw.czerwony_giewont, R.raw.czerwony_dolina_za_bramka, R.raw.czerwony_po_granicy, R.raw.czerwony_nedzowka_przyslo_mietusi,
-                R.raw.czerwony_wolowiec_gaborowa_przelecz,R.raw.czerwony_morskie_oko, R.raw.czerwony_morskie_oko_rysy,
-                R.raw.zielony_czarny_staw_przelecz_pod_chlopkiem, R.raw.zielon_roztoka_wielki_staw,
-                R.raw.zielony_dolinka_kozia, R.raw.zielony_hala_gasienicowa_goly_wierch, R.raw.zielony_dolina_koscieliska_chuda_przelaczka,
-                R.raw.zolty_dolina_bialego, R.raw.zolty_dolina_chocholowsk_hala_ornak, R.raw.zolty_dolina_lejowa,
-                R.raw.zolty_grzes_dolina_chocholowska, R.raw.zolty_przelecz_miedz_kopami, R.raw.zolty_klasztor_albertynow,
-                R.raw.zolty_kasprowy_murowaniec, R.raw.zolty_murowaniec_wielki_staw,
-                R.raw.czarny_gubalowka, R.raw.czarny_zakopane_witow, R.raw.czarny_zakopane_kiry,
-                R.raw.czarn_csg_koscielec, R.raw.czarny_kozie_czuby, R.raw.czarny_schronisko_murowaniec,
-                R.raw.czarny_zleb_kulczynskiego, R.raw.czarny_murowaniec_swinicka_przelecz, R.raw.czarny_dolina_chocholowskiej,
-                R.raw.czarny_jaskinia_mrozna, R.raw.czarny_niedaleko_murowanca, R.raw.czarny_polana_pod_woloszynem,
-                R.raw.czarny_siwa_przelecz, R.raw.czarny_przedni_staw, R.raw.czarny_sarnia_skala, R.raw.czerwony_wrota_chalubinskiego,
-                R.raw.zielony_kasprowy, R.raw.zielony_konczysty_wierch, R.raw.zielony_iwaniacka_przelecz_gaborowa_przelecz,
-                R.raw.zielony_dolina_chocholowska, R.raw.zielony_hala_kondratowa_kopa_kondracka, R.raw.zielony_nosal, R.raw.zielony_przelecz_liliowe,
-                R.raw.niebieski_bobrowiecka_przelecz_do_wolowiec, R.raw.niebieski_kalatowka, R.raw.niebieski_dolina_malej_laki_malolaczniak, R.raw.niebieski_karb,
-                R.raw.niebieski_zawrat_kondracka_przelecz, R.raw.niebieski_palenica, R.raw.niebieski_stoly_do_dolina_koscieliska, R.raw.niebieski_zawrat_moskie_oko
-        };
-
-        // Iteruj przez wszystkie trasy i dodawaj je do mapy
-        for (int i = 0; i < kmlResources.length; i++) {
-            try {
-                // Wczytaj warstwę KML
-                KmlLayer kmlLayer = new KmlLayer(mMap, kmlResources[i], getApplicationContext());
-                kmlLayer.addLayerToMap();
-                kmlLayer.setOnFeatureClickListener(feature -> {
-                    Geometry geometry = feature.getGeometry();
-
-                    KmlLineString lineString = (KmlLineString) geometry;
-                    List<LatLng> points = lineString.getGeometryObject();
-
-                    // Wyświetl nazwę trasy i dodaj marker w pobliżu pierwszego punktu linii
-                    String routeName = feature.getProperty("name");
-
-                    // Ustaw marker w pierwszym punkcie trasy dla przykładu
-                    LatLng firstPoint = points.get(0);
-                    mMap.addMarker(new MarkerOptions().position(firstPoint).title(routeName));});
-                for (KmlContainer container : kmlLayer.getContainers()) {
-                    for (KmlPlacemark placemark : container.getPlacemarks()) {
-                        // Pobierz współrzędne linii
-                        Log.d("KML", "Nazwa: " + placemark.getProperty("name")); // Dodany log
-
-                        if (placemark.getGeometry() instanceof KmlLineString) {
-                            KmlLineString lineString = (KmlLineString) placemark.getGeometry();
-                            List<LatLng> coordinates = lineString.getGeometryObject();
-                            Log.d("KML", coordinates.toString()); // Dodany log
-
-                            // Utwórz Polyline i dodaj ją do mapy
-
-
-                        }
-                    }
-                }
-                drawPolylinesFromKml(kmlLayer);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void loadKmlLayersclick() {
-        int[] kmlResources = {
-                R.raw.czerwony_nedzowka, R.raw.czerwony_dolina_trzydniowianska, R.raw.czerwony_dolina_panszczyca,
-                R.raw.czerwony_giewont, R.raw.czerwony_dolina_za_bramka, R.raw.czerwony_po_granicy, R.raw.czerwony_nedzowka_przyslo_mietusi,
-                R.raw.czerwony_wolowiec_gaborowa_przelecz, R.raw.czerwony_morskie_oko, R.raw.czerwony_morskie_oko_rysy,
-                R.raw.zielony_czarny_staw_przelecz_pod_chlopkiem, R.raw.zielon_roztoka_wielki_staw,
-                R.raw.zielony_dolinka_kozia, R.raw.zielony_hala_gasienicowa_goly_wierch, R.raw.zielony_dolina_koscieliska_chuda_przelaczka,
-                R.raw.zolty_dolina_bialego, R.raw.zolty_dolina_chocholowsk_hala_ornak, R.raw.zolty_dolina_lejowa,
-                R.raw.zolty_grzes_dolina_chocholowska, R.raw.zolty_przelecz_miedz_kopami, R.raw.zolty_klasztor_albertynow,
-                R.raw.zolty_kasprowy_murowaniec, R.raw.zolty_murowaniec_wielki_staw,
-                R.raw.czarny_gubalowka, R.raw.czarny_zakopane_witow, R.raw.czarny_zakopane_kiry,
-                R.raw.czarn_csg_koscielec, R.raw.czarny_kozie_czuby, R.raw.czarny_schronisko_murowaniec,
-                R.raw.czarny_zleb_kulczynskiego, R.raw.czarny_murowaniec_swinicka_przelecz, R.raw.czarny_dolina_chocholowskiej,
-                R.raw.czarny_jaskinia_mrozna, R.raw.czarny_niedaleko_murowanca, R.raw.czarny_polana_pod_woloszynem,
-                R.raw.czarny_siwa_przelecz, R.raw.czarny_przedni_staw, R.raw.czarny_sarnia_skala, R.raw.czerwony_wrota_chalubinskiego,
-                R.raw.zielony_kasprowy, R.raw.zielony_konczysty_wierch, R.raw.zielony_iwaniacka_przelecz_gaborowa_przelecz,
-                R.raw.zielony_dolina_chocholowska, R.raw.zielony_hala_kondratowa_kopa_kondracka, R.raw.zielony_nosal, R.raw.zielony_przelecz_liliowe,
-                R.raw.niebieski_bobrowiecka_przelecz_do_wolowiec, R.raw.niebieski_kalatowka, R.raw.niebieski_dolina_malej_laki_malolaczniak, R.raw.niebieski_karb,
-                R.raw.niebieski_zawrat_kondracka_przelecz, R.raw.niebieski_palenica, R.raw.niebieski_stoly_do_dolina_koscieliska, R.raw.niebieski_zawrat_moskie_oko
-        };
-
-        // Przechowuj wszystkie linie KML w liście
-        List<KmlLayer> kmlLayers = new ArrayList<>();
-
-        // Iteruj przez wszystkie trasy i dodawaj je do mapy
-        for (int kmlResource : kmlResources) {
-            try {
-                // Wczytaj warstwę KML
-                KmlLayer kmlLayer = new KmlLayer(mMap, kmlResource, getApplicationContext());
-                kmlLayer.addLayerToMap();
-
-                // Dodaj warstwę KML do listy
-                kmlLayers.add(kmlLayer);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        // Dodaj nasłuchiwacz kliknięć na mapie
-        mMap.setOnMapClickListener(latLng -> {
-            // Sprawdź, czy kliknięcie jest blisko którejkolwiek z tras
-            Log.d("clikc", String.valueOf(56));
-            for (KmlLayer kmlLayer : kmlLayers) {
-                for (KmlPlacemark placemark : kmlLayer.getPlacemarks()) {
-                    Geometry geometry = placemark.getGeometry();
-
-                    if (geometry instanceof KmlLineString) {
-                        List<LatLng> points = ((KmlLineString) geometry).getGeometryObject();
-
-                        // Sprawdź, czy kliknięcie jest w pobliżu trasy (w odległości 50 metrów)
-                        if (PolyUtil.isLocationOnPath(latLng, points, false, 50.0)) {
-                            // Pobierz nazwę trasy
-                            String routeName = placemark.getProperty("name");
-
-                            // Wyświetl powiadomienie Toast z nazwą trasy
-                            Toast.makeText(this, "Trasa: " + routeName, Toast.LENGTH_SHORT).show();
-                            return; // Zatrzymaj pętlę po znalezieniu pasującej trasy
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-
-
-
-
-    private boolean isPointOnSegment(LatLng point, LatLng start, LatLng end) {
-        double distanceToStart = SphericalUtil.computeDistanceBetween(point, start);
-        double distanceToEnd = SphericalUtil.computeDistanceBetween(point, end);
-        double segmentLength = SphericalUtil.computeDistanceBetween(start, end);
-
-        return distanceToStart + distanceToEnd >= segmentLength - DISTANCE_THRESHOLD_METERS &&
-                distanceToStart + distanceToEnd <= segmentLength + DISTANCE_THRESHOLD_METERS;
     }
 
     private void clearPreviousRoute() {
@@ -1099,11 +945,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             // Dodaj marker na mapie dla każdej lokalizacji
             mMap.addMarker(new MarkerOptions().position(location).title("Zagrożenie"));
         }
-        // Możesz również przesunąć kamerę na pierwszą lokalizację lub wszystkie
-        if (!locations.isEmpty()) {
-            LatLng firstLocation = locations.get(0);
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstLocation, 10));  // Przesuwamy kamerę do pierwszego zgłoszenia
-        }
     }
 
     private void getAcceptedDangersLocations() {
@@ -1153,8 +994,5 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     Log.e("FirestoreError", "Błąd przy pobieraniu zaakceptowanych zgłoszeń", e);
                 });
     }
-
-
-
 
 }

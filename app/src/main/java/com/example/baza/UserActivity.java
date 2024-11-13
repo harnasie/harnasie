@@ -67,10 +67,10 @@ public class UserActivity extends AppCompatActivity {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         //checkLocationPermission();
         // Odbieranie nazwy użytkownika przekazanej z LoginActivity
-        Intent getintent = getIntent();
+        /*Intent getintent = getIntent();
         String userName = getintent.getStringExtra("username");
         uid = getintent.getStringExtra("uid");
-        Log.d("iertyu",uid);
+        Log.d("iertyu",uid);*/
 
         //Cursor res = dbHelper.getAllDistances();
         /*dbHelper.addDistance("Magda", "1000", "2023-09-01");
@@ -88,11 +88,11 @@ public class UserActivity extends AppCompatActivity {
         }
 */
         // Wyświetlenie powitania z nazwą użytkownika
-        if (userName != null) {
+        /*if (userName != null) {
             welcomeTextView.setText("Witaj, " + userName + "!");
         } else {
             welcomeTextView.setText("Witaj, użytkowniku!");
-        }
+        }*/
 
         /*ArrayList<Entry> entries = new ArrayList<>();
         for (int x = -10; x <= 10; x++) {

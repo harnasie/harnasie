@@ -1,6 +1,8 @@
 package com.example.baza;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Environment;
 import android.util.Log;
@@ -8,6 +10,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -19,6 +23,7 @@ import com.google.maps.android.data.kml.KmlContainer;
 import com.google.maps.android.data.kml.KmlLayer;
 import com.google.maps.android.data.kml.KmlLineString;
 import com.google.maps.android.data.kml.KmlPlacemark;
+import com.google.maps.android.data.kml.KmlPoint;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -52,15 +57,15 @@ public class KLMFiles {
         folderRef.listAll()
                 .addOnSuccessListener(listResult -> {
                     for (StorageReference fileRef : listResult.getItems()) {
-                        downloadKMLFile(fileRef);
+                        //downloadKMLFile(fileRef);
                     }
                 })
                 .addOnFailureListener(exception -> Log.e(TAG, "Błąd podczas pobierania listy plików", exception));
     }
 
-    private void downloadKMLFile(StorageReference fileRef) {
-        // Utwórz lokalny folder „szlaki”, jeśli nie istnieje
-        File localDir = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "szlaki");
+    private void downloadKMLFile(StorageReference fileRef, String folderName) {
+        // Utwórz lokalny folder (np. „szlaki” lub „szlaki2”), jeśli nie istnieje
+        File localDir = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), folderName);
         if (!localDir.exists()) {
             localDir.mkdirs();
         }
@@ -70,17 +75,25 @@ public class KLMFiles {
 
         // Pobierz plik z Firebase Storage
         fileRef.getFile(localFile)
-                .addOnSuccessListener(taskSnapshot -> Log.d(TAG, "Pobrano plik: " + fileRef.getName()))
+                .addOnSuccessListener(taskSnapshot -> Log.d(TAG, "Pobrano plik: " + fileRef.getName() + " do folderu: " + folderName))
                 .addOnFailureListener(exception -> Log.e(TAG, "Błąd pobierania pliku: " + fileRef.getName(), exception));
     }
 
-    // Funkcja do pobierania i przetwarzania plików .kml z folderu szlaki
+    // Funkcja do pobierania i przetwarzania plików .kml z folderów szlaki i szlaki2
     public void processKMLFiles() {
-        File szlakiDir = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "szlaki");
+        // Przetwarzaj pliki z folderu „szlaki”
+        processKMLFilesFromFolder("szlaki");
+
+        // Przetwarzaj pliki z folderu „szlaki2”
+        processKMLFilesFromFolderMarker("marker");
+    }
+
+    private void processKMLFilesFromFolder(String folderName) {
+        File folder = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), folderName);
 
         // Sprawdź, czy folder istnieje i jest katalogiem
-        if (szlakiDir.exists() && szlakiDir.isDirectory()) {
-            File[] files = szlakiDir.listFiles();
+        if (folder.exists() && folder.isDirectory()) {
+            File[] files = folder.listFiles();
             if (files != null) {
                 for (File file : files) {
                     // Sprawdź, czy plik jest plikiem .kml
@@ -91,12 +104,36 @@ public class KLMFiles {
                     }
                 }
             } else {
-                Log.d(TAG, "Brak plików w folderze.");
+                Log.d(TAG, "Brak plików w folderze: " + folderName);
             }
         } else {
-            Log.d(TAG, "Folder 'szlaki' nie istnieje lub nie jest katalogiem.");
+            Log.d(TAG, "Folder '" + folderName + "' nie istnieje lub nie jest katalogiem.");
         }
     }
+
+    private void processKMLFilesFromFolderMarker(String folderName) {
+        File folder = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), folderName);
+
+        // Sprawdź, czy folder istnieje i jest katalogiem
+        if (folder.exists() && folder.isDirectory()) {
+            File[] files = folder.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    // Sprawdź, czy plik jest plikiem .kml
+                    if (file.isFile() && file.getName().endsWith(".kml")) {
+                        Log.d(TAG, "Znalazłem plik: " + file.getAbsolutePath());
+                        // Odczytaj zawartość pliku KML
+                        //addMarkerFromKML(file);
+                    }
+                }
+            } else {
+                Log.d(TAG, "Brak plików w folderze: " + folderName);
+            }
+        } else {
+            Log.d(TAG, "Folder '" + folderName + "' nie istnieje lub nie jest katalogiem.");
+        }
+    }
+
 
     // Funkcja do odczytu i przetwarzania pliku .kml
     private void readAndProcessKMLFile(File file) {
@@ -104,24 +141,8 @@ public class KLMFiles {
             FileInputStream fileInputStream = new FileInputStream(file);
             // Wczytaj warstwę KML
             KmlLayer kmlLayer = new KmlLayer(mMap, fileInputStream, context);
-
             // Dodaj warstwę KML do mapy
             kmlLayer.addLayerToMap();
-
-            // Przetwarzaj kliknięcia na elementy KML
-            kmlLayer.setOnFeatureClickListener(feature -> {
-                if (feature.getGeometry() instanceof KmlLineString) {
-                    KmlLineString lineString = (KmlLineString) feature.getGeometry();
-                    List<LatLng> points = lineString.getGeometryObject();
-
-                    // Wyświetl nazwę trasy i dodaj marker w pobliżu pierwszego punktu linii
-                    String routeName = feature.getProperty("name");
-
-                    // Ustaw marker w pierwszym punkcie trasy dla przykładu
-                    LatLng firstPoint = points.get(0);
-                    mMap.addMarker(new MarkerOptions().position(firstPoint).title(routeName));
-                }
-            });
 
             // Iteracja po kontenerach KML i placemarkach
             for (KmlContainer container : kmlLayer.getContainers()) {
@@ -172,5 +193,4 @@ public class KLMFiles {
             Log.e(TAG, "Błąd podczas odczytu pliku: " + e.getMessage());
         }
     }
-
 }
