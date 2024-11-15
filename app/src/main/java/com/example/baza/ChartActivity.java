@@ -14,6 +14,7 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -131,7 +132,16 @@ public class ChartActivity extends AppCompatActivity {
         // Wyłączenie prawej osi Y (jeśli nie jest potrzebna)
         barChart.getAxisRight().setEnabled(false);
 
+        // Dodanie jednostki "km" do osi Y
+        barChart.getAxisLeft().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return value + " km";  // Dodajemy jednostkę km do wartości
+            }
+        });
+
         // Odświeżenie wykresu
         barChart.invalidate();
     }
+
 }
