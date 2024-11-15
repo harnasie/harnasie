@@ -38,7 +38,7 @@ import java.util.Map;
 
 public class UserActivity extends AppCompatActivity {
     private TextView welcomeTextView;
-    Button btnViewDangers, btnGoDanger, btnMapa, btnTelephone, btnDanger;
+    Button btnViewDangers, btnGoDanger, btnMapa, btnTelephone, btnDanger, btnChart;
     FirebaseFirestore db;
     private LineChart lineChart;
     private LatLng currentLocation = null;
@@ -60,17 +60,18 @@ public class UserActivity extends AppCompatActivity {
         btnTelephone = findViewById(R.id.buttonTelephone);
         btnGoDanger = findViewById(R.id.buttonGoDanger);
         btnMapa = findViewById(R.id.buttonMapa);
-        lineChart = findViewById(R.id.lineChart);
+        btnChart = findViewById(R.id.buttonChart);
+        //lineChart = findViewById(R.id.lineChart);
         routeInputLayout = findViewById(R.id.route_input_layout);
         btnDanger = findViewById(R.id.buttonDanger);
         db = FirebaseFirestore.getInstance();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         //checkLocationPermission();
         // Odbieranie nazwy użytkownika przekazanej z LoginActivity
-        /*Intent getintent = getIntent();
+        Intent getintent = getIntent();
         String userName = getintent.getStringExtra("username");
         uid = getintent.getStringExtra("uid");
-        Log.d("iertyu",uid);*/
+        Log.d("iertyu",uid);
 
         //Cursor res = dbHelper.getAllDistances();
         /*dbHelper.addDistance("Magda", "1000", "2023-09-01");
@@ -78,21 +79,14 @@ public class UserActivity extends AppCompatActivity {
         dbHelper.addDistance("Magda", "9000", "2023-09-03");
 */
 /*        Cursor res = dbHelper.getAllDistances();
-        // Budujemy stringa zawierającego wszystkie dane
-        StringBuilder stringBuffer = new StringBuilder();
-        while (res.moveToNext()) {
-            Log.d("Database", "ID: " + res.getString(0));
-            Log.d("Database", "USER: " + res.getString(1));
-            Log.d("Database", "DISTANCE: " + res.getString(2));
-            Log.d("Database", "DAY: " + res.getString(3));
-        }
+
 */
         // Wyświetlenie powitania z nazwą użytkownika
-        /*if (userName != null) {
+        if (userName != null) {
             welcomeTextView.setText("Witaj, " + userName + "!");
         } else {
             welcomeTextView.setText("Witaj, użytkowniku!");
-        }*/
+        }
 
         /*ArrayList<Entry> entries = new ArrayList<>();
         for (int x = -10; x <= 10; x++) {
@@ -124,6 +118,15 @@ public class UserActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(UserActivity.this, ViewDangerActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        btnChart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserActivity.this, ChartActivity.class);
+                intent.putExtra("uid",uid);
                 startActivity(intent);
             }
         });

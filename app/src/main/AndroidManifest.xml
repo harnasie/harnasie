@@ -31,6 +31,7 @@
         <activity android:name=".TelefonActivity" />
         <activity android:name=".MapActivity" />
         <activity android:name=".DangerActivity" />
+        <activity android:name=".ChartActivity" />
         <activity android:name=".WelcomeActivity"
             android:exported="true">
             <intent-filter>

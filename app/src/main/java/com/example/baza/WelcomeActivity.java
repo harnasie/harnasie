@@ -42,7 +42,7 @@ public class WelcomeActivity extends AppCompatActivity {
             //startActivity(signInIntent);
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(WelcomeActivity.this, UserActivity.class);
+                Intent intent = new Intent(WelcomeActivity.this, SignInActivity.class);
                 startActivity(intent);
             }
         });
@@ -78,30 +78,50 @@ public class WelcomeActivity extends AppCompatActivity {
 
         // Sprawdź, czy plik już istnieje lokalnie
         if (localFile.exists()) {
-            // Oblicz hash lokalnego pliku
-            String localFileHash = getFileHash(localFile);
-
-            // Pobierz metadane pliku z Firebase, aby porównać hash
+            // Pobierz metadane pliku z Firebase, aby porównać rozmiary
             fileRef.getMetadata().addOnSuccessListener(metadata -> {
-                // Możesz dodać logikę porównania hash'y, jeśli Firebase przechowuje hash w metadanych
-                // Na przykład załóżmy, że mamy do porównania jakąś wartość z metadanych:
-                String serverFileHash = metadata.getCustomMetadata("hash");  // Przykład: jeśli hash jest zapisany w metadanych
-                if (serverFileHash != null && serverFileHash.equals(localFileHash)) {
+                // Pobierz rozmiar pliku z Firebase
+                long serverFileSize = metadata.getSizeBytes();
+                long localFileSize = localFile.length(); // Rozmiar lokalnego pliku
+
+                // Porównaj rozmiar pliku lokalnego i pliku na serwerze
+                if (serverFileSize == localFileSize) {
                     Log.d(TAG, "Plik jest już aktualny, nie trzeba pobierać: " + fileRef.getName());
                 } else {
-                    // Jeśli hash się różni, pobierz plik
+                    // Jeśli rozmiar się różni, pobierz plik
+                    Log.d(TAG, "Plik różni się od lokalnej wersji, pobieram nową wersję: " + fileRef.getName());
                     downloadFile(fileRef, localFile);
                 }
             }).addOnFailureListener(exception -> {
+                // W przypadku błędu przy pobieraniu metadanych (np. brak metadanych), usuń lokalny plik, jeśli istnieje
                 Log.e(TAG, "Błąd pobierania metadanych dla pliku: " + fileRef.getName(), exception);
-                // Jeśli wystąpił błąd przy pobieraniu metadanych, pobierz plik
+
+                // Jeśli plik nie istnieje na serwerze, usuń lokalny plik
+                if (localFile.exists()) {
+                    localFile.delete();
+                    Log.d(TAG, "Usunięto lokalny plik, ponieważ nie istnieje na serwerze: " + localFile.getName());
+                }
+
+                // Zainicjuj pobieranie pliku, nawet jeśli nie ma go na serwerze
                 downloadFile(fileRef, localFile);
             });
         } else {
-            // Jeśli plik nie istnieje lokalnie, pobierz go
-            downloadFile(fileRef, localFile);
+            // Jeśli plik nie istnieje lokalnie, sprawdź, czy istnieje na serwerze
+            fileRef.getMetadata().addOnSuccessListener(metadata -> {
+                // Pobierz rozmiar pliku z Firebase
+                long serverFileSize = metadata.getSizeBytes();
+                Log.d(TAG, "Plik nie istnieje lokalnie, ale jest na serwerze. Pobieram: " + fileRef.getName());
+                downloadFile(fileRef, localFile);
+            }).addOnFailureListener(exception -> {
+                // Jeśli plik nie istnieje na serwerze, usuń go lokalnie (jeśli istnieje)
+                if (localFile.exists()) {
+                    localFile.delete();
+                    Log.d(TAG, "Usunięto lokalny plik, ponieważ nie istnieje na serwerze: " + localFile.getName());
+                }
+            });
         }
     }
+
 
     private void downloadFile(StorageReference fileRef, File localFile) {
         // Pobierz plik z Firebase Storage
