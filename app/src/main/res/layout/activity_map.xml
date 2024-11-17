@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,11 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+
     <fragment
         android:id="@+id/id_map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
     <ImageView
         android:id="@+id/marker_view1"
@@ -21,49 +21,105 @@
         android:visibility="gone"
         android:layout_alignParentTop="true"
         android:layout_marginTop="300dp"
-        android:layout_marginLeft="300dp"/>
+        android:layout_marginLeft="300dp" />
+
     <RelativeLayout
         android:layout_width="70dp"
         android:layout_height="130dp"
         android:layout_gravity="center"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true">
+
         <ImageView
             android:id="@+id/marker_view"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:src="@drawable/marker_icon"
-            android:visibility="gone"/>
+            android:visibility="gone" />
     </RelativeLayout>
+
+    <Button
+        android:id="@+id/showMenuButton"
+        android:layout_width="57dp"
+        android:layout_height="52dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:drawableBottom="@android:drawable/ic_menu_sort_by_size" />
+
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#D3FFFFFF"
+        android:padding="8dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/topBarText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Wybierz miejsce"
+            android:textSize="18sp"
+            android:gravity="center_vertical" />
+
+        <Button
+            android:id="@+id/topBarButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ustaw"
+            android:textSize="16sp" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/btnRoute"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Wyznacz trase" />
+        android:text="Wyznacz trasę"
+        android:visibility="visible"
+        android:layout_gravity="center_horizontal" />
 
-
-    <Button
-        android:id="@+id/btnSchroniska"
+    <LinearLayout
+        android:id="@+id/menuLayout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnRoute"
-        android:text="Schroniska" />
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone"
+        android:background="#D3FFFFFF">
 
-    <Button
-        android:id="@+id/btnSzczyty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnSchroniska"
-        android:text="Szczyty" />
+        <Button
+            android:id="@+id/userView"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:text="Konto" />
 
-    <Button
-        android:id="@+id/btnStawy"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnSzczyty"
-        android:text="Stawy" />
+        <Button
+            android:id="@+id/buttonTelefon"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:text="Telefony alarmowe" />
 
+        <Button
+            android:id="@+id/danger"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:text="Zagłoś zagrożenie" />
+
+        <Button
+            android:id="@+id/chart"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:text="Wykres" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/route_input_layout"
@@ -85,13 +141,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Skąd"
-                android:focusable="false"/>
-
-            <Button
-                android:id="@+id/button_skad_set"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ustaw" />
+                android:focusable="false" />
         </LinearLayout>
 
         <LinearLayout
@@ -104,17 +154,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="przystanek1"
+                android:hint="Przystanek 1"
                 android:visibility="gone"
-                android:focusable="false"/>
-
-            <Button
-                android:id="@+id/button_stop1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ustaw"
-                android:visibility="gone" />
-
+                android:focusable="false" />
         </LinearLayout>
 
         <LinearLayout
@@ -127,17 +169,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="przystanek2"
+                android:hint="Przystanek 2"
                 android:visibility="gone"
-                android:focusable="false"/>
-
-            <Button
-                android:id="@+id/button_stop2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ustaw"
-                android:visibility="gone" />
-
+                android:focusable="false" />
         </LinearLayout>
 
         <LinearLayout
@@ -150,17 +184,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="przystanek3"
+                android:hint="Przystanek 3"
                 android:visibility="gone"
-                android:focusable="false"/>
-
-            <Button
-                android:id="@+id/button_stop3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ustaw"
-                android:visibility="gone" />
-
+                android:focusable="false" />
         </LinearLayout>
 
         <LinearLayout
@@ -174,15 +200,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Dokąd"
-                android:focusable="false"/>
-
-            <Button
-                android:id="@+id/button_dokad_set"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ustaw" />
+                android:focusable="false" />
         </LinearLayout>
-
 
         <Button
             android:id="@+id/button_stop"
@@ -198,8 +217,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Confirm" />
-
+            android:text="Zatwierdź" />
     </LinearLayout>
 
+    <FrameLayout
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible" />
 </RelativeLayout>

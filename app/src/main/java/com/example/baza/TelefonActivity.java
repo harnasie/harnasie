@@ -6,7 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +19,9 @@ import androidx.appcompat.app.AppCompatActivity;
 public class TelefonActivity extends AppCompatActivity {
 
     private ImageView phone1, phone2, phone3, copy1, copy2, copy3;
+    private LinearLayout menuLayout;
+    private Button btnchart, btnuser, btndanger,btnTelefon, btnMenu;
+    private FrameLayout background;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +41,65 @@ public class TelefonActivity extends AppCompatActivity {
         this.copy1.setOnClickListener(view -> this.copy_phone1());
         this.copy2.setOnClickListener(view -> this.copy_phone2());
         this.copy3.setOnClickListener(view -> this.copy_phone3());
+
+        menuLayout = findViewById(R.id.menuLayout);
+        btnchart = findViewById(R.id.chart);
+        btnuser = findViewById(R.id.userView);
+        btnTelefon = findViewById(R.id.buttonTelefon);
+        btndanger = findViewById(R.id.danger);
+        btnMenu = findViewById(R.id.showMenuButton);
+        background = findViewById(R.id.background);
+
+        background.setOnClickListener(v -> {
+            menuLayout.setVisibility(View.GONE); // Ukrycie menu
+            //background.setVisibility(View.GONE);// Ukrycie tła
+            btnMenu.setVisibility(View.VISIBLE);
+            Log.d("cldsdf","sdfgh");
+        });
+
+        btnMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                menuLayout.setVisibility(View.VISIBLE);
+                btnMenu.setVisibility(View.GONE);
+            }
+        });
+
+
+
+        btnchart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(TelefonActivity.this, ChartActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        btnTelefon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(TelefonActivity.this, TelefonActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+
+        btndanger.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(TelefonActivity.this, DangerActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        btnuser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(TelefonActivity.this, UserActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void call_phone1(){

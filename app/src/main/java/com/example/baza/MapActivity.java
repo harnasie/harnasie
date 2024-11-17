@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -131,14 +132,16 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private Map<String, Marker> markers = new HashMap<>();
     private static final String TAG = "KMLDownloader";
     private FirebaseFirestore db;
-
+    private LinearLayout topBar;
     private FirebaseStorage storage;
-
+    private FrameLayout background;
     private int ile = 1;
-    private Button btnskad, btndokad, btnstop1, btnstop2, btnstop3;
+    private Button btnskad, RouteButton, btndokad, btnstop1, btnstop2, btnstop3;
     private int ileszczyty = 1;
     private int ilestawy = 1;
     private ImageView markerView;
+    private ArrayList<LatLng> trasa = new ArrayList<>();
+    private int[] point = {0, 0, 0, 0, 0};
     private LatLng currentLocation = null, skad_location = null, dokad_location = null,
             stop1_location = null, stop2_location = null, stop3_location = null;
     private long navigationStartTime = 0;
@@ -150,11 +153,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private static final double DISTANCE_THRESHOLD_METERS = 2.0; // 1 meter
     private FusedLocationProviderClient mFusedLocationClient;
     private TextToSpeech tts;
+    private EditText[] stops = {stop1, stop2, stop3};
+    private LinearLayout routeInputLayout,menuLayout,mainLayout;
     private Handler handler;
     private boolean widoczne = false;
     private boolean widoczneszczyty = false;
     private boolean widocznestawy = false;
-    private ArrayList<LatLng> points = new ArrayList<>();
     private LatLng destination = new LatLng(51.27447, 22.55371);// Zakopane
     private LatLng destination1 = new LatLng(49.2598, 19.9667);//20.09156,49.23821
     private List<Polyline> clickedPolylines = new ArrayList<>();
@@ -162,7 +166,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private List<Polyline> routePolylines = new ArrayList<>();
     private Polyline currentRoutePolyline = null;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 101;
-
+    private Button btnchart, btndanger, btnTelefon, btnuser, btnMenu;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -186,7 +190,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
         markerView = findViewById(R.id.marker_view);
 
-        Button SchroniskaButton = findViewById(R.id.btnSchroniska);
+        /*Button SchroniskaButton = findViewById(R.id.btnSchroniska);
         SchroniskaButton.setOnClickListener(v -> {
             ile++;
             Log.d("ile", String.valueOf(ile));
@@ -219,11 +223,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             for (Marker marker : stawy) {
                 marker.setVisible(widoczne);
             }
-        });
+        });*/
         // Inicjalizacja przycisku startu nawigacji
 
-        Button RouteButton = findViewById(R.id.btnRoute);
-        LinearLayout routeInputLayout = findViewById(R.id.route_input_layout);
+
+        RouteButton = findViewById(R.id.btnRoute);
+        routeInputLayout = findViewById(R.id.route_input_layout);
         RouteButton.setOnClickListener(v -> {
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
@@ -243,25 +248,120 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             }
         });
 
+        topBar = findViewById(R.id.topBar);
+        Button topBarButton = findViewById(R.id.topBarButton);
+
+        topBarButton.setOnClickListener(v -> {
+            LatLng stopLocation = null;
+            // Ukrywanie paska i markera po kliknięciu przycisku
+            addMarkerAtCurrentPosition(false);
+            routeInputLayout.setVisibility(View.VISIBLE);
+            for(int i =0; i<point.length; i++){
+                Log.e("iiiii", String.valueOf(point[i]));
+                if(point[i] == 1){
+                    switch (i){
+                        case 0:
+                        {skad_location = addMarkerAtCenter("start");
+                            if(skad_location != null){
+                                skad_et.setText(getCityAndStreetFromCoordinates(skad_location));
+                            }}
+                        point[i] = 0;
+                        break;
+                        case 1:
+                        {dokad_location = addMarkerAtCenter("koniec");
+                            if(dokad_location != null){
+                                dokad_et.setText(getCityAndStreetFromCoordinates(dokad_location));
+                            }}
+                        point[i] = 0;
+                        break;
+                        case 2:
+                        {stopLocation = addMarkerAtCenter("przystanek"+(i-1));
+                            if(stopLocation != null){
+                                stop1.setText(getCityAndStreetFromCoordinates(stopLocation));
+                                waypointsList.add(stopLocation);
+                            }}
+                        point[i] = 0;
+                        break;
+                        case 3:
+                        {stopLocation = addMarkerAtCenter("przystanek"+(i-1));
+                            if(stopLocation != null){
+                                stop2.setText(getCityAndStreetFromCoordinates(stopLocation));
+                                waypointsList.add(stopLocation);
+                            }}
+                        point[i] = 0;
+                        break;
+                        case 4:
+                        {stopLocation = addMarkerAtCenter("przystanek"+(i-1));
+                            if(stopLocation != null){
+                                stop3.setText(getCityAndStreetFromCoordinates(stopLocation));
+                                waypointsList.add(stopLocation);
+                            }}
+                        point[i] = 0;
+                        break;
+                    }
+
+                    //addMarkerAtCurrentPosition(false);
+                }
+            }
+        });
+
         skad_et = findViewById(R.id.place1);
         dokad_et = findViewById(R.id.place2);
-        btnskad = findViewById(R.id.button_skad_set);
-        btnskad.setOnClickListener(v -> {
-            skad_location = addMarkerAtCenter("start");
-            if(skad_location != null){
-                skad_et.setText(getCityAndStreetFromCoordinates(skad_location));
-            }
-            addMarkerAtCurrentPosition(false);
 
+        menuLayout = findViewById(R.id.menuLayout);
+        btnchart = findViewById(R.id.chart);
+        btnuser = findViewById(R.id.userView);
+        btnTelefon = findViewById(R.id.buttonTelefon);
+        btndanger = findViewById(R.id.danger);
+        btnMenu = findViewById(R.id.showMenuButton);
+        background = findViewById(R.id.background);
+        btnMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                menuLayout.setVisibility(View.VISIBLE);
+                btnMenu.setVisibility(View.GONE);
+            }
         });
-        btndokad = findViewById(R.id.button_dokad_set);
-        btndokad.setOnClickListener(v -> {
-            dokad_location = addMarkerAtCenter("koniec");
-            if(dokad_location != null){
-                dokad_et.setText(getCityAndStreetFromCoordinates(dokad_location));
-            }
-            addMarkerAtCurrentPosition(false);
 
+        background.setOnClickListener(v -> {
+            menuLayout.setVisibility(View.GONE); // Ukrycie menu
+            //background.setVisibility(View.GONE);// Ukrycie tła
+            btnMenu.setVisibility(View.VISIBLE);
+            Log.d("cldsdf","sdfgh");
+        });
+
+        btnchart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapActivity.this, ChartActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        btnTelefon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapActivity.this, TelefonActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+
+        btndanger.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapActivity.this, DangerActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        btnuser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapActivity.this, UserActivity.class);
+                startActivity(intent);
+            }
         });
 
         btnconfirm = findViewById(R.id.btnConfirm);
@@ -277,6 +377,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             }
             Log.d("linkurl", url);
             new FetchDirectionsTask().execute(url);
+            RouteButton.setVisibility(View.VISIBLE);
+            routeInputLayout.setVisibility(View.GONE);
             // }
             //});
             //} else {
@@ -287,23 +389,27 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         stop1 = findViewById(R.id.placestop1);
         stop2 = findViewById(R.id.placestop2);
         stop3 = findViewById(R.id.placestop3);
-        btnstop1 = findViewById(R.id.button_stop1);
-        btnstop2 = findViewById(R.id.button_stop2);
-        btnstop3 = findViewById(R.id.button_stop3);
+
 
         skad_et.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addMarkerAtCurrentPosition(true);
+                point[0] = 1;
+                Log.e("skad","skas");
+                routeInputLayout.setVisibility(View.GONE);
             }
-        });
-        dokad_et.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_UP) {
-                addMarkerAtCurrentPosition(true);
-            }
-            return false; // Zwróć false, aby umożliwić dalsze przetwarzanie zdarzenia dotykowego
         });
 
+        dokad_et.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addMarkerAtCurrentPosition(true);
+                point[1] = 1;
+                Log.e("dokad","skas");
+                routeInputLayout.setVisibility(View.GONE);
+            }
+        });
 
         button_addstop = findViewById(R.id.button_stop);
         button_addstop.setOnClickListener(new View.OnClickListener() {
@@ -317,12 +423,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     if (stops[i].getVisibility() == View.GONE) {
                         stops[i].setVisibility(View.VISIBLE);
                         buttons[i].setVisibility(View.VISIBLE);
+                        final int index = i; // Musisz stworzyć lokalną zmienną, aby nie stracić odniesienia w lambdach
                         stops[i].setOnClickListener(v1 -> {
                             addMarkerAtCurrentPosition(true);
+                            point[index+2]=1;
+                            Log.e("przynste", String.valueOf(index+1));
+                            routeInputLayout.setVisibility(View.GONE);
                         });
 
-                        int index = i; // Musisz stworzyć lokalną zmienną, aby nie stracić odniesienia w lambdach
-                        buttons[i].setOnClickListener(v12-> {
+                        /*buttons[i].setOnClickListener(v12-> {
                             LatLng stopLocation = addMarkerAtCenter("przystanek"+(index+1));
                             Log.d("locationnnnnn", String.valueOf(stopLocation));
                             if (stopLocation != null) {
@@ -332,7 +441,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                             }
                             addMarkerAtCurrentPosition(false);
                             Log.d("location", String.valueOf(stopLocation));
-                        });
+                        });*/
                         break; // Wyjdź z pętli po ustawieniu widoczności
                     }
                 }
@@ -690,7 +799,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 if (city != null) {
                     addressString.append(city);
                 } else {
-                    return "Miasto nieznane"; // Jeśli miasto jest niedostępne
+                    return "Nieznane miejsce"; // Jeśli miasto jest niedostępne
                 }
 
                 // Dodanie ulicy, jeśli dostępna
@@ -837,15 +946,18 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private void addMarkerAtCurrentPosition(boolean sign) {
         // Wyświetlenie widoku markera w odpowiedniej pozycji na mapie
         // Przeliczanie współrzędnych GPS na pozycję na ekranie
-        if(sign == true){
+        if (sign) {
             markerView.setVisibility(View.VISIBLE);
-        }
-        else{
+            topBar.setVisibility(View.VISIBLE);
+            RouteButton.setVisibility(View.GONE);
+        } else {
             markerView.setVisibility(View.GONE);
+            topBar.setVisibility(View.GONE);
         }
         markerView.setTranslationX(0); // Przesunięcie w osi X
         markerView.setTranslationY(0);
     }
+
 
 
     private void drawPolylinesFromKml(KmlLayer kmlLayer) {

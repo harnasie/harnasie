@@ -3,6 +3,10 @@ package com.example.baza;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,6 +39,10 @@ import java.util.TimeZone;
 public class ChartActivity extends AppCompatActivity {
     private BarChart barChart;
     private FirebaseFirestore db;
+    private Button btnchart, btnuser, btndanger,btnTelefon, btnMenu;
+    private FrameLayout background;
+    private LinearLayout menuLayout;
+    private String userName = null, uid= null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +51,72 @@ public class ChartActivity extends AppCompatActivity {
         setTitle("Wykres pokonanych dystansów");
         barChart = findViewById(R.id.barChart);
         db = FirebaseFirestore.getInstance();
+        if(userName == null || uid == null){
         Intent getintent = getIntent();
-        String userName = getintent.getStringExtra("username");
-        String uid = getintent.getStringExtra("uid");
+        userName = getintent.getStringExtra("username");
+        uid = getintent.getStringExtra("uid");
         Log.d("iertyu",uid);
-        fetchAndDisplayData(uid);
+        fetchAndDisplayData(uid);}
+
+        menuLayout = findViewById(R.id.menuLayout);
+        btnchart = findViewById(R.id.chart);
+        btnuser = findViewById(R.id.userView);
+        btnTelefon = findViewById(R.id.buttonTelefon);
+        btndanger = findViewById(R.id.danger);
+        btnMenu = findViewById(R.id.showMenuButton);
+        background = findViewById(R.id.background);
+
+        background.setOnClickListener(v -> {
+            menuLayout.setVisibility(View.GONE); // Ukrycie menu
+            //background.setVisibility(View.GONE);// Ukrycie tła
+            btnMenu.setVisibility(View.VISIBLE);
+            Log.d("cldsdf","sdfgh");
+        });
+
+        btnMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                menuLayout.setVisibility(View.VISIBLE);
+                btnMenu.setVisibility(View.GONE);
+            }
+        });
+
+
+
+        btnchart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ChartActivity.this, ChartActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        btnTelefon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ChartActivity.this, TelefonActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+
+        btndanger.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ChartActivity.this, DangerActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        btnuser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ChartActivity.this, UserActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
 
