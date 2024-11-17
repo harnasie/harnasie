@@ -42,7 +42,7 @@ public class DangerActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String uid = null;
     private LinearLayout menuLayout;
-    private Button btnchart, btnuser, btndanger,btnTelefon, btnMenu;
+    private Button btnchart, btnuser, btndanger,btnTelefon, btnmap, btnMenu;
     private FrameLayout background;
 
 
@@ -135,6 +135,14 @@ public class DangerActivity extends AppCompatActivity {
             }
         });
 
+        btnmap = findViewById(R.id.btnmap);
+        btnmap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DangerActivity.this, MapActivity.class);
+                startActivity(intent);
+            }
+        });
 
         background.setOnClickListener(v -> {
             menuLayout.setVisibility(View.GONE); // Ukrycie menu

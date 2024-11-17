@@ -20,7 +20,7 @@ public class TelefonActivity extends AppCompatActivity {
 
     private ImageView phone1, phone2, phone3, copy1, copy2, copy3;
     private LinearLayout menuLayout;
-    private Button btnchart, btnuser, btndanger,btnTelefon, btnMenu;
+    private Button btnchart, btnuser, btndanger,btnmap,btnTelefon, btnMenu;
     private FrameLayout background;
 
     @Override
@@ -49,6 +49,14 @@ public class TelefonActivity extends AppCompatActivity {
         btndanger = findViewById(R.id.danger);
         btnMenu = findViewById(R.id.showMenuButton);
         background = findViewById(R.id.background);
+        btnmap = findViewById(R.id.btnmap);
+                btnmap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(TelefonActivity.this, MapActivity.class);
+                startActivity(intent);
+            }
+        });
 
         background.setOnClickListener(v -> {
             menuLayout.setVisibility(View.GONE); // Ukrycie menu

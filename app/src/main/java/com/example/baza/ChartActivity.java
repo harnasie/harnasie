@@ -39,7 +39,7 @@ import java.util.TimeZone;
 public class ChartActivity extends AppCompatActivity {
     private BarChart barChart;
     private FirebaseFirestore db;
-    private Button btnchart, btnuser, btndanger,btnTelefon, btnMenu;
+    private Button btnchart, btnuser, btndanger,btnTelefon, btnmap,btnMenu;
     private FrameLayout background;
     private LinearLayout menuLayout;
     private String userName = null, uid= null;
@@ -65,6 +65,15 @@ public class ChartActivity extends AppCompatActivity {
         btndanger = findViewById(R.id.danger);
         btnMenu = findViewById(R.id.showMenuButton);
         background = findViewById(R.id.background);
+        btnmap = findViewById(R.id.btnmap);
+
+        btnmap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ChartActivity.this, MapActivity.class);
+                startActivity(intent);
+            }
+        });
 
         background.setOnClickListener(v -> {
             menuLayout.setVisibility(View.GONE); // Ukrycie menu

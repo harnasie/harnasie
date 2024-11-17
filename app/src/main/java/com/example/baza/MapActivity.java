@@ -166,7 +166,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private List<Polyline> routePolylines = new ArrayList<>();
     private Polyline currentRoutePolyline = null;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 101;
-    private Button btnchart, btndanger, btnTelefon, btnuser, btnMenu;
+    private Button btnchart, btndanger, btnTelefon, btnmap, btnuser, btnMenu;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -315,6 +315,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         btndanger = findViewById(R.id.danger);
         btnMenu = findViewById(R.id.showMenuButton);
         background = findViewById(R.id.background);
+        btnmap = findViewById(R.id.btnmap);
+        btnmap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapActivity.this, MapActivity.class);
+                startActivity(intent);
+            }
+        });
         btnMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

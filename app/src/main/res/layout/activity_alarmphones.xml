@@ -31,7 +31,8 @@
         android:orientation="vertical"
         android:padding="8dp"
         android:visibility="gone"
-        android:background="#D3FFFFFF">
+        android:background="#D3FFFFFF"
+        android:elevation="10dp">
 
         <Button
             android:id="@+id/userView"
@@ -50,6 +51,12 @@
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:text="Zagłoś zagrożenie" />
+
+        <Button
+            android:id="@+id/btnmap"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:text="Mapa" />
 
         <Button
             android:id="@+id/chart"

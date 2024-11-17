@@ -48,7 +48,7 @@ public class UserActivity extends AppCompatActivity {
     private String uid = null;
     private LinearLayout routeInputLayout;
     private LinearLayout menuLayout;
-    private Button btnchart, btnuser, btndanger,btnTelefon, btnMenu;
+    private Button btnchart, btnuser, btndanger,btnTelefon,btnmap, btnMenu;
     private FrameLayout background;
     private String userName = null;
 
@@ -62,10 +62,7 @@ public class UserActivity extends AppCompatActivity {
         // Znalezienie TextView do wyświetlania wiadomości powitalnej
         welcomeTextView = findViewById(R.id.welcomeTextView);
         btnViewDangers = findViewById(R.id.buttonViewDangers);
-        btnTelephone = findViewById(R.id.buttonTelephone);
-        btnGoDanger = findViewById(R.id.buttonGoDanger);
         btnMapa = findViewById(R.id.buttonMapa);
-        btnChart = findViewById(R.id.buttonChart);
         //lineChart = findViewById(R.id.lineChart);
         routeInputLayout = findViewById(R.id.route_input_layout);
         btnDanger = findViewById(R.id.buttonDanger);
@@ -119,6 +116,7 @@ public class UserActivity extends AppCompatActivity {
         btndanger = findViewById(R.id.danger);
         btnMenu = findViewById(R.id.showMenuButton);
         background = findViewById(R.id.background);
+        btnmap = findViewById(R.id.btnmap);
         btnMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,7 +132,13 @@ public class UserActivity extends AppCompatActivity {
             Log.d("cldsdf","sdfgh");
         });
 
-
+        btnmap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserActivity.this, MapActivity.class);
+                startActivity(intent);
+            }
+        });
 
         btnViewDangers.setOnClickListener(new View.OnClickListener() {
             @Override
