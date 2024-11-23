@@ -2,74 +2,179 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".MainActivity"
+    android:background="@color/colorBackground">
+
+
+    <TextView
+        android:id="@+id/bottom_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Twoje dystanse"
+        android:textSize="22sp"
+        android:gravity="center"
+        android:textColor="#000000"
+        android:padding="30dp"/>
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/barChart"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
         android:layout_centerInParent="true"
-        android:layout_margin="16dp"/>
-
-
-    <Button
-        android:id="@+id/showMenuButton"
-        android:layout_width="57dp"
-        android:layout_height="52dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
-        android:drawableBottom="@android:drawable/ic_menu_sort_by_size" />
+        android:layout_margin="16dp"
+        android:background="#FFFF"/>
 
     <LinearLayout
-        android:id="@+id/menuLayout"
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:background="#FFFFFF"
+        android:gravity="center">
+
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="8dp"
-        android:visibility="gone"
-        android:background="#D3FFFFFF">
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_margin="8dp">
 
-        <Button
-            android:id="@+id/userView"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Konto" />
-
-        <Button
-            android:id="@+id/buttonTelefon"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Telefony alarmowe" />
-
-        <Button
-            android:id="@+id/danger"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Zagłoś zagrożenie" />
-
-        <Button
+        <ImageButton
             android:id="@+id/btnmap"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Mapa" />
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Button 2"
+            android:src="@drawable/location_pin"
+            app:tint="#ff0000"
+            android:background="?attr/selectableItemBackgroundBorderless" />
 
-        <Button
-            android:id="@+id/chart"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Wykres" />
-
-        <FrameLayout
-            android:id="@+id/background"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="visible" />
+        <TextView
+            android:id="@+id/bottom_btn_1_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mapa"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:textColor="#000000" />
     </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_margin="8dp">
+
+        <ImageButton
+            android:id="@+id/danger"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Button 2"
+            android:src="@drawable/location_pin"
+            app:tint="#ff0000"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:id="@+id/bottom_btn_2_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Zagrożenie"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:textColor="#000000" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_margin="8dp">
+
+        <ImageButton
+            android:id="@+id/buttonTelefon"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Button 2"
+            android:src="@drawable/location_pin"
+            app:tint="#ff0000"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:id="@+id/bottom_btn_3_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pomoc"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:textColor="#000000" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:layout_margin="8dp">
+
+        <ImageButton
+            android:id="@+id/userView"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Button 2"
+            android:src="@drawable/location_pin"
+            app:tint="#ff0000"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:id="@+id/bottom_btn_4_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Konto"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:textColor="#000000" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_margin="8dp">
+
+        <ImageButton
+            android:id="@+id/chart"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Button 2"
+            android:src="@drawable/location_pin"
+            app:tint="#ff0000"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:id="@+id/bottom_btn_5_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Wykres"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:textColor="#000000" />
+    </LinearLayout>
+
+    </LinearLayout>
+
 </RelativeLayout>

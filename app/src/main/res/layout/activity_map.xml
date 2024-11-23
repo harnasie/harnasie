@@ -7,11 +7,86 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
     <fragment
         android:id="@+id/id_map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+
+    <LinearLayout
+        android:id="@+id/spinnerl"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:visibility="gone">
+
+
+        <Spinner
+            android:id="@+id/spinnerszlak"
+            android:layout_width="10dp"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:padding="8dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/chooseszlak"
+            style="@style/ButtonRed"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            android:text="Wybierz"
+            android:layout_margin="8dp"/>
+    </LinearLayout>
+
+
+
+
+    <Button
+        android:id="@+id/googleszlak"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_centerHorizontal="true"
+        android:text="Idz google"
+        style="@style/ButtonRed"
+        android:translationY="40dp"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/szlak_route"
+        android:layout_alignParentBottom="false"
+        android:orientation="horizontal"
+        android:layout_marginTop="600dp"
+        android:gravity="center"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp">
+
+        <Button
+            android:id="@+id/spinner"
+            style="@style/ButtonRed"
+            android:layout_width="200dp"
+            android:layout_weight="1"
+            android:layout_height="50dp"
+            android:layout_marginEnd="10dp"
+            android:text="Wybierz szlak" />
+
+        <Button
+            android:id="@+id/btnRoute"
+            style="@style/ButtonRed"
+            android:layout_weight="1"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:text="Wyznacz trasę"
+            android:layout_marginStart="10dp"/>
+
+    </LinearLayout>
+
+
 
     <ImageView
         android:id="@+id/marker_view1"
@@ -38,26 +113,120 @@
             android:visibility="gone" />
     </RelativeLayout>
 
-    <Button
-        android:id="@+id/showMenuButton"
-        android:layout_width="57dp"
-        android:layout_height="52dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
-        android:drawableBottom="@android:drawable/ic_menu_sort_by_size" />
 
-    <LinearLayout
+    <!---<Button
+        android:id="@+id/btnSchroniska1"
+        android:layout_width="93dp"
+        android:layout_height="81dp"
+        android:text="Schroniska"
+        android:textSize="16sp" /> -->
+
+
+
+    <!--<Button
+        style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+        android:id="@+id/btnSzczyty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/snowed_mountains"
+        />-->
+   <!-- <ImageButton
+        android:id="@+id/btnSzczyty"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="8dp"
+        android:contentDescription="A tiny Android icon"
+        android:scaleType="centerInside"
+        android:src="@drawable/snowed_mountains"
+        app:tint="#ff0000" />
+
+
+    <ImageButton
+        android:id="@+id/btnSchroniska"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="8dp"
+        android:contentDescription="A tiny Android icon"
+        android:scaleType="centerInside"
+        android:src="@drawable/home"
+        app:tint="#ff0000" />
+
+    <ImageButton
+        android:id="@+id/btnStawy"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="8dp"
+        android:contentDescription="A tiny Android icon"
+        android:scaleType="centerInside"
+        android:src="@drawable/location_pin"
+        app:tint="#ff0000" /> -->
+<!--
+        android:background="@drawable/rounded_background" -->
+
+
+
+        <LinearLayout
+            android:id="@+id/menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="1dp"
+            android:padding="0dp">
+
+        <ImageButton
+            android:id="@+id/btnSzczyty"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="8dp"
+            android:contentDescription="A tiny Android icon"
+            android:scaleType="centerInside"
+            android:src="@drawable/snowed_mountains"
+            app:tint="#ff0000" />
+
+        <ImageButton
+            android:id="@+id/btnSchroniska"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="8dp"
+            android:contentDescription="A tiny Android icon"
+            android:scaleType="centerInside"
+            android:src="@drawable/tent"
+            app:tint="#ff0000" />
+
+        <ImageButton
+            android:id="@+id/btnStawy"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="8dp"
+            android:contentDescription="A tiny Android icon"
+            android:scaleType="centerInside"
+            android:src="@drawable/location_pin"
+            app:tint="#ff0000" />
+
+
+            <ImageButton
+                android:id="@+id/btnLayer"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:contentDescription="A tiny Android icon"
+                android:scaleType="centerInside"
+                android:src="@drawable/layer"
+                app:tint="#ff0000" />
+
+    </LinearLayout>
+
+
+
+<LinearLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="#D3FFFFFF"
+        android:background="#FFFFFF"
         android:padding="8dp"
         android:visibility="gone">
 
@@ -67,64 +236,25 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Wybierz miejsce"
-            android:textSize="18sp"
+            android:textSize="20sp"
+            android:textColor="@color/black"
             android:gravity="center_vertical" />
 
         <Button
             android:id="@+id/topBarButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/ButtonRed"
             android:text="Ustaw"
             android:textSize="16sp" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/menuLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:background="#D3FFFFFF"
-        android:elevation="10dp"
-        android:orientation="vertical"
-        android:padding="8dp"
-        android:visibility="gone">
-
-        <Button
-            android:id="@+id/userView"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Konto" />
-
-        <Button
-            android:id="@+id/buttonTelefon"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Telefony alarmowe" />
-
-        <Button
-            android:id="@+id/danger"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Zagłoś zagrożenie" />
-        <Button
-            android:id="@+id/btnmap"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Mapa" />
-
-        <Button
-            android:id="@+id/chart"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Wykres" />
-    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/route_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="#D3FFFFFF"
+        android:background="#FFFFFF"
         android:orientation="vertical"
         android:visibility="gone">
 
@@ -155,6 +285,16 @@
                 android:hint="Przystanek 1"
                 android:visibility="gone"
                 android:focusable="false" />
+
+            <Button
+                android:id="@+id/btnstop1"
+                style="@style/ButtonRed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="usun"
+                android:visibility="gone"/>
+
         </LinearLayout>
 
         <LinearLayout
@@ -170,6 +310,15 @@
                 android:hint="Przystanek 2"
                 android:visibility="gone"
                 android:focusable="false" />
+
+            <Button
+                android:id="@+id/btnstop2"
+                style="@style/ButtonRed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="usun"
+                android:visibility="gone"/>
         </LinearLayout>
 
         <LinearLayout
@@ -185,6 +334,15 @@
                 android:hint="Przystanek 3"
                 android:visibility="gone"
                 android:focusable="false" />
+
+            <Button
+                android:id="@+id/btnstop3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="usun"
+                style="@style/ButtonRed"
+                android:visibility="gone"/>
         </LinearLayout>
 
         <LinearLayout
@@ -201,36 +359,215 @@
                 android:focusable="false" />
         </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:gravity="center"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp">
+
         <Button
             android:id="@+id/button_stop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="16dp"
+            android:layout_width="180dp"
+            android:layout_height="30dp"
+            style="@style/ButtonRed"
+            android:layout_marginEnd="10dp"
+            android:layout_gravity="center"
             android:text="Dodaj przystanek" />
 
         <Button
             android:id="@+id/btnConfirm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ButtonRed"
+            android:layout_width="180dp"
+            android:layout_height="30dp"
             android:layout_gravity="center"
+            android:layout_marginStart="10dp"
             android:text="Zatwierdź" />
     </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/background"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible" >
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/google_clear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="false"
+        android:orientation="horizontal"
+        android:layout_marginTop="600dp"
+        android:gravity="center"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:visibility="gone">
 
         <Button
-            android:id="@+id/btnRoute"
-            android:layout_width="300dp"
+            android:id="@+id/btnRouteclean"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:text="Usuń trasę"
+            android:layout_marginEnd="10dp"
+            style="@style/ButtonRed" />
+
+        <Button
+            android:id="@+id/btn_Google"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:text="Idz google"
+            android:layout_marginStart="10dp"
+            style="@style/ButtonRed"/>
+
+        </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:gravity="center">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Wyznacz trasę"
-            android:translationY="700dp"
-            android:visibility="visible" />
-    </FrameLayout>
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/btnmap"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/location_pin"
+                app:tint="#ff0000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_1_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mapa"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/danger"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/location_pin"
+                app:tint="#ff0000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_2_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Zagrożenie"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/buttonTelefon"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/location_pin"
+                app:tint="#ff0000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_3_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pomoc"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/userView"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/location_pin"
+                app:tint="#ff0000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_4_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Konto"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/chart"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/location_pin"
+                app:tint="#ff0000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_5_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Wykres"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+    </LinearLayout>
 </RelativeLayout>

@@ -14,7 +14,7 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/harnas"
+        android:icon="@mipmap/war"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
@@ -30,6 +30,7 @@
         <activity android:name=".UserActivity" />
         <activity android:name=".TelefonActivity" />
         <activity android:name=".MapActivity" />
+        <activity android:name=".Map1Activity" />
         <activity android:name=".DangerActivity" />
         <activity android:name=".ChartActivity" />
         <activity android:name=".WelcomeActivity"

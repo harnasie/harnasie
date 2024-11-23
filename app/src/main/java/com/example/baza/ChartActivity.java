@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
@@ -39,7 +40,7 @@ import java.util.TimeZone;
 public class ChartActivity extends AppCompatActivity {
     private BarChart barChart;
     private FirebaseFirestore db;
-    private Button btnchart, btnuser, btndanger,btnTelefon, btnmap,btnMenu;
+    private ImageButton btnchart, btnuser, btndanger,btnTelefon, btnmap;
     private FrameLayout background;
     private LinearLayout menuLayout;
     private String userName = null, uid= null;
@@ -58,13 +59,10 @@ public class ChartActivity extends AppCompatActivity {
         Log.d("iertyu",uid);
         fetchAndDisplayData(uid);}
 
-        menuLayout = findViewById(R.id.menuLayout);
         btnchart = findViewById(R.id.chart);
         btnuser = findViewById(R.id.userView);
         btnTelefon = findViewById(R.id.buttonTelefon);
         btndanger = findViewById(R.id.danger);
-        btnMenu = findViewById(R.id.showMenuButton);
-        background = findViewById(R.id.background);
         btnmap = findViewById(R.id.btnmap);
 
         btnmap.setOnClickListener(new View.OnClickListener() {
@@ -74,22 +72,6 @@ public class ChartActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        background.setOnClickListener(v -> {
-            menuLayout.setVisibility(View.GONE); // Ukrycie menu
-            //background.setVisibility(View.GONE);// Ukrycie tła
-            btnMenu.setVisibility(View.VISIBLE);
-            Log.d("cldsdf","sdfgh");
-        });
-
-        btnMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                menuLayout.setVisibility(View.VISIBLE);
-                btnMenu.setVisibility(View.GONE);
-            }
-        });
-
 
 
         btnchart.setOnClickListener(new View.OnClickListener() {
@@ -143,10 +125,15 @@ public class ChartActivity extends AppCompatActivity {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 // Pobieramy wartość "distance"
                                 Double distance = document.getDouble("distance");
+                                Date timeee = document.getDate("date");
 
+                                int day = timeee.getDate();
+                                int month = timeee.getMonth() + 1;
+                                int year = timeee.getYear();
+                                String datad = day + "." + month + "." + year;
                                     // Dodaj dane do wykresu
                                     barEntries.add(new BarEntry(index, distance.floatValue()));
-                                    labels.add(uid); // Dodaj datę jako etykietę
+                                    labels.add(datad); // Dodaj datę jako etykietę
                                     index++;
 
 

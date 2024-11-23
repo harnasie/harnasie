@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
-    android:orientation="vertical"
-    android:padding="16dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorBackground">
+
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="500dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_margin="20dp"
+        android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:background="#FFFFFF">
 
         <TextView
             android:id="@+id/type_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Typ zagrożenia"
-            android:textSize="16sp"
-            android:layout_marginEnd="20dp"/>
+            android:textSize="20sp"
+            android:layout_marginStart="20dp"
+            android:textColor="@color/black"/>
 
         <Spinner
             android:id="@+id/spinnertype"
@@ -28,74 +37,20 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/menuLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:orientation="vertical"
-        android:padding="8dp"
-        android:visibility="gone"
-        android:background="#D3FFFFFF">
 
-        <Button
-            android:id="@+id/userView"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Konto" />
-
-        <Button
-            android:id="@+id/buttonTelefon"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Telefony alarmowe" />
-
-        <Button
-            android:id="@+id/danger"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Zagłoś zagrożenie" />
-
-        <Button
-            android:id="@+id/btnmap"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Mapa" />
-
-        <Button
-            android:id="@+id/chart"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Wykres" />
-    </LinearLayout>
-
-
-    <Button
-        android:id="@+id/showMenuButton"
-        android:layout_width="57dp"
-        android:layout_height="52dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
-        android:drawableBottom="@android:drawable/ic_menu_sort_by_size" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_vertical"
-        android:layout_marginTop="16dp">
+        android:layout_margin="10dp">
 
         <TextView
             android:id="@+id/description_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Opis zagrożenia"
-            android:textSize="16sp"/>
+            android:textSize="20sp"
+            android:textColor="@color/black"/>
 
         <EditText
             android:id="@+id/editTextDescription"
@@ -111,19 +66,170 @@
         android:id="@+id/buttonAddDanger"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Dodaj zgłoszenie" />
+        android:text="Dodaj zgłoszenie"
+        style="@style/ButtonRed"
+        android:layout_margin="10dp"/>
 
     <Button
         android:id="@+id/buttonViewDangers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Pokaż zagłoszenia" />
+        android:text="Pokaż zagłoszenia"
+        style="@style/ButtonRed"
+        android:layout_margin="10dp"/>
 
+    </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/background"
+    <LinearLayout
+        android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible" />
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:background="#FFFFFF"
+        android:gravity="center">
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/btnmap"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/location_pin"
+                app:tint="#ff0000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_1_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mapa"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/danger"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/location_pin"
+                app:tint="#ff0000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_2_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Zagrożenie"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/buttonTelefon"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/location_pin"
+                app:tint="#ff0000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_3_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pomoc"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/userView"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/location_pin"
+                app:tint="#ff0000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_4_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Konto"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/chart"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/location_pin"
+                app:tint="#ff0000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_5_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Wykres"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+</RelativeLayout>

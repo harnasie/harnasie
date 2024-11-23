@@ -17,4 +17,20 @@
         <item name="android:padding">10dp</item> <!-- Padding wewnętrzny przycisku -->
         <item name="android:textSize">16sp</item> <!-- Rozmiar tekstu -->    </style>
 
+
+    <style name="Widget.App.Button.OutlinedButton.IconOnly" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="iconPadding">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+
+    <style name="ButtonRed">
+        <item name="android:background">@color/colorStatusBar</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:radius"><![CDATA[25dp]]></item>
+    </style>
 </resources>

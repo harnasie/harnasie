@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -17,11 +18,15 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -84,11 +89,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -132,10 +139,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private Map<String, Marker> markers = new HashMap<>();
     private static final String TAG = "KMLDownloader";
     private FirebaseFirestore db;
-    private LinearLayout topBar;
+    private LinearLayout topBar, spine, google_clear, szlak_route;
     private FirebaseStorage storage;
-    private FrameLayout background;
+    private String selectedFile;
     private int ile = 1;
+    private Spinner sp;
+    private List<Marker> stawylist = new ArrayList<>();
+    private List<Marker> szczytylist = new ArrayList<>();
+    private List<Marker> schroniskalist = new ArrayList<>();
+    private String url = "";
     private Button btnskad, RouteButton, btndokad, btnstop1, btnstop2, btnstop3;
     private int ileszczyty = 1;
     private int ilestawy = 1;
@@ -164,9 +176,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private List<Polyline> clickedPolylines = new ArrayList<>();
     private List<LatLng> routePoints = new ArrayList<>();
     private List<Polyline> routePolylines = new ArrayList<>();
+    private List<String> szlaki = new ArrayList<>();
+    private List<String> szlakisp = new ArrayList<>();
     private Polyline currentRoutePolyline = null;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 101;
-    private Button btnchart, btndanger, btnTelefon, btnmap, btnuser, btnMenu;
+    //private KLMFiles kmlfiles = new KLMFiles(this,mMap);
+    private Button spiner,chosenSzlak, googlesz, btnMenu,clear, btnGoogle;
+    private ImageButton btnchart, btndanger, btnTelefon, btnmap, btnuser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -189,47 +205,82 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         });
 
         markerView = findViewById(R.id.marker_view);
+        btnGoogle =  findViewById(R.id.btn_Google);
+
 
         /*Button SchroniskaButton = findViewById(R.id.btnSchroniska);
         SchroniskaButton.setOnClickListener(v -> {
-            ile++;
+            KLMFiles kmlFiles = new KLMFiles(this, mMap);
+            LatLng stt = kmlFiles.getRouteStartEnd(selectedFile).get(0);
+            LatLng ennn = kmlFiles.getRouteStartEnd(selectedFile).get(1);
+            Log.d(String.valueOf(stt), String.valueOf(ennn));
+            new FetchDirectionsTask().execute(getDirectionsUrl(stt, ennn));
+            btnGoogle.setVisibility(View.VISIBLE);
+            //openGoogleMapsWithRoute(getDirectionsUrlGoogle(stt, ennn));
+
+            /*ile++;
             Log.d("ile", String.valueOf(ile));
             widoczne = ile % 2 == 0;
 
-            // Zaktualizuj widoczność wszystkich markerów
-            for (Marker marker : schroniska) {
-                marker.setVisible(widoczne);
-            }
-        });
+            KLMFiles kmlfiles = new KLMFiles(this,mMap);
+            //kmlfiles.widoczne = widoczne;
+            kmlfiles.VisibilityMarker("schroniska",widoczne);
+            Log.d("sdfgh", "asdfghj");
+        });*/
 
-        Button SzczytyButton = findViewById(R.id.btnSzczyty);
+        ImageButton SzczytyButton = findViewById(R.id.btnSzczyty);
         SzczytyButton.setOnClickListener(v -> {
             ileszczyty++;
             Log.d("ile", String.valueOf(ileszczyty));
             widoczne = ileszczyty % 2 == 0;
 
             // Zaktualizuj widoczność wszystkich markerów
-            for (Marker marker : szczyty) {
+            for (Marker marker : szczytylist) {
+                Log.d("sdfgh", "list");
                 marker.setVisible(widoczne);
             }
         });
-        Button StawyButton = findViewById(R.id.btnStawy);
+        ImageButton StawyButton = findViewById(R.id.btnStawy);
         StawyButton.setOnClickListener(v -> {
             ilestawy++;
             Log.d("ile", String.valueOf(ilestawy));
             widoczne = ilestawy % 2 == 0;
 
             // Zaktualizuj widoczność wszystkich markerów
-            for (Marker marker : stawy) {
+            for (Marker marker : stawylist) {
+                Log.d("sdfgh", "list");
                 marker.setVisible(widoczne);
             }
-        });*/
-        // Inicjalizacja przycisku startu nawigacji
+        });
 
+        ImageButton SchroniskaButton = findViewById(R.id.btnSchroniska);
+        SchroniskaButton.setOnClickListener(v -> {
+            ile++;
+            Log.d("ile", String.valueOf(ile));
+            widoczne = ile % 2 == 0;
+
+            // Zaktualizuj widoczność wszystkich markerów
+            for (Marker marker : schroniskalist) {
+                Log.d("sdfgh", "list");
+                marker.setVisible(widoczne);
+            }
+        });
+
+        ImageButton LayerButton = findViewById(R.id.btnLayer);
+        LayerButton.setOnClickListener(v -> {
+            if (mMap.getMapType() == GoogleMap.MAP_TYPE_SATELLITE) {
+                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL); // Zmiana na normalny widok
+            } else {
+                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE); // Zmiana na satelitę
+            }
+
+        });
 
         RouteButton = findViewById(R.id.btnRoute);
+        googlesz = findViewById(R.id.googleszlak);
         routeInputLayout = findViewById(R.id.route_input_layout);
         RouteButton.setOnClickListener(v -> {
+            googlesz.setVisibility(View.GONE);
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
                     if (location != null) {
@@ -245,6 +296,69 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 routeInputLayout.setVisibility(View.VISIBLE); // Pokazuje layout
             } else {
                 routeInputLayout.setVisibility(View.GONE); // Ukrywa layout
+            }
+            szlak_route.setVisibility(View.GONE);
+            google_clear.setVisibility(View.GONE);
+        });
+
+        spiner = findViewById(R.id.spinner);
+        clear = findViewById(R.id.btnRouteclean);
+        spiner.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                google_clear.setVisibility(View.GONE);
+                szlak_route.setVisibility(View.GONE);
+                spine = findViewById(R.id.spinnerl);
+                chosenSzlak = findViewById(R.id.chooseszlak);
+                chosenSzlak.setOnClickListener(vv -> {
+                    spine.setVisibility(View.GONE);
+                    szlak_route.setVisibility(View.VISIBLE);
+                    KLMFiles kmlFiles = new KLMFiles(MapActivity.this, mMap);
+                    LatLng stt = kmlFiles.getRouteStartEnd(selectedFile).get(0);
+                    LatLng ennn = kmlFiles.getRouteStartEnd(selectedFile).get(1);
+                    float bearing = calculateBearing(stt, ennn);
+
+                    // Tworzenie pozycji kamery z odpowiednim bearing
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(stt)  // Punkt początkowy
+                            .zoom(25)     // Ustawiona wcześniej wartość zoomu
+                            .bearing(bearing)  // Obrót kamery w stronę punktu ennn
+                            .tilt(45)     // Opcjonalne: pochylanie kamery (wartość w stopniach)
+                            .build();
+
+                    // Przesunięcie kamery
+                    mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                    googlesz.setText(selectedFile);
+                    googlesz.setVisibility(View.VISIBLE);
+                    googlesz.setOnClickListener(vvv -> {
+                        url = getDirectionsUrlGoogle(stt,ennn);
+                        openGoogleMapsWithRoute(url);
+                    });
+                });
+                spine.setVisibility(View.VISIBLE);
+                sp = findViewById(R.id.spinnerszlak);
+                //KLMFiles kmlfiles = new KLMFiles(this, mMap);
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(MapActivity.this, android.R.layout.simple_spinner_item,szlakisp);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                sp.setVisibility(View.VISIBLE);
+                // Ustawienie adaptera do spinnera
+                sp.setAdapter(adapter);
+                //String f = (String) sp.getSelectedItem();
+                //Log.d("sp",f);
+                sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        // Pobieranie wybranego elementu
+                        selectedFile = szlaki.get(position);
+                        Toast.makeText(MapActivity.this, "Wybrano: " + selectedFile, Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        // Obsługa braku wyboru
+                    }
+                });
+
             }
         });
 
@@ -275,7 +389,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                         point[i] = 0;
                         break;
                         case 2:
-                        {stopLocation = addMarkerAtCenter("przystanek"+(i-1));
+                        {stopLocation = addMarkerAtCenter("przystanek "+(i-1));
                             if(stopLocation != null){
                                 stop1.setText(getCityAndStreetFromCoordinates(stopLocation));
                                 waypointsList.add(stopLocation);
@@ -283,7 +397,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                         point[i] = 0;
                         break;
                         case 3:
-                        {stopLocation = addMarkerAtCenter("przystanek"+(i-1));
+                        {stopLocation = addMarkerAtCenter("przystanek "+(i-1));
                             if(stopLocation != null){
                                 stop2.setText(getCityAndStreetFromCoordinates(stopLocation));
                                 waypointsList.add(stopLocation);
@@ -291,7 +405,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                         point[i] = 0;
                         break;
                         case 4:
-                        {stopLocation = addMarkerAtCenter("przystanek"+(i-1));
+                        {stopLocation = addMarkerAtCenter("przystanek "+(i-1));
                             if(stopLocation != null){
                                 stop3.setText(getCityAndStreetFromCoordinates(stopLocation));
                                 waypointsList.add(stopLocation);
@@ -308,13 +422,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         skad_et = findViewById(R.id.place1);
         dokad_et = findViewById(R.id.place2);
 
-        menuLayout = findViewById(R.id.menuLayout);
+        //menuLayout = findViewById(R.id.menuLayout);
         btnchart = findViewById(R.id.chart);
         btnuser = findViewById(R.id.userView);
         btnTelefon = findViewById(R.id.buttonTelefon);
         btndanger = findViewById(R.id.danger);
-        btnMenu = findViewById(R.id.showMenuButton);
-        background = findViewById(R.id.background);
         btnmap = findViewById(R.id.btnmap);
         btnmap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -322,20 +434,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 Intent intent = new Intent(MapActivity.this, MapActivity.class);
                 startActivity(intent);
             }
-        });
-        btnMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                menuLayout.setVisibility(View.VISIBLE);
-                btnMenu.setVisibility(View.GONE);
-            }
-        });
-
-        background.setOnClickListener(v -> {
-            menuLayout.setVisibility(View.GONE); // Ukrycie menu
-            //background.setVisibility(View.GONE);// Ukrycie tła
-            btnMenu.setVisibility(View.VISIBLE);
-            Log.d("cldsdf","sdfgh");
         });
 
         btnchart.setOnClickListener(new View.OnClickListener() {
@@ -372,20 +470,51 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             }
         });
 
-        btnconfirm = findViewById(R.id.btnConfirm);
-        btnconfirm.setOnClickListener(v -> {
-            markerView.setVisibility(View.GONE);
-            String url = "";
-            if(waypointsList == null) {
-                url = getDirectionsUrl(skad_location, dokad_location);
-            }
-            else{
-                url = getDirectionsUrlWITH(skad_location, dokad_location, waypointsList);
+        btnGoogle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(url != ""){
+                    url = getDirectionsUrlGoogle(skad_location,dokad_location);
+                openGoogleMapsWithRoute(url);}
 
             }
+        });
+
+
+
+        btnconfirm = findViewById(R.id.btnConfirm);
+        google_clear = findViewById(R.id.google_clear);
+        szlak_route = findViewById(R.id.szlak_route);
+        btnconfirm.setOnClickListener(v -> {
+            szlak_route.setVisibility(View.GONE);
+            markerView.setVisibility(View.GONE);
+            google_clear.setVisibility(View.VISIBLE);
+            clear.setOnClickListener(vv -> {
+                clearPreviousRoute();
+                String[] markerNames = {"start", "koniec", "przystanek 1", "przystanek 2","przystanek 3"};
+                for (String name : markerNames) {
+                    Marker existingMarker = markers.get(name);
+                    if (existingMarker != null) {
+                        existingMarker.remove();
+                    }
+                }
+                google_clear.setVisibility(View.GONE);
+                szlak_route.setVisibility(View.VISIBLE);
+
+            });
+            if(skad_location != null && dokad_location != null){
+                if(waypointsList == null) {
+                    url = getDirectionsUrl(skad_location, dokad_location);
+                }
+                else{
+                    url = getDirectionsUrlWITH(skad_location, dokad_location, waypointsList);
+
+                }
+            }
+            else {
+                Toast.makeText(this, "Podaj wszystkie dane trasy", Toast.LENGTH_SHORT).show();            }
             Log.d("linkurl", url);
             new FetchDirectionsTask().execute(url);
-            RouteButton.setVisibility(View.VISIBLE);
             routeInputLayout.setVisibility(View.GONE);
             // }
             //});
@@ -419,6 +548,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             }
         });
 
+        btnstop1 = findViewById(R.id.btnstop1);
+        btnstop2 = findViewById(R.id.btnstop2);
+        btnstop3 = findViewById(R.id.btnstop3);
         button_addstop = findViewById(R.id.button_stop);
         button_addstop.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -432,11 +564,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                         stops[i].setVisibility(View.VISIBLE);
                         buttons[i].setVisibility(View.VISIBLE);
                         final int index = i; // Musisz stworzyć lokalną zmienną, aby nie stracić odniesienia w lambdach
-                        stops[i].setOnClickListener(v1 -> {
-                            addMarkerAtCurrentPosition(true);
-                            point[index+2]=1;
-                            Log.e("przynste", String.valueOf(index+1));
-                            routeInputLayout.setVisibility(View.GONE);
+                        buttons[i].setOnClickListener(v1 -> {
+                            stops[index].setVisibility(View.GONE);
+                            buttons[index].setVisibility(View.GONE);
                         });
 
                         /*buttons[i].setOnClickListener(v12-> {
@@ -489,7 +619,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         LatLng initialLocation = new LatLng(49.2992, 19.9496);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, 10));
         mMap.setMyLocationEnabled(true);
-        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(false);
         mMap.getUiSettings().setCompassEnabled(true);
 
         //loadKmlLayers();
@@ -497,227 +627,133 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         //kmlDownloader.processKMLFiles();
         //kmlDownloader.copyKMLFilesFromAssets();
         KLMFiles kmlfiles = new KLMFiles(this,mMap);
+
         //downloadAllKMLFiles();
         kmlfiles.processKMLFiles();
+        Log.d("ileee", "wertu");
+        szlaki = kmlfiles.getSzlaki();
+        for(String file : szlaki){
+            String name = file.substring(0, file.lastIndexOf('.'));
+            String[] parts = name.split("_");
+            name =parts[0] + " z " + parts[1] + " do " ;//+ parts[2];
+            szlakisp.add(name);
+        }
+        Log.d("ileee", String.valueOf(szlaki.size()));
+        szczytylist = kmlfiles.getSzczyty();
+        stawylist = kmlfiles.getStawy();
+        schroniskalist = kmlfiles.getSchroniska();
         getAcceptedDangersLocations();
-        /*Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.home);
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 85, 85, false);
-        BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap);
-        LatLng schonisko_murowaniec = new LatLng(49.2433878,20.0071087);
-        schroniska.add(googleMap.addMarker(new MarkerOptions().position(schonisko_murowaniec).title("Schronisko Murowaniec")
-                .icon(icon).visible(widoczne)));
-        LatLng schonisko_kondratowa = new LatLng(49.2498074,19.9517708);
-        schroniska.add(googleMap.addMarker(new MarkerOptions().position(schonisko_kondratowa).title("Schronisko PTTK Hala Kondratowa")
-                .icon(icon).visible(widoczne)));
-        LatLng schonisko_kalatowki = new LatLng(49.259801,19.966706);
-        schroniska.add(googleMap.addMarker(new MarkerOptions().position(schonisko_kalatowki).title("Hotel Górski PTTK Kalatówki")
-                .icon(icon).visible(widoczne)));
-        LatLng schonisko_ornak = new LatLng(49.2291175,19.8587185);
-        schroniska.add(googleMap.addMarker(new MarkerOptions().position(schonisko_ornak).title("Schronisko PTTK na Hali Ornak")
-                .icon(icon).visible(widoczne)));
-        LatLng schonisko_stawy = new LatLng(49.2133541,20.0491499);
-        schroniska.add(googleMap.addMarker(new MarkerOptions().position(schonisko_stawy).title("Schronisko PTTK w Dolinie Pięciu Stawów Polskich")
-                .icon(icon).visible(widoczne)));
-        LatLng schonisko_oko = new LatLng(49.2013333,20.0712722);
-        schroniska.add(googleMap.addMarker(new MarkerOptions().position(schonisko_oko).title("Schronisko PTTK Morskie Oko")
-                .icon(icon).visible(widoczne)));
-        LatLng schonisko_roztoce = new LatLng(49.2337222,20.095675);
-        schroniska.add(googleMap.addMarker(new MarkerOptions().position(schonisko_roztoce).title("Schronisko im. W. Pola w Roztoce")
-                .snippet("Population: 776733")
-                .icon(icon).visible(widoczne)));
-        LatLng schonisko_chocholowska = new LatLng(49.2360599,19.7874255);
-        schroniska.add(googleMap.addMarker(new MarkerOptions().position(schonisko_chocholowska).title("Schronisko PTTK na Polanie Chochołowskiej")
-                .icon(icon).visible(widoczne)));
-        originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.snowed_mountains);
-        scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 85, 85, false);
-        icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap);
-        LatLng rysy = new LatLng(49.179548, 20.088064);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(rysy)
-                .title("Rysy")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng mnich = new LatLng(49.192500, 20.055000);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(mnich)
-                .title("Mnich")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng swinica = new LatLng(49.219408, 20.009282);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(swinica)
-                .title("Świnica")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng koziWierch = new LatLng(49.218412, 20.028901);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(koziWierch)
-                .title("Kozi Wierch")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-
-        LatLng kasprowyWierch = new LatLng(49.232164, 19.981798);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(kasprowyWierch)
-                .title("Kasprowy Wierch")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng krzesanica = new LatLng(49.232490, 19.912055);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(krzesanica)
-                .title("Krzesanica")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng rakon = new LatLng(49.215934, 19.758468);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(rakon)
-                .title("Rakoń")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng wolowiec = new LatLng(49.207515, 19.763092);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(wolowiec)
-                .title("Wołowiec")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng konczystyWierch = new LatLng(49.205654, 19.807529);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(konczystyWierch)
-                .title("Kończysty Wierch")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng lopata = new LatLng(49.205009, 19.778566);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(lopata)
-                .title("Łopata")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng nosal = new LatLng(49.276698, 19.989603);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(nosal)
-                .title("Nosal")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng miguszowieckiSzczytWielki = new LatLng(49.187222, 20.060000);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(miguszowieckiSzczytWielki)
-                .title("Mięguszowiecki Szczyt Wielki")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng gesiaSzyja = new LatLng(49.259014, 20.076474);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(gesiaSzyja)
-                .title("Gęsia Szyja")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng kopieniecWielki = new LatLng(49.271639, 20.016197);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(kopieniecWielki)
-                .title("Kopieniec Wielki")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng sarniaSkala = new LatLng(49.264735, 19.941708);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(sarniaSkala)
-                .title("Sarnia Skała")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng krokiew = new LatLng(49.267103, 19.964372);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(krokiew)
-                .title("Krokiew (Tatry)")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng kondrackaKopa = new LatLng(49.236256, 19.932193);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(kondrackaKopa)
-                .title("Kondracka Kopa")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng goryczkowaCzuba = new LatLng(49.232354, 19.956923);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(goryczkowaCzuba)
-                .title("Goryczkowa Czuba")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng przeleczZawrat = new LatLng(49.219160, 20.016535);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(przeleczZawrat)
-                .title("Przełęcz Zawrat (2159 m n.p.m.)")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        LatLng giewont = new LatLng(49.251002, 19.934035);
-        szczyty.add(googleMap.addMarker(new MarkerOptions()
-                .position(giewont)
-                .title("Giewont")
-                .icon(icon)
-                .visible(widoczneszczyty)));
-
-        originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.location_pin);
-        scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 85, 85, false);
-        icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap);
-        LatLng czarnyStawPolski = new LatLng(49.204640, 20.025915);
-        stawy.add(googleMap.addMarker(new MarkerOptions()
-                .position(czarnyStawPolski)
-                .title("Czarny Staw Polski")
-                .icon(icon)
-                .visible(widocznestawy)));
-
-        LatLng wielkiStaw = new LatLng(49.208623, 20.039697);
-        stawy.add(googleMap.addMarker(new MarkerOptions()
-                .position(wielkiStaw)
-                .title("Wielki Staw")
-                .icon(icon)
-                .visible(widocznestawy)));
-
-        LatLng morskieOko = new LatLng(49.197141, 20.070087);
-        stawy.add(googleMap.addMarker(new MarkerOptions()
-                .position(morskieOko)
-                .title("Morskie Oko")
-                .icon(icon)
-                .visible(widocznestawy)));
-
-        LatLng czarnyStawPodRysami = new LatLng(49.190285, 20.073716);
-        stawy.add(googleMap.addMarker(new MarkerOptions()
-                .position(czarnyStawPodRysami)
-                .title("Czarny Staw pod Rysami")
-                .icon(icon)
-                .visible(widocznestawy)));
-
-        LatLng dolinaPieciuStawow = new LatLng(49.210956, 20.046530);
-        stawy.add(googleMap.addMarker(new MarkerOptions()
-                .position(dolinaPieciuStawow)
-                .title("Dolina Pięciu Stawów Polskich")
-                .icon(icon)
-                .visible(widocznestawy)));
-
-        LatLng zadniStawPolski = new LatLng(49.213177, 20.013175);
-        stawy.add(googleMap.addMarker(new MarkerOptions()
-                .position(zadniStawPolski)
-                .title("Zadni Staw Polski")
-                .icon(icon)
-                .visible(widocznestawy)));*/
 
     }
+
+    private void openGoogleMapsWithRoute(String url) {
+        Log.d("fghj",url);
+        //url = "https://www.google.com/maps/dir/?api=1&origin=52.2296756,21.0122287&destination=52.406374,16.9251681&travelmode=walking";
+
+        // Tworzymy intent z URL Google Maps
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        intent.setPackage("com.google.android.apps.maps");
+        startActivity(intent);
+
+    }
+
+    private float calculateBearing(LatLng start, LatLng end) {
+        double lat1 = Math.toRadians(start.latitude);
+        double lon1 = Math.toRadians(start.longitude);
+        double lat2 = Math.toRadians(end.latitude);
+        double lon2 = Math.toRadians(end.longitude);
+
+        double dLon = lon2 - lon1;
+
+        double y = Math.sin(dLon) * Math.cos(lat2);
+        double x = Math.cos(lat1) * Math.sin(lat2) -
+                Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+
+        return (float) Math.toDegrees(Math.atan2(y, x));
+    }
+
+
+
+    private void openGoogleMapsRoute() {
+        // Origin, destination, and waypoints (example values)
+        LatLng origin = new LatLng(52.2296756, 21.0122287); // Replace with actual origin
+        LatLng destination = new LatLng(52.406374, 16.9251681); // Replace with actual destination
+        List<LatLng> waypointsList = Arrays.asList(
+                new LatLng(51.107883, 17.038538), // Example waypoint
+                new LatLng(50.064650, 19.944980)  // Example waypoint
+        );
+
+        // Construct URL for Google Maps
+        StringBuilder uriBuilder = new StringBuilder("https://www.google.com/maps/dir/?api=1");
+        uriBuilder.append("&origin=").append(encodeLatLng(origin));
+        uriBuilder.append("&destination=").append(encodeLatLng(destination));
+
+        if (waypointsList != null && !waypointsList.isEmpty()) {
+            uriBuilder.append("&waypoints=");
+            for (int i = 0; i < waypointsList.size(); i++) {
+                uriBuilder.append(encodeLatLng1(waypointsList.get(i)));
+                if (i < waypointsList.size() - 1) {
+                    uriBuilder.append("|");
+                }
+            }
+        }
+
+        uriBuilder.append("&travelmode=walking");
+
+        // Create Intent to open Google Maps
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriBuilder.toString()));
+        intent.setPackage("com.google.android.apps.maps");
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "Google Maps nie jest zainstalowane", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String encodeLatLng1(LatLng latLng) {
+        return latLng.latitude + "," + latLng.longitude;
+    }
+
+
+    private String getDirectionsUrlWITHGoogle(LatLng origin, LatLng dest, List<LatLng> waypointsList) {
+        if (origin == null || dest == null) {
+            throw new IllegalArgumentException("Origin and destination cannot be null");
+        }
+
+        // Parametry początkowy i końcowy
+        String str_origin = "origin=" + encodeLatLng(origin);
+        String str_dest = "destination=" + encodeLatLng(dest);
+        String mode = "mode=walking";
+        String key = "key=AIzaSyC4KaLnKSYLuF9xCyzudGh8DMCB-6HefJA"; // Zmienna do przechowywania klucza API
+
+        // Tworzenie parametru waypoints, jeśli lista punktów pośrednich nie jest pusta
+        String waypoints = "";
+        if (waypointsList != null && !waypointsList.isEmpty()) {
+            StringBuilder waypointsBuilder = new StringBuilder("waypoints=");
+            for (int i = 0; i < waypointsList.size(); i++) {
+                LatLng point = waypointsList.get(i);
+                waypointsBuilder.append(encodeLatLng(point));
+                if (i < waypointsList.size() - 1) {
+                    waypointsBuilder.append("|");
+                }
+            }
+            waypoints = waypointsBuilder.toString();
+        }
+
+        // Składanie wszystkich parametrów do jednego ciągu
+        StringBuilder parametersBuilder = new StringBuilder(str_origin);
+        parametersBuilder.append("&").append(str_dest);
+        parametersBuilder.append("&").append(mode);
+        parametersBuilder.append("&").append(key);
+
+        if (!waypoints.isEmpty()) {
+            parametersBuilder.append("&").append(waypoints);
+        }
+
+        // Zwrócenie pełnego URL-a
+        return "https://maps.googleapis.com/maps/api/directions/json?" + parametersBuilder.toString();
+    }
+
     private LatLng addMarkerAtCenter(String name) {
         // Pobranie obecnego widoku mapy i dodanie markera
         LatLng center = mMap.getCameraPosition().target;
@@ -752,6 +788,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         return "https://maps.googleapis.com/maps/api/directions/json?" + parameters;
     }
 
+    private String getDirectionsUrlGoogle(LatLng origin, LatLng dest) {
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+        String mode = "travelmode=walking";
+        String key = "key=AIzaSyC4KaLnKSYLuF9xCyzudGh8DMCB-6HefJA";
+        String parameters = str_origin + "&" + str_dest + "&" + mode;
+        return "https://www.google.com/maps/dir/?api=1&" + parameters;
+    }
+//String url = "https://www.google.com/maps/dir/?api=1&origin=52.2296756,21.0122287&destination=52.406374,16.9251681&travelmode=walking";
 
     private String getDirectionsUrlWITH(LatLng origin, LatLng dest, List<LatLng> waypointsList) {
         if (origin == null || dest == null) {
@@ -919,7 +964,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
             lineOptions.addAll(points);
             lineOptions.width(15);
-            lineOptions.color(Color.RED);
+            lineOptions.color(Color.MAGENTA);
 
             if (mMap != null) {
                 // Usuń poprzednią trasę
@@ -932,8 +977,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
                 // Ustaw kamerę na ostatni punkt, jeśli punkty są dostępne
                 if (!routePoints.isEmpty()) {
-                    LatLng endPoint = routePoints.get(routePoints.size() - 1); // Ostatni punkt
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(endPoint, 15));
+                    LatLng startPoint = routePoints.get(0); // Ostatni punkt
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startPoint, 15));
                 }
             }
         }
@@ -957,10 +1002,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         if (sign) {
             markerView.setVisibility(View.VISIBLE);
             topBar.setVisibility(View.VISIBLE);
-            RouteButton.setVisibility(View.GONE);
+            szlak_route.setVisibility(View.GONE);
         } else {
             markerView.setVisibility(View.GONE);
             topBar.setVisibility(View.GONE);
+            szlak_route.setVisibility(View.VISIBLE);
+
         }
         markerView.setTranslationX(0); // Przesunięcie w osi X
         markerView.setTranslationY(0);
@@ -1005,6 +1052,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             currentRoutePolyline = null;
         }
         routePoints.clear();
+
     }
 
 

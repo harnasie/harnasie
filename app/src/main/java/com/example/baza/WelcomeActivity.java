@@ -31,10 +31,16 @@ public class WelcomeActivity extends AppCompatActivity {
 
         Button btnSignUp = findViewById(R.id.btn_sign_up);
         Button btnSignIn = findViewById(R.id.btn_sign_in);
+        Button btnMap = findViewById(R.id.btn_map);
 
         btnSignUp.setOnClickListener(v -> {
             Intent signUpIntent = new Intent(WelcomeActivity.this, SignUpActivity.class);
             startActivity(signUpIntent);
+        });
+
+        btnMap.setOnClickListener(v -> {
+            Intent mapIntent = new Intent(WelcomeActivity.this, MapActivity.class);
+            startActivity(mapIntent);
         });
 
         btnSignIn.setOnClickListener(new View.OnClickListener() {

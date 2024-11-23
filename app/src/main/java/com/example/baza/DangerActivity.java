@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -42,8 +43,8 @@ public class DangerActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String uid = null;
     private LinearLayout menuLayout;
-    private Button btnchart, btnuser, btndanger,btnTelefon, btnmap, btnMenu;
     private FrameLayout background;
+    private ImageButton btnchart, btndanger, btnTelefon, btnmap, btnuser;
 
 
     @Override
@@ -125,16 +126,6 @@ public class DangerActivity extends AppCompatActivity {
         btnuser = findViewById(R.id.userView);
         btnTelefon = findViewById(R.id.buttonTelefon);
         btndanger = findViewById(R.id.danger);
-        btnMenu = findViewById(R.id.showMenuButton);
-        background = findViewById(R.id.background);
-        btnMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                menuLayout.setVisibility(View.VISIBLE);
-                btnMenu.setVisibility(View.GONE);
-            }
-        });
-
         btnmap = findViewById(R.id.btnmap);
         btnmap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,22 +134,6 @@ public class DangerActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        background.setOnClickListener(v -> {
-            menuLayout.setVisibility(View.GONE); // Ukrycie menu
-            //background.setVisibility(View.GONE);// Ukrycie tła
-            btnMenu.setVisibility(View.VISIBLE);
-            Log.d("cldsdf","sdfgh");
-        });
-
-        btnMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                menuLayout.setVisibility(View.VISIBLE);
-                btnMenu.setVisibility(View.GONE);
-            }
-        });
-
 
 
         btnchart.setOnClickListener(new View.OnClickListener() {
