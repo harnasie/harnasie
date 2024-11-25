@@ -1,6 +1,7 @@
 package com.example.baza;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -9,6 +10,8 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -26,7 +29,6 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
-        // Inicjalizacja Firebase Storage
         storage = FirebaseStorage.getInstance();
 
         Button btnSignUp = findViewById(R.id.btn_sign_up);
@@ -44,28 +46,33 @@ public class WelcomeActivity extends AppCompatActivity {
         });
 
         btnSignIn.setOnClickListener(new View.OnClickListener() {
-            //Intent signInIntent = new Intent(WelcomeActivity.this, UserActivity.class);
-            //startActivity(signInIntent);
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(WelcomeActivity.this, SignInActivity.class);
                 startActivity(intent);
             }
         });
-        // Wywołanie pobierania plików KML po kliknięciu przycisku
         downloadAllKMLFiles("szlaki");
         downloadAllKMLFiles("marker");
+
+        if (isUserLoggedIn()) {
+            // Użytkownik jest zalogowany, pobierz rolę i przekieruj
+            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            fetchRoleAndRedirect(userId);
+        } else {
+            // Przekieruj na ekran logowania
+            Intent intent = new Intent(this, SignInActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
     public void downloadAllKMLFiles(String filename) {
-        // Odwołanie do folderu, w którym znajdują się pliki KML
         StorageReference folderRef = storage.getReference().child(filename);
 
-        // Pobranie listy plików w folderze
         folderRef.listAll()
                 .addOnSuccessListener(listResult -> {
                     for (StorageReference fileRef : listResult.getItems()) {
-                        // Dla każdego pliku sprawdzamy, czy go pobrać
                         checkAndDownloadFile(fileRef, filename);
                     }
                 })
@@ -73,53 +80,40 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     private void checkAndDownloadFile(StorageReference fileRef, String filename) {
-        // Utwórz lokalny folder, jeśli nie istnieje
         File localDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), filename);
         if (!localDir.exists()) {
             localDir.mkdirs();
         }
 
-        // Utwórz plik w lokalnym folderze z nazwą taką samą jak na Firebase
         File localFile = new File(localDir, fileRef.getName());
 
-        // Sprawdź, czy plik już istnieje lokalnie
         if (localFile.exists()) {
-            // Pobierz metadane pliku z Firebase, aby porównać rozmiary
             fileRef.getMetadata().addOnSuccessListener(metadata -> {
-                // Pobierz rozmiar pliku z Firebase
                 long serverFileSize = metadata.getSizeBytes();
-                long localFileSize = localFile.length(); // Rozmiar lokalnego pliku
+                long localFileSize = localFile.length();
 
-                // Porównaj rozmiar pliku lokalnego i pliku na serwerze
                 if (serverFileSize == localFileSize) {
                     Log.d(TAG, "Plik jest już aktualny, nie trzeba pobierać: " + fileRef.getName());
                 } else {
-                    // Jeśli rozmiar się różni, pobierz plik
                     Log.d(TAG, "Plik różni się od lokalnej wersji, pobieram nową wersję: " + fileRef.getName());
                     downloadFile(fileRef, localFile);
                 }
             }).addOnFailureListener(exception -> {
-                // W przypadku błędu przy pobieraniu metadanych (np. brak metadanych), usuń lokalny plik, jeśli istnieje
                 Log.e(TAG, "Błąd pobierania metadanych dla pliku: " + fileRef.getName(), exception);
 
-                // Jeśli plik nie istnieje na serwerze, usuń lokalny plik
                 if (localFile.exists()) {
                     localFile.delete();
                     Log.d(TAG, "Usunięto lokalny plik, ponieważ nie istnieje na serwerze: " + localFile.getName());
                 }
 
-                // Zainicjuj pobieranie pliku, nawet jeśli nie ma go na serwerze
                 downloadFile(fileRef, localFile);
             });
         } else {
-            // Jeśli plik nie istnieje lokalnie, sprawdź, czy istnieje na serwerze
             fileRef.getMetadata().addOnSuccessListener(metadata -> {
-                // Pobierz rozmiar pliku z Firebase
                 long serverFileSize = metadata.getSizeBytes();
                 Log.d(TAG, "Plik nie istnieje lokalnie, ale jest na serwerze. Pobieram: " + fileRef.getName());
                 downloadFile(fileRef, localFile);
             }).addOnFailureListener(exception -> {
-                // Jeśli plik nie istnieje na serwerze, usuń go lokalnie (jeśli istnieje)
                 if (localFile.exists()) {
                     localFile.delete();
                     Log.d(TAG, "Usunięto lokalny plik, ponieważ nie istnieje na serwerze: " + localFile.getName());
@@ -130,28 +124,24 @@ public class WelcomeActivity extends AppCompatActivity {
 
 
     private void downloadFile(StorageReference fileRef, File localFile) {
-        // Pobierz plik z Firebase Storage
         fileRef.getFile(localFile)
                 .addOnSuccessListener(taskSnapshot -> {
-                    // Sprawdź, czy plik został pobrany
                     if (localFile.exists()) {
                         Log.d(TAG, "Pobrano plik: " + fileRef.getName());
                     } else {
                         Log.e(TAG, "Plik nie istnieje po pobraniu, usuwam: " + fileRef.getName());
-                        localFile.delete();  // Usuwamy plik, jeśli nie istnieje po pobraniu
+                        localFile.delete();
                     }
                 })
                 .addOnFailureListener(exception -> {
                     Log.e(TAG, "Błąd pobierania pliku: " + fileRef.getName(), exception);
-                    // Jeśli wystąpił błąd, usuń plik, jeśli istnieje
                     if (localFile.exists()) {
                         Log.e(TAG, "Usuwam plik, ponieważ wystąpił błąd: " + fileRef.getName());
-                        localFile.delete();  // Usuwamy plik, jeśli wystąpił błąd
+                        localFile.delete();
                     }
                 });
     }
 
-    // Funkcja pomocnicza do obliczania hash'a pliku
     private String getFileHash(File file) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -172,6 +162,29 @@ public class WelcomeActivity extends AppCompatActivity {
             Log.e(TAG, "Błąd obliczania hash'a pliku: " + e.getMessage());
             return null;
         }
+    }
+
+    private boolean isUserLoggedIn() {
+        SharedPreferences preferences = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        return preferences.getBoolean("isLoggedIn", false);
+    }
+
+    private void fetchRoleAndRedirect(String userId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String role = documentSnapshot.getString("role");
+                        Intent intent;
+                        if ("admin".equalsIgnoreCase(role)) {
+                            intent = new Intent(this, AdminMenuActivity.class);
+                        } else {
+                            intent = new Intent(this, UserActivity.class);
+                        }
+                        startActivity(intent);
+                        finish();
+                    }
+                });
     }
 
 }

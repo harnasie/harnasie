@@ -361,7 +361,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
             }
         });
-
+/*
         topBar = findViewById(R.id.topBar);
         Button topBarButton = findViewById(R.id.topBarButton);
 
@@ -434,7 +434,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 Intent intent = new Intent(MapActivity.this, MapActivity.class);
                 startActivity(intent);
             }
-        });
+        });*/
 
         btnchart.setOnClickListener(new View.OnClickListener() {
             @Override

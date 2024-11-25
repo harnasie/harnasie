@@ -76,6 +76,7 @@ public class SignUpActivity extends AppCompatActivity {
         userMap.put("email", email);
         userMap.put("username", username);
         userMap.put("uid", uid);
+        userMap.put("role", "user");
 
         db.collection("users").document(uid).set(userMap)
                 .addOnSuccessListener(aVoid ->

@@ -2,9 +2,12 @@ package com.example.baza;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.content.SharedPreferences;
+
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -40,11 +43,29 @@ public class SignInActivity extends AppCompatActivity {
                 return;
             }
 
-            // Sign in with Firebase Authentication
             auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
                         if (task.isSuccessful()) {
+                            setLoggedInState(true);
                             FirebaseUser user = auth.getCurrentUser();
+                            String userId = auth.getCurrentUser().getUid();
+                            db.collection("users").document(userId).get()
+                                    .addOnSuccessListener(documentSnapshot -> {
+                                        if (documentSnapshot.exists()) {
+                                            String role = documentSnapshot.getString("role");
+                                            Log.d("DEBUG", "Rola użytkownika: " + role);
+                                            if ("admin".equalsIgnoreCase(role)) {
+                                                Log.d("DEBUG", "POSZLO");
+                                                Intent intent = new Intent(SignInActivity.this, AdminMenuActivity.class);
+                                                startActivity(intent);
+                                                finish();
+                                            } else {
+                                                Intent intent = new Intent(SignInActivity.this, UserActivity.class);
+                                                startActivity(intent);
+                                                finish();
+                                            }
+                                        }
+                                    });
                             if (user != null) {
                                 fetchUsernameFromFirestore(user.getUid());
                             }
@@ -62,12 +83,22 @@ public class SignInActivity extends AppCompatActivity {
                         DocumentSnapshot document = task.getResult();
                         if (document != null && document.exists()) {
                             String username = document.getString("username");
+                            String role = document.getString("role");
                             String id = document.getId();
-                            // Redirect to HomeActivity, passing the username
-                            Intent intent = new Intent(SignInActivity.this, UserActivity.class);
-                            intent.putExtra("username", username);
-                            intent.putExtra("uid",id);
-                            startActivity(intent);
+
+                            if ("admin".equalsIgnoreCase(role)) {
+                                // Przekierowanie do widoku administratora
+                                Intent intent = new Intent(SignInActivity.this, AdminMenuActivity.class);
+                                intent.putExtra("username", username);
+                                intent.putExtra("uid", id);
+                                startActivity(intent);
+                            } else {
+                                // Przekierowanie do widoku zwykłego użytkownika
+                                Intent intent = new Intent(SignInActivity.this, UserActivity.class);
+                                intent.putExtra("username", username);
+                                intent.putExtra("uid", id);
+                                startActivity(intent);
+                            }
                             finish();
                         } else {
                             Toast.makeText(SignInActivity.this, "User profile not found", Toast.LENGTH_SHORT).show();
@@ -76,5 +107,12 @@ public class SignInActivity extends AppCompatActivity {
                         Toast.makeText(SignInActivity.this, "Failed to retrieve username", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void setLoggedInState(boolean state) {
+        SharedPreferences preferences = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("isLoggedIn", state);
+        editor.apply();
     }
 }

@@ -42,6 +42,8 @@
         </activity>
         <activity android:name=".SignInActivity"/>
         <activity android:name=".SignUpActivity"/>
+        <activity android:name=".AdminMenuActivity"/>
+        <activity android:name=".AdminUploadActivity"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

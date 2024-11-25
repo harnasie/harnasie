@@ -33,7 +33,7 @@
             android:id="@+id/danger"
             android:layout_width="match_parent"
             android:layout_height="80dp"
-            android:text="Zagłoś zagrożenie" />
+            android:text="Zgłoś zagrożenie" />
 
         <Button
             android:id="@+id/btnmap"
@@ -76,7 +76,7 @@
         android:id="@+id/buttonViewDangers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Pokaż zagłoszenia" />
+        android:text="Pokaż zgłoszenia" />
 
 
     <Button
