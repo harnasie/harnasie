@@ -15,7 +15,7 @@ import com.google.firebase.storage.StorageReference;
 
 public class AdminUploadActivity extends AppCompatActivity {
 
-    private Button openMyMapsButton, selectFileButton, uploadFileButton;
+    private Button openMyMapsButton, selectFileButton, uploadFileButton, openConverterButton;
     private static final int PICK_FILE_REQUEST = 1;
     private Uri fileUri;
 
@@ -27,6 +27,7 @@ public class AdminUploadActivity extends AppCompatActivity {
         openMyMapsButton = findViewById(R.id.openMyMapsButton);
         selectFileButton = findViewById(R.id.selectFileButton);
         uploadFileButton = findViewById(R.id.uploadFileButton);
+        openConverterButton = findViewById(R.id.openConverterButton); // Nowy przycisk
 
         openMyMapsButton.setOnClickListener(v -> {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/d/u/0/"));
@@ -40,13 +41,18 @@ public class AdminUploadActivity extends AppCompatActivity {
             startActivityForResult(Intent.createChooser(intent, "Wybierz plik KML"), PICK_FILE_REQUEST);
         });
 
-
         uploadFileButton.setOnClickListener(v -> {
             if (fileUri != null) {
                 uploadFileToFirebase(fileUri);
             } else {
                 Toast.makeText(this, "Nie wybrano pliku!", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        // Akcja dla nowego przycisku
+        openConverterButton.setOnClickListener(v -> {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://mygeodata.cloud/converter/"));
+            startActivity(browserIntent);
         });
     }
 
@@ -66,7 +72,6 @@ public class AdminUploadActivity extends AppCompatActivity {
             }
         }
     }
-
 
     private void uploadFileToFirebase(Uri fileUri) {
         FirebaseStorage storage = FirebaseStorage.getInstance();

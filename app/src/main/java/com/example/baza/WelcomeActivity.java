@@ -7,10 +7,12 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -55,16 +57,22 @@ public class WelcomeActivity extends AppCompatActivity {
         downloadAllKMLFiles("szlaki");
         downloadAllKMLFiles("marker");
 
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (isUserLoggedIn()) {
-            // Użytkownik jest zalogowany, pobierz rolę i przekieruj
-            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            fetchRoleAndRedirect(userId);
+            SharedPreferences preferences = getSharedPreferences("app_prefs", MODE_PRIVATE);
+            String userId = preferences.getString("userId", null);
+
+            if (userId != null) {
+                fetchRoleAndRedirect(userId); // Wszystko obsługiwane w tej funkcji
+            } else {
+                Log.e(TAG, "Nie można znaleźć userId w SharedPreferences, wylogowuję...");
+                logOutUser();
+            }
         } else {
-            // Przekieruj na ekran logowania
-            Intent intent = new Intent(this, SignInActivity.class);
-            startActivity(intent);
-            finish();
+            Log.d(TAG, "Użytkownik nie jest zalogowany, przekierowanie do ekranu logowania.");
         }
+
+
     }
 
     public void downloadAllKMLFiles(String filename) {
@@ -169,22 +177,60 @@ public class WelcomeActivity extends AppCompatActivity {
         return preferences.getBoolean("isLoggedIn", false);
     }
 
+
     private void fetchRoleAndRedirect(String userId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+
         db.collection("users").document(userId).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
+                        // Pobranie roli i nazwy użytkownika z dokumentu
                         String role = documentSnapshot.getString("role");
-                        Intent intent;
-                        if ("admin".equalsIgnoreCase(role)) {
-                            intent = new Intent(this, AdminMenuActivity.class);
-                        } else {
-                            intent = new Intent(this, UserActivity.class);
-                        }
-                        startActivity(intent);
-                        finish();
+                        String username = documentSnapshot.getString("username");
+
+                        // Przekierowanie do odpowiedniej aktywności z przekazaniem userId i username
+                        redirectToActivity(role, username, userId);
+                    } else {
+                        // Jeśli dokument użytkownika nie istnieje
+                        Toast.makeText(this, "User profile not found", Toast.LENGTH_SHORT).show();
                     }
+                })
+                .addOnFailureListener(e -> {
+                    // Obsługa błędu w przypadku niepowodzenia zapytania
+                    Log.e("FetchRole", "Error fetching user data: " + e.getMessage());
+                    Toast.makeText(this, "Error fetching user data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    private void redirectToActivity(String role, String username, String userId) {
+        Intent intent;
+
+
+        if ("admin".equalsIgnoreCase(role)) {
+            intent = new Intent(this, AdminMenuActivity.class);
+        } else {
+            intent = new Intent(this, UserActivity.class);
+        }
+
+        intent.putExtra("username", username);
+        intent.putExtra("userId", userId);
+        startActivity(intent);
+        finish();
+    }
+
+
+
+    private void logOutUser() {
+        FirebaseAuth.getInstance().signOut();
+        SharedPreferences preferences = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.apply();
+
+        Intent intent = new Intent(this, WelcomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
 }

@@ -442,7 +442,7 @@
                 android:layout_height="38dp"
                 android:scaleType="centerInside"
                 android:contentDescription="Button 2"
-                android:src="@drawable/location_pin"
+                android:src="@drawable/map"
                 app:tint="#ff0000"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
@@ -471,7 +471,7 @@
                 android:layout_height="38dp"
                 android:scaleType="centerInside"
                 android:contentDescription="Button 2"
-                android:src="@drawable/location_pin"
+                android:src="@drawable/warning"
                 app:tint="#ff0000"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
@@ -499,7 +499,7 @@
                 android:layout_height="38dp"
                 android:scaleType="centerInside"
                 android:contentDescription="Button 2"
-                android:src="@drawable/location_pin"
+                android:src="@drawable/call"
                 app:tint="#ff0000"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
@@ -527,7 +527,7 @@
                 android:layout_height="38dp"
                 android:scaleType="centerInside"
                 android:contentDescription="Button 2"
-                android:src="@drawable/location_pin"
+                android:src="@drawable/person"
                 app:tint="#ff0000"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
@@ -555,7 +555,7 @@
                 android:layout_height="38dp"
                 android:scaleType="centerInside"
                 android:contentDescription="Button 2"
-                android:src="@drawable/location_pin"
+                android:src="@drawable/chart"
                 app:tint="#ff0000"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
