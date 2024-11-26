@@ -12,7 +12,10 @@
         android:id="@+id/id_map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_alignParentTop="true"
+        android:layout_above="@id/bottom_bar" />
+
 
 
     <LinearLayout
@@ -56,12 +59,12 @@
         android:visibility="gone"/>
 
     <LinearLayout
+        android:id="@+id/szlak_route"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/szlak_route"
-        android:layout_alignParentBottom="false"
         android:orientation="horizontal"
-        android:layout_marginTop="600dp"
+        android:layout_above="@id/bottom_bar"
+        android:layout_marginBottom="16dp"
         android:gravity="center"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp">
@@ -114,57 +117,6 @@
     </RelativeLayout>
 
 
-    <!---<Button
-        android:id="@+id/btnSchroniska1"
-        android:layout_width="93dp"
-        android:layout_height="81dp"
-        android:text="Schroniska"
-        android:textSize="16sp" /> -->
-
-
-
-    <!--<Button
-        style="@style/Widget.App.Button.OutlinedButton.IconOnly"
-        android:id="@+id/btnSzczyty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:icon="@drawable/snowed_mountains"
-        />-->
-   <!-- <ImageButton
-        android:id="@+id/btnSzczyty"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_margin="8dp"
-        android:contentDescription="A tiny Android icon"
-        android:scaleType="centerInside"
-        android:src="@drawable/snowed_mountains"
-        app:tint="#ff0000" />
-
-
-    <ImageButton
-        android:id="@+id/btnSchroniska"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_margin="8dp"
-        android:contentDescription="A tiny Android icon"
-        android:scaleType="centerInside"
-        android:src="@drawable/home"
-        app:tint="#ff0000" />
-
-    <ImageButton
-        android:id="@+id/btnStawy"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_margin="8dp"
-        android:contentDescription="A tiny Android icon"
-        android:scaleType="centerInside"
-        android:src="@drawable/location_pin"
-        app:tint="#ff0000" /> -->
-<!--
-        android:background="@drawable/rounded_background" -->
-
-
-
         <LinearLayout
             android:id="@+id/menu"
             android:layout_width="wrap_content"
@@ -172,7 +124,7 @@
             android:orientation="vertical"
             android:gravity="center"
             android:layout_alignParentLeft="true"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="70dp"
             android:layout_marginLeft="1dp"
             android:padding="0dp">
 
@@ -463,7 +415,8 @@
             android:orientation="vertical"
             android:gravity="center"
             android:layout_weight="1"
-            android:layout_margin="8dp">
+            android:layout_margin="8dp"
+            android:elevation="10dp">
 
             <ImageButton
                 android:id="@+id/danger"

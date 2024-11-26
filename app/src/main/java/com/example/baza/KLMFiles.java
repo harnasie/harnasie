@@ -275,6 +275,7 @@ public class KLMFiles {
         if (!coordinates.isEmpty()) {
             result.add(coordinates.get(0)); // Start
             result.add(coordinates.get(coordinates.size() - 1)); // End
+            result.add(coordinates.get(27));
         }
         return result;
     }

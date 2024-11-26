@@ -16,8 +16,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -308,6 +310,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             public void onClick(View v) {
                 google_clear.setVisibility(View.GONE);
                 szlak_route.setVisibility(View.GONE);
+                googlesz.setVisibility(View.GONE);
                 spine = findViewById(R.id.spinnerl);
                 chosenSzlak = findViewById(R.id.chooseszlak);
                 chosenSzlak.setOnClickListener(vv -> {
@@ -316,7 +319,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     KLMFiles kmlFiles = new KLMFiles(MapActivity.this, mMap);
                     LatLng stt = kmlFiles.getRouteStartEnd(selectedFile).get(0);
                     LatLng ennn = kmlFiles.getRouteStartEnd(selectedFile).get(1);
-                    float bearing = calculateBearing(stt, ennn);
+                    LatLng cam = kmlFiles.getRouteStartEnd(selectedFile).get(2);
+                    float bearing = calculateBearing(stt, cam);
 
                     // Tworzenie pozycji kamery z odpowiednim bearing
                     CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -338,11 +342,62 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 spine.setVisibility(View.VISIBLE);
                 sp = findViewById(R.id.spinnerszlak);
                 //KLMFiles kmlfiles = new KLMFiles(this, mMap);
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(MapActivity.this, android.R.layout.simple_spinner_item,szlakisp);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                sp.setVisibility(View.VISIBLE);
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(MapActivity.this, R.layout.spinner_with_square,szlakisp){
+                //adapter.setDropDownViewResource(R.layout.spinner_with_square);
+                // Niestandardowy adapter dla Spinnera z zielonym kwadratem
+                    @Override
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        // Inflacja układu dla elementu Spinnera
+                        LayoutInflater inflater = LayoutInflater.from(getContext());
+                        View view = inflater.inflate(R.layout.spinner_with_square, parent, false);
+
+                        // Znalezienie i ustawienie tekstu w TextView
+                        TextView textView = view.findViewById(R.id.spinner_item_text);
+                        textView.setText(getItem(position));
+                        View square = view.findViewById(R.id.square_view);
+                        if (szlaki.get(position).toLowerCase().contains("czerwony")) {
+                            square.setBackgroundColor(Color.RED); // Ustaw kolor czerwony
+                        } else if (szlaki.get(position).toLowerCase().contains("niebieski")){
+                            square.setBackgroundColor(Color.BLUE); // Domyślny kolor np. zielony
+                        } else if (szlaki.get(position).toLowerCase().contains("czarny")){
+                            square.setBackgroundColor(Color.BLACK); // Domyślny kolor np. zielony
+                        } else if (szlaki.get(position).toLowerCase().contains("zolty")){
+                            square.setBackgroundColor(Color.YELLOW); // Domyślny kolor np. zielony
+                        }
+
+                        return view;
+                    }
+
+                    @Override
+                    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                        // Inflacja układu dla rozwiniętej listy Spinnera
+                        LayoutInflater inflater = LayoutInflater.from(getContext());
+                        View view = inflater.inflate(R.layout.spinner_with_square, parent, false);
+
+                        // Znalezienie i ustawienie tekstu w TextView
+                        TextView textView = view.findViewById(R.id.spinner_item_text);
+                        textView.setText(getItem(position));
+                        View square = view.findViewById(R.id.square_view);
+                        if (szlaki.get(position).toLowerCase().contains("czerwony")) {
+                            square.setBackgroundColor(Color.RED); // Ustaw kolor czerwony
+                        } else if (szlaki.get(position).toLowerCase().contains("niebieski")){
+                            square.setBackgroundColor(Color.BLUE); // Domyślny kolor np. zielony
+                        } else if (szlaki.get(position).toLowerCase().contains("czarny_")){
+                            square.setBackgroundColor(Color.BLACK); // Domyślny kolor np. zielony
+                        } else if (szlaki.get(position).toLowerCase().contains("żółty")){
+                            square.setBackgroundColor(Color.YELLOW); // Domyślny kolor np. zielony
+                        }
+
+                        return view;
+                    }
+                };
+
+// Przypisanie adaptera do Spinnera
+
+
                 // Ustawienie adaptera do spinnera
                 sp.setAdapter(adapter);
+                sp.setVisibility(View.VISIBLE);
                 //String f = (String) sp.getSelectedItem();
                 //Log.d("sp",f);
                 sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -635,8 +690,21 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         for(String file : szlaki){
             String name = file.substring(0, file.lastIndexOf('.'));
             String[] parts = name.split("_");
-            name =parts[0] + " z " + parts[1] + " do " ;//+ parts[2];
+            String part1 = parts[1].replace("&", " ");
+            String part2 = parts[2].replace("&", " ");
+            if(parts.length == 4){
+                Log.d("trzy", "trzy");
+
+                String part3 = parts[3].replace("&", " ");
+                name = "z " + part1 + " do " + part2 + " (" + part3 + ")";//+ parts[2];
+            }
+            else{
+                Log.d("dwa", "dwa");
+                name = part1 +  " (" + part2 + ")";
+            }
             szlakisp.add(name);
+            Log.d("name", name);
+
         }
         Log.d("ileee", String.valueOf(szlaki.size()));
         szczytylist = kmlfiles.getSzczyty();
