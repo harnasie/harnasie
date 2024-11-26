@@ -41,7 +41,7 @@ public class SignUpActivity extends AppCompatActivity {
             String username = etUsername.getText().toString().trim();
 
             if (email.isEmpty() || password.isEmpty() || username.isEmpty()) {
-                Toast.makeText(SignUpActivity.this, "Fill in all fields", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SignUpActivity.this, "Wypełnij wszystkie pola.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -60,7 +60,7 @@ public class SignUpActivity extends AppCompatActivity {
                             // Log the error to get details on why sign-up failed
                             String errorMessage = task.getException() != null ? task.getException().getMessage() : "Unknown error";
                             Log.e("SignUpError", "Sign-up failed: " + errorMessage);
-                            Toast.makeText(SignUpActivity.this, "Sign Up Failed: " + errorMessage, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SignUpActivity.this, "Rejestracja nie powiodła się: " + errorMessage, Toast.LENGTH_SHORT).show();
                         }
                     });
         });
@@ -68,7 +68,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void addUserToFirestore(String uid, String email, String username) {
         if (uid == null || uid.isEmpty()) {
-            Toast.makeText(SignUpActivity.this, "Error: UID is null or empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignUpActivity.this, "Błąd: UID jest null lub pusty", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -76,16 +76,17 @@ public class SignUpActivity extends AppCompatActivity {
         userMap.put("email", email);
         userMap.put("username", username);
         userMap.put("uid", uid);
+        userMap.put("role", "user");
 
         db.collection("users").document(uid).set(userMap)
                 .addOnSuccessListener(aVoid ->
-                        Toast.makeText(SignUpActivity.this, "User added to Firestore", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(SignUpActivity.this, "Użytkownik dodany do bazy.", Toast.LENGTH_SHORT).show()
 
                 )
                 .addOnFailureListener(e -> {
                     // Log the error for debugging
                     Log.e("FirestoreError", "Error adding user", e);
-                    Toast.makeText(SignUpActivity.this, "Error adding user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignUpActivity.this, "Błąd przy dodawaniu nowego użytkownika: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 

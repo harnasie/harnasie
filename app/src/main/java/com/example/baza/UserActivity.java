@@ -1,6 +1,7 @@
 package com.example.baza;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -39,7 +40,7 @@ import java.util.Map;
 
 public class UserActivity extends AppCompatActivity {
     private TextView welcomeTextView;
-    Button btnViewDangers, btnGoDanger, btnMapa, btnTelephone, btnDanger, btnChart;
+    Button btnViewDangers, btnGoDanger, btnMapa, btnTelephone, btnDanger, btnChart, btnWyloguj;
     FirebaseFirestore db;
     private LineChart lineChart;
     private LatLng currentLocation = null;
@@ -66,15 +67,16 @@ public class UserActivity extends AppCompatActivity {
         //lineChart = findViewById(R.id.lineChart);
         routeInputLayout = findViewById(R.id.route_input_layout);
         btnDanger = findViewById(R.id.buttonDanger);
+        btnWyloguj = findViewById(R.id.logout);
         db = FirebaseFirestore.getInstance();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         //checkLocationPermission();
         // Odbieranie nazwy użytkownika przekazanej z LoginActivity
         if(userName == null || uid == null){
-        Intent getintent = getIntent();
-        userName = getintent.getStringExtra("username");
-        uid = getintent.getStringExtra("uid");
-        Log.d("iertyu",uid);
+            Intent getintent = getIntent();
+            userName = getintent.getStringExtra("username");
+            uid = getintent.getStringExtra("userId");
+            Log.d("iertyu",uid);
         }
 
         //Cursor res = dbHelper.getAllDistances();
@@ -82,9 +84,9 @@ public class UserActivity extends AppCompatActivity {
         dbHelper.addDistance("Magda", "4000", "2023-09-02");
         dbHelper.addDistance("Magda", "9000", "2023-09-03");
 */
-/*        Cursor res = dbHelper.getAllDistances();
+        /*        Cursor res = dbHelper.getAllDistances();
 
-*/
+         */
         // Wyświetlenie powitania z nazwą użytkownika
         if (userName != null) {
             welcomeTextView.setText("Witaj, " + userName + "!");
@@ -188,6 +190,13 @@ public class UserActivity extends AppCompatActivity {
                 Intent intent = new Intent(UserActivity.this, UserActivity.class);
                 intent.putExtra("uid",uid);
                 startActivity(intent);
+            }
+        });
+
+        btnWyloguj.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logoutAndRedirect();
             }
         });
 
@@ -327,5 +336,18 @@ public class UserActivity extends AppCompatActivity {
             }
         });
     }
+
+
+    private void logoutAndRedirect() {
+        SharedPreferences preferences = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.apply();
+
+        Intent intent = new Intent(this, WelcomeActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
 
 }

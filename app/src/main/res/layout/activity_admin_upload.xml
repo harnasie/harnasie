@@ -1,0 +1,41 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/openMyMapsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Otwórz Google My Maps" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:text="Wybierz plik KML"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/selectFileButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Wybierz plik" />
+
+    <Button
+        android:id="@+id/uploadFileButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Prześlij plik" />
+
+    <Button
+        android:id="@+id/openConverterButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Otwórz konwerter XML na KML"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center_horizontal"/>
+
+</LinearLayout>

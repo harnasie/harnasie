@@ -20,7 +20,7 @@ public class TelefonActivity extends AppCompatActivity {
 
     private ImageView phone1, phone2, phone3, copy1, copy2, copy3;
     private LinearLayout menuLayout;
-    private Button btnchart, btnuser, btndanger,btnmap,btnTelefon, btnMenu;
+    private Button btnchart, btnuser, btndanger, btnmap, btnTelefon, btnMenu;
     private FrameLayout background;
 
     @Override
@@ -58,12 +58,7 @@ public class TelefonActivity extends AppCompatActivity {
             }
         });
 
-        background.setOnClickListener(v -> {
-            menuLayout.setVisibility(View.GONE); // Ukrycie menu
-            //background.setVisibility(View.GONE);// Ukrycie tła
-            btnMenu.setVisibility(View.VISIBLE);
-            Log.d("cldsdf","sdfgh");
-        });
+
 
         btnMenu.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,7 +110,7 @@ public class TelefonActivity extends AppCompatActivity {
 
     }
     private void call_phone2(){
-
+        callPhoneNumber("112");
     }
     private void call_phone3(){
 
@@ -125,7 +120,7 @@ public class TelefonActivity extends AppCompatActivity {
         ClipData clipdata = ClipData.newPlainText(null, "112");
         if(clipboard == null) return;
         clipboard.setPrimaryClip(clipdata);
-        Toast.makeText(this, "numer alarmowy został skopiowany", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Numer alarmowy został skopiowany", Toast.LENGTH_SHORT).show();
     }
 
     private void copy_phone2(){
@@ -133,14 +128,14 @@ public class TelefonActivity extends AppCompatActivity {
         ClipData clipdata = ClipData.newPlainText(null, "985");
         if(clipboard == null) return;
         clipboard.setPrimaryClip(clipdata);
-        Toast.makeText(this, "numer alarmowy został skopiowany", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Numer alarmowy został skopiowany", Toast.LENGTH_SHORT).show();
     }
     private void copy_phone3(){
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipdata = ClipData.newPlainText(null, "601 100 300");
         if(clipboard == null) return;
         clipboard.setPrimaryClip(clipdata);
-        Toast.makeText(this, "numer alarmowy został skopiowany", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Numer alarmowy został skopiowany", Toast.LENGTH_SHORT).show();
     }
 
     public void callPhoneNumber(String phoneNumber) {

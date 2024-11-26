@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorBackground"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/welcomeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Administrator"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center" />
+
+    <Button
+        android:id="@+id/btnPowiadomieniaOgólne"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:text="Wyślij powiadomienie ogólne" />
+    <Button
+        android:id="@+id/btnZgloszenia"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:text="Pokaż wszystkie zgłoszenia" />
+    <Button
+        android:id="@+id/btnDodajKML"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:text="Dodaj trasę" />
+    <Button
+        android:id="@+id/btnWyloguj"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:text="Wyloguj" />
+
+
+</LinearLayout>

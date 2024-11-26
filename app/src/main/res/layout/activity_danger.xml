@@ -74,7 +74,7 @@
         android:id="@+id/buttonViewDangers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Pokaż zagłoszenia"
+        android:text="Pokaż zgłoszenia"
         style="@style/ButtonRed"
         android:layout_margin="10dp"/>
 
@@ -103,7 +103,7 @@
                 android:layout_height="38dp"
                 android:scaleType="centerInside"
                 android:contentDescription="Button 2"
-                android:src="@drawable/location_pin"
+                android:src="@drawable/map"
                 app:tint="#ff0000"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
@@ -132,7 +132,7 @@
                 android:layout_height="38dp"
                 android:scaleType="centerInside"
                 android:contentDescription="Button 2"
-                android:src="@drawable/location_pin"
+                android:src="@drawable/warning"
                 app:tint="#ff0000"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
@@ -160,7 +160,7 @@
                 android:layout_height="38dp"
                 android:scaleType="centerInside"
                 android:contentDescription="Button 2"
-                android:src="@drawable/location_pin"
+                android:src="@drawable/call"
                 app:tint="#ff0000"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
@@ -188,7 +188,7 @@
                 android:layout_height="38dp"
                 android:scaleType="centerInside"
                 android:contentDescription="Button 2"
-                android:src="@drawable/location_pin"
+                android:src="@drawable/person"
                 app:tint="#ff0000"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
@@ -216,7 +216,7 @@
                 android:layout_height="38dp"
                 android:scaleType="centerInside"
                 android:contentDescription="Button 2"
-                android:src="@drawable/location_pin"
+                android:src="@drawable/chart"
                 app:tint="#ff0000"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
