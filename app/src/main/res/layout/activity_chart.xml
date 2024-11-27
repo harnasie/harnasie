@@ -48,8 +48,8 @@
             android:layout_height="38dp"
             android:scaleType="centerInside"
             android:contentDescription="Button 2"
-            android:src="@drawable/location_pin"
-            app:tint="#ff0000"
+            android:src="@drawable/map"
+            app:tint="#000000"
             android:background="?attr/selectableItemBackgroundBorderless" />
 
         <TextView
@@ -77,8 +77,8 @@
             android:layout_height="38dp"
             android:scaleType="centerInside"
             android:contentDescription="Button 2"
-            android:src="@drawable/location_pin"
-            app:tint="#ff0000"
+            android:src="@drawable/warning"
+            app:tint="#000000"
             android:background="?attr/selectableItemBackgroundBorderless" />
 
         <TextView
@@ -105,8 +105,8 @@
             android:layout_height="38dp"
             android:scaleType="centerInside"
             android:contentDescription="Button 2"
-            android:src="@drawable/location_pin"
-            app:tint="#ff0000"
+            android:src="@drawable/call"
+            app:tint="#000000"
             android:background="?attr/selectableItemBackgroundBorderless" />
 
         <TextView
@@ -133,8 +133,8 @@
             android:layout_height="38dp"
             android:scaleType="centerInside"
             android:contentDescription="Button 2"
-            android:src="@drawable/location_pin"
-            app:tint="#ff0000"
+            android:src="@drawable/person"
+            app:tint="#000000"
             android:background="?attr/selectableItemBackgroundBorderless" />
 
         <TextView
@@ -161,8 +161,8 @@
             android:layout_height="38dp"
             android:scaleType="centerInside"
             android:contentDescription="Button 2"
-            android:src="@drawable/location_pin"
-            app:tint="#ff0000"
+            android:src="@drawable/chart"
+            app:tint="#000000"
             android:background="?attr/selectableItemBackgroundBorderless" />
 
         <TextView

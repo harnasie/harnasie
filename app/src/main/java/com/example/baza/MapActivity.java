@@ -1,8 +1,5 @@
 package com.example.baza;
 
-import static java.security.AccessController.getContext;
-
-import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -11,35 +8,26 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
-
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -50,39 +38,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-
-
-
-
-
-
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.location.Location;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.speech.tts.TextToSpeech;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentActivity;
-
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -97,99 +57,57 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.Polyline;
-import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.maps.android.PolyUtil;
-import com.google.maps.android.SphericalUtil;
-import com.google.maps.android.data.Geometry;
 import com.google.maps.android.data.kml.KmlContainer;
 import com.google.maps.android.data.kml.KmlLayer;
 import com.google.maps.android.data.kml.KmlLineString;
 import com.google.maps.android.data.kml.KmlPlacemark;
-
-import org.json.JSONObject;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private List<Marker> schroniska = new ArrayList<>();
-    private List<Marker> szczyty = new ArrayList<>();
-    private List<Marker> stawy = new ArrayList<>();
     private LocationCallback mLocationCallback;
     private LatLng lastLocation = null;
-    private LatLng firstLocation = null;
     private int lastTraversedIndex = -1;
-    private List<LatLng> przystanki = new ArrayList<>();
     private List<LatLng> waypointsList = new ArrayList<>();
     private Map<String, Marker> markers = new HashMap<>();
     private static final String TAG = "KMLDownloader";
     private FirebaseFirestore db;
     private LinearLayout topBar, spine, google_clear, szlak_route;
-    private FirebaseStorage storage;
-    private String selectedFile;
-    private int ile = 1;
-    private Spinner sp;
+    private String selectedFile, nameselectedFile;
+    private int ile = 1, ileszczyty = 1, ilestawy = 1;
+    private Spinner spiner;
     private List<Marker> stawylist = new ArrayList<>();
     private List<Marker> szczytylist = new ArrayList<>();
     private List<Marker> schroniskalist = new ArrayList<>();
     private String url = "";
-    private Button btnskad, RouteButton, btndokad, btnstop1, btnstop2, btnstop3;
-    private int ileszczyty = 1;
-    private int ilestawy = 1;
+    private Button RouteButton, btnstop1, btnstop2, btnstop3, button_addstop, btnconfirm;
     private ImageView markerView;
-    private ArrayList<LatLng> trasa = new ArrayList<>();
     private int[] point = {0, 0, 0, 0, 0};
     private LatLng currentLocation = null, skad_location = null, dokad_location = null,
             stop1_location = null, stop2_location = null, stop3_location = null;
-    private long navigationStartTime = 0;
-    private Handler timerHandler = new Handler();
-    private Runnable timerRunnable;
     private EditText skad_et, dokad_et, stop1, stop2, stop3;
-    private Button button_addstop, btnconfirm;
-    private PolylineOptions lineOptions; // = new PolylineOptions();
-    private static final double DISTANCE_THRESHOLD_METERS = 2.0; // 1 meter
     private FusedLocationProviderClient mFusedLocationClient;
     private TextToSpeech tts;
-    private EditText[] stops = {stop1, stop2, stop3};
+    private EditText[] stops = new EditText[3];
     private LinearLayout routeInputLayout,menuLayout,mainLayout;
-    private Handler handler;
     private boolean widoczne = false;
-    private boolean widoczneszczyty = false;
-    private boolean widocznestawy = false;
-    private LatLng destination = new LatLng(51.27447, 22.55371);// Zakopane
-    private LatLng destination1 = new LatLng(49.2598, 19.9667);//20.09156,49.23821
-    private List<Polyline> clickedPolylines = new ArrayList<>();
     private List<LatLng> routePoints = new ArrayList<>();
     private List<Polyline> routePolylines = new ArrayList<>();
     private List<String> szlaki = new ArrayList<>();
     private List<String> szlakisp = new ArrayList<>();
     private Polyline currentRoutePolyline = null;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 101;
-    //private KLMFiles kmlfiles = new KLMFiles(this,mMap);
-    private Button spiner,chosenSzlak, googlesz, btnMenu,clear, btnGoogle;
+    private Button spinerview, chosenSzlak, googlesz, clear, btnGoogle;
     private ImageButton btnchart, btndanger, btnTelefon, btnmap, btnuser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-            setTitle("Mapa");
+        setTitle("Mapa");
         db = FirebaseFirestore.getInstance();
 
         // Inicjalizacja mapy
@@ -198,7 +116,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
         // Inicjalizacja klienta lokalizacji
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        handler = new Handler(Looper.getMainLooper());
         // Inicjalizacja Text-to-Speech
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
@@ -209,48 +126,23 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         markerView = findViewById(R.id.marker_view);
         btnGoogle =  findViewById(R.id.btn_Google);
 
-
-        /*Button SchroniskaButton = findViewById(R.id.btnSchroniska);
-        SchroniskaButton.setOnClickListener(v -> {
-            KLMFiles kmlFiles = new KLMFiles(this, mMap);
-            LatLng stt = kmlFiles.getRouteStartEnd(selectedFile).get(0);
-            LatLng ennn = kmlFiles.getRouteStartEnd(selectedFile).get(1);
-            Log.d(String.valueOf(stt), String.valueOf(ennn));
-            new FetchDirectionsTask().execute(getDirectionsUrl(stt, ennn));
-            btnGoogle.setVisibility(View.VISIBLE);
-            //openGoogleMapsWithRoute(getDirectionsUrlGoogle(stt, ennn));
-
-            /*ile++;
-            Log.d("ile", String.valueOf(ile));
-            widoczne = ile % 2 == 0;
-
-            KLMFiles kmlfiles = new KLMFiles(this,mMap);
-            //kmlfiles.widoczne = widoczne;
-            kmlfiles.VisibilityMarker("schroniska",widoczne);
-            Log.d("sdfgh", "asdfghj");
-        });*/
-
         ImageButton SzczytyButton = findViewById(R.id.btnSzczyty);
         SzczytyButton.setOnClickListener(v -> {
             ileszczyty++;
-            Log.d("ile", String.valueOf(ileszczyty));
             widoczne = ileszczyty % 2 == 0;
 
             // Zaktualizuj widoczność wszystkich markerów
             for (Marker marker : szczytylist) {
-                Log.d("sdfgh", "list");
                 marker.setVisible(widoczne);
             }
         });
         ImageButton StawyButton = findViewById(R.id.btnStawy);
         StawyButton.setOnClickListener(v -> {
             ilestawy++;
-            Log.d("ile", String.valueOf(ilestawy));
             widoczne = ilestawy % 2 == 0;
 
             // Zaktualizuj widoczność wszystkich markerów
             for (Marker marker : stawylist) {
-                Log.d("sdfgh", "list");
                 marker.setVisible(widoczne);
             }
         });
@@ -258,12 +150,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         ImageButton SchroniskaButton = findViewById(R.id.btnSchroniska);
         SchroniskaButton.setOnClickListener(v -> {
             ile++;
-            Log.d("ile", String.valueOf(ile));
             widoczne = ile % 2 == 0;
 
             // Zaktualizuj widoczność wszystkich markerów
             for (Marker marker : schroniskalist) {
-                Log.d("sdfgh", "list");
                 marker.setVisible(widoczne);
             }
         });
@@ -303,9 +193,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             google_clear.setVisibility(View.GONE);
         });
 
-        spiner = findViewById(R.id.spinner);
+        spinerview = findViewById(R.id.spinner);
         clear = findViewById(R.id.btnRouteclean);
-        spiner.setOnClickListener(new View.OnClickListener() {
+        spinerview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 google_clear.setVisibility(View.GONE);
@@ -317,33 +207,32 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     spine.setVisibility(View.GONE);
                     szlak_route.setVisibility(View.VISIBLE);
                     KLMFiles kmlFiles = new KLMFiles(MapActivity.this, mMap);
-                    LatLng stt = kmlFiles.getRouteStartEnd(selectedFile).get(0);
-                    LatLng ennn = kmlFiles.getRouteStartEnd(selectedFile).get(1);
+                    LatLng start = kmlFiles.getRouteStartEnd(selectedFile).get(0);
+                    LatLng end = kmlFiles.getRouteStartEnd(selectedFile).get(1);
                     LatLng cam = kmlFiles.getRouteStartEnd(selectedFile).get(2);
-                    float bearing = calculateBearing(stt, cam);
+                    float bearing = calculateBearing(start, cam);
 
                     // Tworzenie pozycji kamery z odpowiednim bearing
                     CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(stt)  // Punkt początkowy
-                            .zoom(25)     // Ustawiona wcześniej wartość zoomu
+                            .target(start)  // Punkt początkowy
+                            .zoom(20)     // Ustawiona wcześniej wartość zoomu
                             .bearing(bearing)  // Obrót kamery w stronę punktu ennn
                             .tilt(45)     // Opcjonalne: pochylanie kamery (wartość w stopniach)
                             .build();
 
                     // Przesunięcie kamery
                     mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                    googlesz.setText(selectedFile);
+                    googlesz.setText(nameselectedFile + " --> GOOGLE");
                     googlesz.setVisibility(View.VISIBLE);
                     googlesz.setOnClickListener(vvv -> {
-                        url = getDirectionsUrlGoogle(stt,ennn);
+                        url = getDirectionsUrlGoogle(start,end);
                         openGoogleMapsWithRoute(url);
                     });
                 });
+
                 spine.setVisibility(View.VISIBLE);
-                sp = findViewById(R.id.spinnerszlak);
-                //KLMFiles kmlfiles = new KLMFiles(this, mMap);
+                spiner = findViewById(R.id.spinnerszlak);
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(MapActivity.this, R.layout.spinner_with_square,szlakisp){
-                //adapter.setDropDownViewResource(R.layout.spinner_with_square);
                 // Niestandardowy adapter dla Spinnera z zielonym kwadratem
                     @Override
                     public View getView(int position, View convertView, ViewGroup parent) {
@@ -392,18 +281,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     }
                 };
 
-// Przypisanie adaptera do Spinnera
-
-
-                // Ustawienie adaptera do spinnera
-                sp.setAdapter(adapter);
-                sp.setVisibility(View.VISIBLE);
-                //String f = (String) sp.getSelectedItem();
-                //Log.d("sp",f);
-                sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                spiner.setAdapter(adapter);
+                spiner.setVisibility(View.VISIBLE);
+                spiner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         // Pobieranie wybranego elementu
+                        nameselectedFile = szlakisp.get(position);
                         selectedFile = szlaki.get(position);
                         Toast.makeText(MapActivity.this, "Wybrano: " + selectedFile, Toast.LENGTH_SHORT).show();
                     }
@@ -426,7 +310,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             addMarkerAtCurrentPosition(false);
             routeInputLayout.setVisibility(View.VISIBLE);
             for(int i =0; i<point.length; i++){
-                Log.e("iiiii", String.valueOf(point[i]));
                 if(point[i] == 1){
                     switch (i){
                         case 0:
@@ -444,40 +327,22 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                         point[i] = 0;
                         break;
                         case 2:
-                        {stopLocation = addMarkerAtCenter("przystanek "+(i-1));
-                            if(stopLocation != null){
-                                stop1.setText(getCityAndStreetFromCoordinates(stopLocation));
-                                waypointsList.add(stopLocation);
-                            }}
-                        point[i] = 0;
-                        break;
                         case 3:
-                        {stopLocation = addMarkerAtCenter("przystanek "+(i-1));
-                            if(stopLocation != null){
-                                stop2.setText(getCityAndStreetFromCoordinates(stopLocation));
-                                waypointsList.add(stopLocation);
-                            }}
-                        point[i] = 0;
-                        break;
                         case 4:
                         {stopLocation = addMarkerAtCenter("przystanek "+(i-1));
                             if(stopLocation != null){
-                                stop3.setText(getCityAndStreetFromCoordinates(stopLocation));
+                                stops[i-2].setText(getCityAndStreetFromCoordinates(stopLocation));
                                 waypointsList.add(stopLocation);
                             }}
                         point[i] = 0;
                         break;
                     }
-
-                    //addMarkerAtCurrentPosition(false);
                 }
             }
         });
 
         skad_et = findViewById(R.id.place1);
         dokad_et = findViewById(R.id.place2);
-
-        //menuLayout = findViewById(R.id.menuLayout);
         btnchart = findViewById(R.id.chart);
         btnuser = findViewById(R.id.userView);
         btnTelefon = findViewById(R.id.buttonTelefon);
@@ -507,8 +372,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             }
         });
 
-
-
         btndanger.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -534,8 +397,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
             }
         });
-
-
 
         btnconfirm = findViewById(R.id.btnConfirm);
         google_clear = findViewById(R.id.google_clear);
@@ -571,24 +432,21 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             Log.d("linkurl", url);
             new FetchDirectionsTask().execute(url);
             routeInputLayout.setVisibility(View.GONE);
-            // }
-            //});
-            //} else {
-            //    ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
-            //}
-
         });
+
+
         stop1 = findViewById(R.id.placestop1);
         stop2 = findViewById(R.id.placestop2);
         stop3 = findViewById(R.id.placestop3);
-
+        stops[0] = stop1;
+        stops[1] = stop2;
+        stops[2] = stop3;
 
         skad_et.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addMarkerAtCurrentPosition(true);
                 point[0] = 1;
-                Log.e("skad","skas");
                 routeInputLayout.setVisibility(View.GONE);
             }
         });
@@ -598,7 +456,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             public void onClick(View v) {
                 addMarkerAtCurrentPosition(true);
                 point[1] = 1;
-                Log.e("dokad","skas");
                 routeInputLayout.setVisibility(View.GONE);
             }
         });
@@ -610,37 +467,33 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         button_addstop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText[] stops = {stop1, stop2, stop3};
                 Button[] buttons = {btnstop1, btnstop2, btnstop3};
-                LatLng[] locations = {stop1_location, stop2_location, stop3_location};
 
                 for (int i = 0; i < stops.length; i++) {
+                    final int index = i;
                     if (stops[i].getVisibility() == View.GONE) {
                         stops[i].setVisibility(View.VISIBLE);
+                        stops[i].setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                addMarkerAtCurrentPosition(true);
+                                point[index + 2] = 1;
+                                routeInputLayout.setVisibility(View.GONE);
+                            }
+                        });
                         buttons[i].setVisibility(View.VISIBLE);
-                        final int index = i; // Musisz stworzyć lokalną zmienną, aby nie stracić odniesienia w lambdach
+                        // Musisz stworzyć lokalną zmienną, aby nie stracić odniesienia w lambdach
                         buttons[i].setOnClickListener(v1 -> {
                             stops[index].setVisibility(View.GONE);
                             buttons[index].setVisibility(View.GONE);
                         });
+                        break;
+                    } else {
 
-                        /*buttons[i].setOnClickListener(v12-> {
-                            LatLng stopLocation = addMarkerAtCenter("przystanek"+(index+1));
-                            Log.d("locationnnnnn", String.valueOf(stopLocation));
-                            if (stopLocation != null) {
-                                stops[index].setText(getCityAndStreetFromCoordinates(stopLocation));
-                                waypointsList.add(stopLocation);
-
-                            }
-                            addMarkerAtCurrentPosition(false);
-                            Log.d("location", String.valueOf(stopLocation));
-                        });*/
-                        break; // Wyjdź z pętli po ustawieniu widoczności
                     }
                 }
             }
         });
-
 
         mLocationCallback = new LocationCallback() {
             @Override
@@ -677,15 +530,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         mMap.getUiSettings().setZoomControlsEnabled(false);
         mMap.getUiSettings().setCompassEnabled(true);
 
-        //loadKmlLayers();
-        //KMLDownloader kmlDownloader = new KMLDownloader(this, mMap); // 'this' to kontekst, np. Activity
-        //kmlDownloader.processKMLFiles();
-        //kmlDownloader.copyKMLFilesFromAssets();
         KLMFiles kmlfiles = new KLMFiles(this,mMap);
-
-        //downloadAllKMLFiles();
         kmlfiles.processKMLFiles();
-        Log.d("ileee", "wertu");
         szlaki = kmlfiles.getSzlaki();
         for(String file : szlaki){
             String name = file.substring(0, file.lastIndexOf('.'));
@@ -693,20 +539,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             String part1 = parts[1].replace("&", " ");
             String part2 = parts[2].replace("&", " ");
             if(parts.length == 4){
-                Log.d("trzy", "trzy");
-
                 String part3 = parts[3].replace("&", " ");
-                name = "z " + part1 + " do " + part2 + " (" + part3 + ")";//+ parts[2];
+                name =part1 + " - " + part2 + " (" + part3 + ")";//+ parts[2];
             }
             else{
-                Log.d("dwa", "dwa");
                 name = part1 +  " (" + part2 + ")";
             }
             szlakisp.add(name);
-            Log.d("name", name);
-
         }
-        Log.d("ileee", String.valueOf(szlaki.size()));
+
         szczytylist = kmlfiles.getSzczyty();
         stawylist = kmlfiles.getStawy();
         schroniskalist = kmlfiles.getSchroniska();
@@ -715,9 +556,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     }
 
     private void openGoogleMapsWithRoute(String url) {
-        Log.d("fghj",url);
-        //url = "https://www.google.com/maps/dir/?api=1&origin=52.2296756,21.0122287&destination=52.406374,16.9251681&travelmode=walking";
-
         // Tworzymy intent z URL Google Maps
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         intent.setPackage("com.google.android.apps.maps");
@@ -732,7 +570,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         double lon2 = Math.toRadians(end.longitude);
 
         double dLon = lon2 - lon1;
-
         double y = Math.sin(dLon) * Math.cos(lat2);
         double x = Math.cos(lat1) * Math.sin(lat2) -
                 Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
@@ -741,85 +578,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     }
 
 
-
-    private void openGoogleMapsRoute() {
-        // Origin, destination, and waypoints (example values)
-        LatLng origin = new LatLng(52.2296756, 21.0122287); // Replace with actual origin
-        LatLng destination = new LatLng(52.406374, 16.9251681); // Replace with actual destination
-        List<LatLng> waypointsList = Arrays.asList(
-                new LatLng(51.107883, 17.038538), // Example waypoint
-                new LatLng(50.064650, 19.944980)  // Example waypoint
-        );
-
-        // Construct URL for Google Maps
-        StringBuilder uriBuilder = new StringBuilder("https://www.google.com/maps/dir/?api=1");
-        uriBuilder.append("&origin=").append(encodeLatLng(origin));
-        uriBuilder.append("&destination=").append(encodeLatLng(destination));
-
-        if (waypointsList != null && !waypointsList.isEmpty()) {
-            uriBuilder.append("&waypoints=");
-            for (int i = 0; i < waypointsList.size(); i++) {
-                uriBuilder.append(encodeLatLng1(waypointsList.get(i)));
-                if (i < waypointsList.size() - 1) {
-                    uriBuilder.append("|");
-                }
-            }
-        }
-
-        uriBuilder.append("&travelmode=walking");
-
-        // Create Intent to open Google Maps
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriBuilder.toString()));
-        intent.setPackage("com.google.android.apps.maps");
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        } else {
-            Toast.makeText(this, "Google Maps nie jest zainstalowane", Toast.LENGTH_SHORT).show();
-        }
-    }
-
     private String encodeLatLng1(LatLng latLng) {
         return latLng.latitude + "," + latLng.longitude;
-    }
-
-
-    private String getDirectionsUrlWITHGoogle(LatLng origin, LatLng dest, List<LatLng> waypointsList) {
-        if (origin == null || dest == null) {
-            throw new IllegalArgumentException("Origin and destination cannot be null");
-        }
-
-        // Parametry początkowy i końcowy
-        String str_origin = "origin=" + encodeLatLng(origin);
-        String str_dest = "destination=" + encodeLatLng(dest);
-        String mode = "mode=walking";
-        String key = "key=AIzaSyC4KaLnKSYLuF9xCyzudGh8DMCB-6HefJA"; // Zmienna do przechowywania klucza API
-
-        // Tworzenie parametru waypoints, jeśli lista punktów pośrednich nie jest pusta
-        String waypoints = "";
-        if (waypointsList != null && !waypointsList.isEmpty()) {
-            StringBuilder waypointsBuilder = new StringBuilder("waypoints=");
-            for (int i = 0; i < waypointsList.size(); i++) {
-                LatLng point = waypointsList.get(i);
-                waypointsBuilder.append(encodeLatLng(point));
-                if (i < waypointsList.size() - 1) {
-                    waypointsBuilder.append("|");
-                }
-            }
-            waypoints = waypointsBuilder.toString();
-        }
-
-        // Składanie wszystkich parametrów do jednego ciągu
-        StringBuilder parametersBuilder = new StringBuilder(str_origin);
-        parametersBuilder.append("&").append(str_dest);
-        parametersBuilder.append("&").append(mode);
-        parametersBuilder.append("&").append(key);
-
-        if (!waypoints.isEmpty()) {
-            parametersBuilder.append("&").append(waypoints);
-        }
-
-        // Zwrócenie pełnego URL-a
-        return "https://maps.googleapis.com/maps/api/directions/json?" + parametersBuilder.toString();
     }
 
     private LatLng addMarkerAtCenter(String name) {
@@ -827,21 +587,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         LatLng center = mMap.getCameraPosition().target;
 
         Marker existingMarker = markers.get(name);
-        Log.d("sdfghjk", String.valueOf(existingMarker));
         if (existingMarker != null) {
-            // Usunięcie istniejącego markera
             existingMarker.remove();
         }
 
-        // Dodanie markera
         Marker newMarker = mMap.addMarker(new MarkerOptions().position(center).title(name));
-        // Zapisanie nowego markera w mapie
         markers.put(name, newMarker);
-        // Wyświetlenie komunikatu o zapisaniu współrzędnych
         Toast.makeText(this, "Marker dodany na: " + center, Toast.LENGTH_SHORT).show();
-
-        // Logowanie współrzędnych markera
-        Log.d("MainActivity", "Współrzędne markera: " + center);
 
         return center;
     }
@@ -864,7 +616,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         String parameters = str_origin + "&" + str_dest + "&" + mode;
         return "https://www.google.com/maps/dir/?api=1&" + parameters;
     }
-//String url = "https://www.google.com/maps/dir/?api=1&origin=52.2296756,21.0122287&destination=52.406374,16.9251681&travelmode=walking";
 
     private String getDirectionsUrlWITH(LatLng origin, LatLng dest, List<LatLng> waypointsList) {
         if (origin == null || dest == null) {
@@ -1058,12 +809,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 20));
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        timerHandler.removeCallbacks(timerRunnable); // Zatrzymaj licznik, gdy aplikacja zostanie zamknięta
-    }
-
     private void addMarkerAtCurrentPosition(boolean sign) {
         // Wyświetlenie widoku markera w odpowiedniej pozycji na mapie
         // Przeliczanie współrzędnych GPS na pozycję na ekranie
@@ -1081,42 +826,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         markerView.setTranslationY(0);
     }
 
-
-
-    private void drawPolylinesFromKml(KmlLayer kmlLayer) {
-        for (KmlContainer container : kmlLayer.getContainers()) {
-            for (KmlPlacemark placemark : container.getPlacemarks()) {
-                if (placemark.getGeometry() instanceof KmlLineString) {
-                    String name = placemark.getProperty("name");
-                    int color = Color.GRAY;// = getColorBasedOnName(name); // Pobierz kolor na podstawie nazwy
-                    if (name.contains("czerwony")) {
-                        color =  Color.RED;
-                    } else if (name.contains("niebieski")) {
-                        color =  Color.BLUE;
-                    } else if (name.contains("zolty")) {
-                        color =  Color.YELLOW;
-                    } else if (name.contains("zielony")) {
-                        color =  Color.GREEN;
-                    } else if (name.contains("czarny")) {
-                        color =  Color.BLACK;
-                    }
-                    PolylineOptions polylineOptions = new PolylineOptions()
-                            .color(color)
-                            .width(5f)
-                            .clickable(true);
-
-                    List<LatLng> points = ((KmlLineString) placemark.getGeometry()).getGeometryObject();
-                    Polyline polyline = mMap.addPolyline(polylineOptions.addAll(points));
-                    polyline.setTag("name");
-                }
-            }
-        }
-    }
-
     private void clearPreviousRoute() {
         if (currentRoutePolyline != null) {
             currentRoutePolyline.remove();
-            timerHandler.removeCallbacks(timerRunnable); // Zatrzymaj timer
             currentRoutePolyline = null;
         }
         routePoints.clear();

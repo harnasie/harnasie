@@ -53,7 +53,7 @@
         android:layout_width="200dp"
         android:layout_height="40dp"
         android:layout_centerHorizontal="true"
-        android:text="Idz google"
+        android:text="--> google"
         style="@style/ButtonRed"
         android:translationY="40dp"
         android:visibility="gone"/>
@@ -244,7 +244,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:text="usun"
+                android:text="usuń"
                 android:visibility="gone"/>
 
         </LinearLayout>
@@ -269,7 +269,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:text="usun"
+                android:text="usuń"
                 android:visibility="gone"/>
         </LinearLayout>
 
@@ -292,7 +292,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:text="usun"
+                android:text="usuń"
                 style="@style/ButtonRed"
                 android:visibility="gone"/>
         </LinearLayout>
@@ -345,9 +345,9 @@
         android:id="@+id/google_clear"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="false"
         android:orientation="horizontal"
-        android:layout_marginTop="600dp"
+        android:layout_above="@id/bottom_bar"
+        android:layout_marginBottom="16dp"
         android:gravity="center"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
@@ -365,7 +365,7 @@
             android:id="@+id/btn_Google"
             android:layout_width="200dp"
             android:layout_height="50dp"
-            android:text="Idz google"
+            android:text="--> google"
             android:layout_marginStart="10dp"
             style="@style/ButtonRed"/>
 
@@ -395,7 +395,7 @@
                 android:scaleType="centerInside"
                 android:contentDescription="Button 2"
                 android:src="@drawable/map"
-                app:tint="#ff0000"
+                app:tint="#000000"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
             <TextView
@@ -425,7 +425,7 @@
                 android:scaleType="centerInside"
                 android:contentDescription="Button 2"
                 android:src="@drawable/warning"
-                app:tint="#ff0000"
+                app:tint="#000000"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
             <TextView
@@ -453,7 +453,7 @@
                 android:scaleType="centerInside"
                 android:contentDescription="Button 2"
                 android:src="@drawable/call"
-                app:tint="#ff0000"
+                app:tint="#000000"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
             <TextView
@@ -481,7 +481,7 @@
                 android:scaleType="centerInside"
                 android:contentDescription="Button 2"
                 android:src="@drawable/person"
-                app:tint="#ff0000"
+                app:tint="#000000"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
             <TextView
@@ -509,7 +509,7 @@
                 android:scaleType="centerInside"
                 android:contentDescription="Button 2"
                 android:src="@drawable/chart"
-                app:tint="#ff0000"
+                app:tint="#000000"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
             <TextView

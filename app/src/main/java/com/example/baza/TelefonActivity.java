@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -19,56 +20,41 @@ import androidx.appcompat.app.AppCompatActivity;
 public class TelefonActivity extends AppCompatActivity {
 
     private ImageView phone1, phone2, phone3, copy1, copy2, copy3;
-    private LinearLayout menuLayout;
-    private Button btnchart, btnuser, btndanger, btnmap, btnTelefon, btnMenu;
-    private FrameLayout background;
+    private ImageButton btnchart, btnuser, btndanger, btnmap, btnTelefon, btnMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarmphones);
         setTitle("Telefony alarmowe");
-        this.phone1 = findViewById(R.id.phone1);
-        this.phone2 = findViewById(R.id.phone2);
-        this.phone3 = findViewById(R.id.phone3);
-        this.copy1 = findViewById(R.id.copy1);
-        this.copy2 = findViewById(R.id.copy2);
-        this.copy3 = findViewById(R.id.copy3);
-
-        this.phone1.setOnClickListener(view -> this.call_phone1());
-        this.phone2.setOnClickListener(view -> this.call_phone2());
-        this.phone3.setOnClickListener(view -> this.call_phone3());
-        this.copy1.setOnClickListener(view -> this.copy_phone1());
-        this.copy2.setOnClickListener(view -> this.copy_phone2());
-        this.copy3.setOnClickListener(view -> this.copy_phone3());
-
-        menuLayout = findViewById(R.id.menuLayout);
+        phone1 = findViewById(R.id.phone1);
+        phone2 = findViewById(R.id.phone2);
+        phone3 = findViewById(R.id.phone3);
+        copy1 = findViewById(R.id.copy1);
+        copy2 = findViewById(R.id.copy2);
+        copy3 = findViewById(R.id.copy3);
         btnchart = findViewById(R.id.chart);
         btnuser = findViewById(R.id.userView);
         btnTelefon = findViewById(R.id.buttonTelefon);
         btndanger = findViewById(R.id.danger);
-        btnMenu = findViewById(R.id.showMenuButton);
-        background = findViewById(R.id.background);
         btnmap = findViewById(R.id.btnmap);
-                btnmap.setOnClickListener(new View.OnClickListener() {
+
+
+        phone1.setOnClickListener(view -> call_phone1());
+        phone2.setOnClickListener(view -> call_phone2());
+        phone3.setOnClickListener(view -> call_phone3());
+        copy1.setOnClickListener(view -> copy_phone1());
+        copy2.setOnClickListener(view -> copy_phone2());
+        copy3.setOnClickListener(view -> copy_phone3());
+
+
+        btnmap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(TelefonActivity.this, MapActivity.class);
                 startActivity(intent);
             }
         });
-
-
-
-        btnMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                menuLayout.setVisibility(View.VISIBLE);
-                btnMenu.setVisibility(View.GONE);
-            }
-        });
-
-
 
         btnchart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,8 +71,6 @@ public class TelefonActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-
 
         btndanger.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,15 +90,17 @@ public class TelefonActivity extends AppCompatActivity {
     }
 
     private void call_phone1(){
-        callPhoneNumber("515964042");
-
-    }
-    private void call_phone2(){
         callPhoneNumber("112");
     }
-    private void call_phone3(){
 
+    private void call_phone2(){
+        callPhoneNumber("985");
     }
+
+    private void call_phone3(){
+        callPhoneNumber("601 100 300");
+    }
+
     private void copy_phone1(){
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipdata = ClipData.newPlainText(null, "112");

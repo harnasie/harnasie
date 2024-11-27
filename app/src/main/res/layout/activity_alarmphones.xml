@@ -1,71 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:background="@color/colorBackground"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorBackground">
 
-
-    <Button
-        android:id="@+id/showMenuButton"
-        android:layout_width="57dp"
-        android:layout_height="52dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
-        android:drawableBottom="@android:drawable/ic_menu_sort_by_size"
-        tools:ignore="MissingConstraints" />
 
     <LinearLayout
-        android:id="@+id/menuLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:orientation="vertical"
-        android:padding="8dp"
-        android:visibility="gone"
-        android:background="#D3FFFFFF"
-        android:elevation="10dp"
-        tools:ignore="MissingConstraints">
+        android:layout_alignParentTop="true"
+        android:layout_above="@id/bottom_bar"
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/userView"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Konto" />
-
-        <Button
-            android:id="@+id/buttonTelefon"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Telefony alarmowe" />
-
-        <Button
-            android:id="@+id/danger"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Zgłoś zagrożenie" />
-
-        <Button
-            android:id="@+id/btnmap"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Mapa" />
-
-        <Button
-            android:id="@+id/chart"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Wykres" />
-    </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:text="Wezwij pomoc"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_margin="10dp"
+            android:textColor="#6B0404"/>
 
     <GridLayout
         android:id="@+id/gridLayout"
@@ -75,16 +32,17 @@
         android:columnCount="2"
         android:rowCount="3"
         android:layout_gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="25dp"
         android:useDefaultMargins="true"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:background="#ffffff">
 
         <!-- First Image + Text -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_margin="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -111,16 +69,32 @@
             android:layout_width="0dp"
             android:layout_height="187dp"
             android:layout_columnWeight="1"
+            android:orientation="vertical"
+            android:layout_margin="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="112"
                 android:textColor="#070707"
                 android:textSize="20sp"
                 android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="112"
+
+                android:textColor="#070707"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
             <ImageView
                 android:id="@+id/copy1"
@@ -138,7 +112,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_margin="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -165,7 +140,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_margin="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -193,7 +169,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_margin="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -219,7 +196,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_margin="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -242,11 +220,158 @@
         </LinearLayout>
 
     </GridLayout>
+    </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/background"
+    <LinearLayout
+        android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible" />
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:gravity="center">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/btnmap"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/map"
+                app:tint="#000000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_1_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mapa"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_margin="8dp"
+            android:elevation="10dp">
+
+            <ImageButton
+                android:id="@+id/danger"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/warning"
+                app:tint="#000000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_2_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Zagrożenie"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/buttonTelefon"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/call"
+                app:tint="#000000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_3_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pomoc"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/userView"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/person"
+                app:tint="#000000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_4_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Konto"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/chart"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/chart"
+                app:tint="#000000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_5_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Wykres"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

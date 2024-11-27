@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DangerActivity extends AppCompatActivity {
-    private Button btnAddDanger, btnViewDangers, btnDelete, btnMapa, btnTelephone, btnDanger;
+    private Button btnAddDanger;//, btnViewDangers, btnDelete, btnMapa, btnTelephone, btnDanger;
     TextView type_tv, description_tv;
     private FusedLocationProviderClient mFusedLocationClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 101;
@@ -54,7 +54,7 @@ public class DangerActivity extends AppCompatActivity {
         setTitle("Zgłoś zagrożenie");
 
         btnAddDanger = findViewById(R.id.buttonAddDanger);
-        btnViewDangers = findViewById(R.id.buttonViewDangers);
+        //btnViewDangers = findViewById(R.id.buttonViewDangers);
         type_tv = findViewById(R.id.type_tv);
         description_tv = findViewById(R.id.description_tv);
         editDescription = findViewById(R.id.editTextDescription);
@@ -65,13 +65,13 @@ public class DangerActivity extends AppCompatActivity {
         //String userName = intent.getStringExtra("username");
         uid = intent.getStringExtra("uid");
         Log.d("emmmmmmmmm" , String.valueOf(uid));
-        btnViewDangers.setOnClickListener(new View.OnClickListener() {
+        /*btnViewDangers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(DangerActivity.this, ViewDangerActivity.class);
                 startActivity(intent);
             }
-        });
+        });*/
 
         sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -112,16 +112,15 @@ public class DangerActivity extends AppCompatActivity {
             }
         });
 
-        btnViewDangers.setOnClickListener(new View.OnClickListener() {
+        /*btnViewDangers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(DangerActivity.this, ViewDangerActivity.class);
                 startActivity(intent);
             }
-        });
+        });*/
 
 
-        menuLayout = findViewById(R.id.menuLayout);
         btnchart = findViewById(R.id.chart);
         btnuser = findViewById(R.id.userView);
         btnTelefon = findViewById(R.id.buttonTelefon);
