@@ -891,11 +891,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
     private void updateMapWithAcceptedDangers(List<LatLng> locations) {
         Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.warning_sign);
-        //Bitmap originalBitmap = BitmapFactory.decodeResource(getContext().getResources(),R.drawable.warning_sign));
-        //BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.warning_sign);
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 85, 85, false);
         BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap);
-        // Załóżmy, że masz instancję GoogleMap
         for (LatLng location : locations) {
             // Dodaj marker na mapie dla każdej lokalizacji
             mMap.addMarker(new MarkerOptions().position(location).icon(icon).title("Zagrożenie"));
