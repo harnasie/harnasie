@@ -578,6 +578,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     }
 
 
+    private String encodeLatLng1(LatLng latLng) {
+        return latLng.latitude + "," + latLng.longitude;
+    }
+
     private LatLng addMarkerAtCenter(String name) {
         // Pobranie obecnego widoku mapy i dodanie markera
         LatLng center = mMap.getCameraPosition().target;
@@ -595,7 +599,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     }
 
 
-    protected static String getDirectionsUrl(LatLng origin, LatLng dest) {
+    private String getDirectionsUrl(LatLng origin, LatLng dest) {
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
         String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
         String mode = "mode=walking";
@@ -647,6 +651,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         if (!waypoints.isEmpty()) {
             parametersBuilder.append("&").append(waypoints);
         }
+
+        // Zwrócenie pełnego URL-a
         return "https://maps.googleapis.com/maps/api/directions/json?" + parametersBuilder.toString();
     }
 
@@ -940,4 +946,5 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     Log.e("FirestoreError", "Błąd przy pobieraniu zaakceptowanych zgłoszeń", e);
                 });
     }
+
 }
