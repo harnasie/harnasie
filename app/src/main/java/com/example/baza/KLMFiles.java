@@ -44,7 +44,6 @@ public class KLMFiles {
 
     private Context context;
     private GoogleMap mMap;
-    private List<Polyline> drawnPolylines = new ArrayList<>();
     private List<String> szlaki = new ArrayList<>();
     private List<Marker> stawy = new ArrayList<>();
     private List<Marker> szczyty = new ArrayList<>();
@@ -54,7 +53,6 @@ public class KLMFiles {
     public KLMFiles(Context context, GoogleMap mMap) {
         this.context = context;
         this.mMap = mMap;
-
 
     }
 
@@ -71,12 +69,10 @@ public class KLMFiles {
     }
 
     public List<String> getSzlaki() {
-        Log.d("pobirwaszlkaki", String.valueOf(szlaki.size()));
         return szlaki;
     }
 
 
-    // Funkcja do pobierania i przetwarzania plików .kml z folderów szlaki i szlaki2
     public void processKMLFiles() {
         processKMLFilesFromFolder("szlaki");
         processKMLFilesFromFolderMarker("marker");
@@ -92,8 +88,7 @@ public class KLMFiles {
                 for (File file : files) {
                     if (file.isFile() && file.getName().endsWith(".kml")) {
                         Log.d(TAG, "Znalazłem plik: " + file.getAbsolutePath());
-                        // Odczytaj zawartość pliku KML
-                        readAndProcessKMLFile1(file);
+                        readAndProcessKMLFile(file);
                         szlaki.add(file.getName());
                         Log.d(TAG, "Znalazłem plik: " + szlaki.size());
 
@@ -122,7 +117,6 @@ public class KLMFiles {
                     if (file.isFile() && file.getName().endsWith(".kml")) {
                         Log.d(TAG, "Znalazłem plik: " + file.getAbsolutePath());
                         // Odczytaj zawartość pliku KML
-                        //addMarkerFromKML(file);
                         Log.d("nazwa", file.getName());
                         switch (file.getName()) {
                             case "stawy.kml":
@@ -148,7 +142,6 @@ public class KLMFiles {
                                     Log.d("qqqqq", String.valueOf(schroniska.size()));
                                 //}
                                 break;
-
                         }
                     }
                 }
@@ -207,25 +200,19 @@ public class KLMFiles {
     }
 
 
-    private void readAndProcessKMLFile1(File file) {
+    private void readAndProcessKMLFile(File file) {
         try {
             FileInputStream fileInputStream = new FileInputStream(file);
-            // Wczytaj warstwę KML
             KmlLayer kmlLayer = new KmlLayer(mMap, fileInputStream, context);
-            // Dodaj warstwę KML do mapy
             kmlLayer.addLayerToMap();
 
-            //kmlLayer.setMap(mMap);
-
-            // Iteracja po kontenerach KML i placemarkach
             for (KmlContainer container : kmlLayer.getContainers()) {
                 for (KmlPlacemark placemark : container.getPlacemarks()) {
-                    // Pobierz nazwę placemarka
+
                     String name = placemark.getProperty("name");
                     Log.d("KML", "Nazwa: " + name);
 
-                    // Określ kolor na podstawie nazwy
-                    int color = Color.GRAY; // Domyślny kolor
+                    int color = Color.GRAY;
                     if (name != null) {
                         if (name.contains("czerwony")) {
                             color = Color.RED;
@@ -240,27 +227,20 @@ public class KLMFiles {
                         }
                     }
 
-                    // Tworzymy PolylineOptions z odpowiednim kolorem
                     PolylineOptions polylineOptions = new PolylineOptions()
                             .color(color)
                             .width(5f);
 
-                    // Sprawdzenie, czy geometria placemarka to KmlLineString
                     if (placemark.getGeometry() instanceof KmlLineString) {
                         KmlLineString lineString = (KmlLineString) placemark.getGeometry();
                         List<LatLng> coordinates = lineString.getGeometryObject();
                         Log.d("KML", coordinates.toString());
 
-                        // Dodajemy współrzędne do PolylineOptions
                         polylineOptions.addAll(coordinates);
-
-                        // Dodajemy Polyline na mapie
                         mMap.addPolyline(polylineOptions);
                     }
                 }
             }
-
-            // Możesz także dodać inną funkcjonalność, np. rysowanie innych elementów KML
 
         } catch (IOException | XmlPullParserException e) {
             Log.e(TAG, "Błąd podczas odczytu pliku: " + e.getMessage());

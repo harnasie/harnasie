@@ -42,8 +42,6 @@ public class DangerActivity extends AppCompatActivity {
     private LatLng currentLocation = null;
     private FirebaseFirestore db;
     private String uid = null;
-    private LinearLayout menuLayout;
-    private FrameLayout background;
     private ImageButton btnchart, btndanger, btnTelefon, btnmap, btnuser;
 
 
