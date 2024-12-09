@@ -108,27 +108,18 @@ public class WelcomeActivity extends AppCompatActivity {
                 }
             }).addOnFailureListener(exception -> {
                 Log.e(TAG, "Błąd pobierania metadanych dla pliku: " + fileRef.getName(), exception);
-
-                if (localFile.exists()) {
-                    localFile.delete();
-                    Log.d(TAG, "Usunięto lokalny plik, ponieważ nie istnieje na serwerze: " + localFile.getName());
-                }
-
                 downloadFile(fileRef, localFile);
             });
         } else {
             fileRef.getMetadata().addOnSuccessListener(metadata -> {
-                long serverFileSize = metadata.getSizeBytes();
                 Log.d(TAG, "Plik nie istnieje lokalnie, ale jest na serwerze. Pobieram: " + fileRef.getName());
                 downloadFile(fileRef, localFile);
             }).addOnFailureListener(exception -> {
-                if (localFile.exists()) {
-                    localFile.delete();
-                    Log.d(TAG, "Usunięto lokalny plik, ponieważ nie istnieje na serwerze: " + localFile.getName());
-                }
+                Log.e(TAG, "Błąd pobierania metadanych dla pliku: " + fileRef.getName(), exception);
             });
         }
     }
+
 
 
     private void downloadFile(StorageReference fileRef, File localFile) {
@@ -148,28 +139,6 @@ public class WelcomeActivity extends AppCompatActivity {
                         localFile.delete();
                     }
                 });
-    }
-
-    private String getFileHash(File file) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            FileInputStream fis = new FileInputStream(file);
-            byte[] byteArray = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = fis.read(byteArray)) != -1) {
-                digest.update(byteArray, 0, bytesRead);
-            }
-            fis.close();
-            byte[] hashBytes = digest.digest();
-            StringBuilder sb = new StringBuilder();
-            for (byte b : hashBytes) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
-        } catch (Exception e) {
-            Log.e(TAG, "Błąd obliczania hash'a pliku: " + e.getMessage());
-            return null;
-        }
     }
 
     private boolean isUserLoggedIn() {

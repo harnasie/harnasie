@@ -33,7 +33,6 @@ public class TelefonActivity extends AppCompatActivity {
         copy1 = findViewById(R.id.copy1);
         copy2 = findViewById(R.id.copy2);
         copy3 = findViewById(R.id.copy3);
-        btnchart = findViewById(R.id.chart);
         btnuser = findViewById(R.id.userView);
         btnTelefon = findViewById(R.id.buttonTelefon);
         btndanger = findViewById(R.id.danger);
@@ -56,13 +55,6 @@ public class TelefonActivity extends AppCompatActivity {
             }
         });
 
-        btnchart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(TelefonActivity.this, ChartActivity.class);
-                startActivity(intent);
-            }
-        });
 
         btnTelefon.setOnClickListener(new View.OnClickListener() {
             @Override

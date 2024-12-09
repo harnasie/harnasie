@@ -343,7 +343,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
         skad_et = findViewById(R.id.place1);
         dokad_et = findViewById(R.id.place2);
-        btnchart = findViewById(R.id.chart);
         btnuser = findViewById(R.id.userView);
         btnTelefon = findViewById(R.id.buttonTelefon);
         btndanger = findViewById(R.id.danger);
@@ -352,14 +351,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MapActivity.this, MapActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        btnchart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MapActivity.this, ChartActivity.class);
                 startActivity(intent);
             }
         });
@@ -619,16 +610,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
     private String getDirectionsUrlWITH(LatLng origin, LatLng dest, List<LatLng> waypointsList) {
         if (origin == null || dest == null) {
-            throw new IllegalArgumentException("Origin and destination cannot be null");
+            throw new IllegalArgumentException("Dane trasy są nieuzupełnione");
         }
 
-        // Parametry początkowy i końcowy
         String str_origin = "origin=" + encodeLatLng(origin);
         String str_dest = "destination=" + encodeLatLng(dest);
         String mode = "mode=walking";
-        String key = "key=AIzaSyC4KaLnKSYLuF9xCyzudGh8DMCB-6HefJA"; // Zmienna do przechowywania klucza API
+        String key = "key=AIzaSyC4KaLnKSYLuF9xCyzudGh8DMCB-6HefJA";
 
-        // Tworzenie parametru waypoints, jeśli lista punktów pośrednich nie jest pusta
         String waypoints = "";
         if (waypointsList != null && !waypointsList.isEmpty()) {
             StringBuilder waypointsBuilder = new StringBuilder("waypoints=");
@@ -642,7 +631,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             waypoints = waypointsBuilder.toString();
         }
 
-        // Składanie wszystkich parametrów do jednego ciągu
         StringBuilder parametersBuilder = new StringBuilder(str_origin);
         parametersBuilder.append("&").append(str_dest);
         parametersBuilder.append("&").append(mode);
@@ -652,7 +640,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             parametersBuilder.append("&").append(waypoints);
         }
 
-        // Zwrócenie pełnego URL-a
         return "https://maps.googleapis.com/maps/api/directions/json?" + parametersBuilder.toString();
     }
 
@@ -760,10 +747,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         @Override
         protected void onPostExecute(List<List<HashMap<String, String>>> result) {
             routePoints.clear();
+            routePolylines.clear();
             ArrayList<LatLng> points = new ArrayList<>();
-            HashSet<LatLng> uniquePoints = new HashSet<>(); // Zestaw do śledzenia unikalnych punktów
+            HashSet<LatLng> uniquePoints = new HashSet<>();
             PolylineOptions lineOptions = new PolylineOptions();
-            routePolylines.clear(); // Upewnij się, że lista jest czyszczona przed dodaniem nowych polilinii
+
 
             for (int i = 0; i < result.size(); i++) {
                 List<HashMap<String, String>> path = result.get(i);
@@ -771,37 +759,29 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     double lat = Double.parseDouble(point.get("lat"));
                     double lng = Double.parseDouble(point.get("lng"));
                     LatLng position = new LatLng(lat, lng);
-                    Log.d("punkty", String.valueOf(position));
 
-                    // Sprawdź, czy punkt jest unikalny
-                    if (uniquePoints.add(position)) { // Jeśli dodanie do zestawu się powiedzie, to punkt jest unikalny
+                    if (uniquePoints.add(position)) {
                         points.add(position);
                     }
                 }
             }
-
 
             lineOptions.addAll(points);
             lineOptions.width(15);
             lineOptions.color(Color.MAGENTA);
 
             if (mMap != null) {
-                // Usuń poprzednią trasę
                 clearPreviousRoute();
-
-                // Dodaj nową trasę
                 currentRoutePolyline = mMap.addPolyline(lineOptions);
                 routePoints.clear();
                 routePoints.addAll(points);
 
-                // Ustaw kamerę na ostatni punkt, jeśli punkty są dostępne
                 if (!routePoints.isEmpty()) {
-                    LatLng startPoint = routePoints.get(0); // Ostatni punkt
+                    LatLng startPoint = routePoints.get(0);
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startPoint, 15));
                 }
             }
         }
-
     }
 
 
@@ -894,52 +874,34 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 85, 85, false);
         BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap);
         for (LatLng location : locations) {
-            // Dodaj marker na mapie dla każdej lokalizacji
             mMap.addMarker(new MarkerOptions().position(location).icon(icon).title("Zagrożenie"));
         }
     }
 
     private void getAcceptedDangersLocations() {
-        // Pobieramy kolekcję "dangers" z Firestore
         db.collection("dangers")
-                .whereEqualTo("accepted", true)  // Filtrujemy tylko zaakceptowane zgłoszenia
+                .whereEqualTo("accepted", true)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (queryDocumentSnapshots != null && !queryDocumentSnapshots.isEmpty()) {
-                        // Lista, w której przechowamy lokalizacje zaakceptowanych zgłoszeń
                         List<LatLng> locations = new ArrayList<>();
-                        // Iterujemy przez dokumenty i wyciągamy lokalizacje
                         for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            // Sprawdzamy, czy dokument zawiera dane o lokalizacji
                             if (documentSnapshot.contains("location")) {
                                 Map<String, Object> locationmap = (Map<String, Object>) documentSnapshot.get("location");
 
                                 if (locationmap != null) {
-                                    // Jeśli pole "location" istnieje, pobieramy współrzędne
                                     double latitude = (double) locationmap.get("latitude");
                                     double longitude = (double) locationmap.get("longitude");
 
-                                    // Tworzymy LatLng i dodajemy do listy
                                     LatLng location = new LatLng(latitude, longitude);
                                     locations.add(location);
 
-                                    // Możemy tu dodać dodatkowe działania z lokalizacjami, np. wyświetlanie na mapie
                                     Log.d("Accepted Danger", "Location: " + latitude + ", " + longitude);
-                                }
-                            }
-                        }
-
-                        // Po zakończeniu możemy np. wyświetlić lokalizacje na mapie lub zrobić coś innego
+                                }}}
                         if (!locations.isEmpty()) {
-                            // Tutaj możesz zrobić coś z listą lokalizacji
-                            // Na przykład, zaktualizować mapę
                             updateMapWithAcceptedDangers(locations);
-                        } else {
-                            Toast.makeText(MapActivity.this, "Brak zaakceptowanych zgłoszeń.", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(MapActivity.this, "Brak zgłoszeń w bazie.", Toast.LENGTH_SHORT).show();
-                    }
+                        } else {Toast.makeText(MapActivity.this, "Brak zaakceptowanych zgłoszeń.", Toast.LENGTH_SHORT).show();}
+                    } else {Toast.makeText(MapActivity.this, "Brak zgłoszeń w bazie.", Toast.LENGTH_SHORT).show();}
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(MapActivity.this, "Błąd przy pobieraniu zgłoszeń: " + e.getMessage(), Toast.LENGTH_SHORT).show();

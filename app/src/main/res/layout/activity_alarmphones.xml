@@ -345,33 +345,5 @@
                 android:textColor="#000000" />
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_weight="1"
-            android:layout_margin="8dp">
-
-            <ImageButton
-                android:id="@+id/chart"
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-                android:scaleType="centerInside"
-                android:contentDescription="Button 2"
-                android:src="@drawable/chart"
-                app:tint="#000000"
-                android:background="?attr/selectableItemBackgroundBorderless" />
-
-            <TextView
-                android:id="@+id/bottom_btn_5_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Wykres"
-                android:textSize="12sp"
-                android:gravity="center"
-                android:textColor="#000000" />
-        </LinearLayout>
-
     </LinearLayout>
 </RelativeLayout>

@@ -121,7 +121,6 @@ public class DangerActivity extends AppCompatActivity {
         });*/
 
 
-        btnchart = findViewById(R.id.chart);
         btnuser = findViewById(R.id.userView);
         btnTelefon = findViewById(R.id.buttonTelefon);
         btndanger = findViewById(R.id.danger);
@@ -130,15 +129,6 @@ public class DangerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(DangerActivity.this, MapActivity.class);
-                startActivity(intent);
-            }
-        });
-
-
-        btnchart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(DangerActivity.this, ChartActivity.class);
                 startActivity(intent);
             }
         });
@@ -180,41 +170,32 @@ public class DangerActivity extends AppCompatActivity {
 
     private void addDanger(String description, String type, String uid) {
         if (!isInternetAvailable()) {
-            // Brak połączenia z internetem - zapisujemy dane lokalnie
             saveDangerLocally(description, type, uid);
         } else {
-            // Sprawdzanie uprawnień do lokalizacji
             checkLocationPermission();
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Brak uprawnień do lokalizacji.", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            // Pobieramy ostatnią lokalizację
             mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
                 if (location != null) {
                     currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                    Log.d("lokalizacja", String.valueOf(currentLocation));
 
-                    // Pobieramy dokument użytkownika, aby uzyskać jego dane
                     db.collection("users").document(uid).get().addOnSuccessListener(userDoc -> {
                         if (userDoc.exists()) {
-                            // Tworzymy mapę `userMap` z danymi użytkownika
                             Map<String, Object> userMap = new HashMap<>();
                             userMap.put("email", userDoc.getString("email"));
                             userMap.put("username", userDoc.getString("username"));
                             userMap.put("uid", uid);
 
-                            // Tworzymy mapę danych dla `danger`
                             Map<String, Object> danger = new HashMap<>();
                             danger.put("description", description);
                             danger.put("location", currentLocation);
                             danger.put("type", type);
-                            danger.put("user", userMap); // Zagnieżdżamy obiekt `userMap` w `danger`
+                            danger.put("user", userMap);
                             danger.put("createdAt", Timestamp.now());
                             danger.put("accepted", false);
 
-                            // Zapisujemy dane do kolekcji "dangers" w Firestore
                             db.collection("dangers").add(danger)
                                     .addOnSuccessListener(documentReference -> {
                                         Toast.makeText(DangerActivity.this, "Dodano zagrożenie z ID: " + documentReference.getId(), Toast.LENGTH_SHORT).show();
@@ -227,13 +208,8 @@ public class DangerActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(this, "Nie znaleziono użytkownika.", Toast.LENGTH_SHORT).show();
                         }
-                    }).addOnFailureListener(e -> {
-                        Log.e("FirestoreError", "Błąd przy pobieraniu danych użytkownika", e);
-                        Toast.makeText(this, "Błąd przy pobieraniu danych użytkownika: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
-                } else {
-                    Toast.makeText(DangerActivity.this, "Nie można uzyskać bieżącej lokalizacji.", Toast.LENGTH_SHORT).show();
-                }
+                    }).addOnFailureListener(e -> {Toast.makeText(this, "Błąd przy pobieraniu danych użytkownika: " + e.getMessage(), Toast.LENGTH_SHORT).show();});
+                } else {Toast.makeText(DangerActivity.this, "Nie można uzyskać bieżącej lokalizacji.", Toast.LENGTH_SHORT).show();}
             });
         }
     }

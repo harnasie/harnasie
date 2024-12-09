@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -20,27 +21,38 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class UserActivity extends AppCompatActivity {
     private TextView welcomeTextView;
-    Button btnViewDangers, btnGoDanger, btnMapa, btnTelephone, btnDanger, btnChart, btnWyloguj;
     FirebaseFirestore db;
     private LineChart lineChart;
     private LatLng currentLocation = null;
@@ -49,9 +61,11 @@ public class UserActivity extends AppCompatActivity {
     private String uid = null;
     private LinearLayout routeInputLayout;
     private LinearLayout menuLayout;
-    private Button btnchart, btnuser, btndanger,btnTelefon,btnmap, btnMenu;
+    private Button  btnWyloguj;
+    private ImageButton btnuser, btndanger,btnTelefon,btnmap;
     private FrameLayout background;
     private String userName = null;
+    private BarChart barChart;
 
 
     @Override
@@ -59,14 +73,10 @@ public class UserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
         setTitle("Konto użytkownika");
-
+        barChart = findViewById(R.id.barChart);
         // Znalezienie TextView do wyświetlania wiadomości powitalnej
         welcomeTextView = findViewById(R.id.welcomeTextView);
-        btnViewDangers = findViewById(R.id.buttonViewDangers);
-        btnMapa = findViewById(R.id.buttonMapa);
-        //lineChart = findViewById(R.id.lineChart);
         routeInputLayout = findViewById(R.id.route_input_layout);
-        btnDanger = findViewById(R.id.buttonDanger);
         btnWyloguj = findViewById(R.id.logout);
         db = FirebaseFirestore.getInstance();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -90,6 +100,7 @@ public class UserActivity extends AppCompatActivity {
         // Wyświetlenie powitania z nazwą użytkownika
         if (userName != null) {
             welcomeTextView.setText("Witaj, " + userName + "!");
+            fetchAndDisplayData(uid);
         } else {
             welcomeTextView.setText("Witaj, użytkowniku!");
         }
@@ -111,29 +122,11 @@ public class UserActivity extends AppCompatActivity {
 
         // Odśwież wykres
         lineChart.invalidate();*/
-        menuLayout = findViewById(R.id.menuLayout);
-        btnchart = findViewById(R.id.chart);
+        btnuser = findViewById(R.id.userView);
         btnuser = findViewById(R.id.userView);
         btnTelefon = findViewById(R.id.buttonTelefon);
         btndanger = findViewById(R.id.danger);
-        btnMenu = findViewById(R.id.showMenuButton);
-        background = findViewById(R.id.background);
         btnmap = findViewById(R.id.btnmap);
-        btnMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                menuLayout.setVisibility(View.VISIBLE);
-                btnMenu.setVisibility(View.GONE);
-            }
-        });
-
-        background.setOnClickListener(v -> {
-            menuLayout.setVisibility(View.GONE); // Ukrycie menu
-            //background.setVisibility(View.GONE);// Ukrycie tła
-            btnMenu.setVisibility(View.VISIBLE);
-            Log.d("cldsdf","sdfgh");
-        });
-
         btnmap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,22 +135,6 @@ public class UserActivity extends AppCompatActivity {
             }
         });
 
-        btnViewDangers.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(UserActivity.this, ViewDangerActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        btnchart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(UserActivity.this, ChartActivity.class);
-                intent.putExtra("uid",uid);
-                startActivity(intent);
-            }
-        });
 
         btnTelefon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -167,19 +144,10 @@ public class UserActivity extends AppCompatActivity {
             }
         });
 
-        btnMapa.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(UserActivity.this, MapActivity.class);
-                startActivity(intent);
-            }
-        });
-
         btndanger.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(UserActivity.this, DangerActivity.class);
-                intent.putExtra("uid",uid);
                 startActivity(intent);
             }
         });
@@ -188,7 +156,6 @@ public class UserActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(UserActivity.this, UserActivity.class);
-                intent.putExtra("uid",uid);
                 startActivity(intent);
             }
         });
@@ -349,5 +316,85 @@ public class UserActivity extends AppCompatActivity {
         finish();
     }
 
+
+    private void fetchAndDisplayData(String uid){
+        db.collection("walking")
+                .whereEqualTo("uid", uid) // Filtrujemy po polu "uid"
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<BarEntry> barEntries = new ArrayList<>();
+                        ArrayList<String> labels = new ArrayList<>();
+                        int index = 0;
+                        // Sprawdzamy, czy znaleziono dokumenty
+                        if (!task.getResult().isEmpty()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                // Pobieramy wartość "distance"
+                                Double distance = document.getDouble("distance");
+                                Date timeee = document.getDate("date");
+
+                                int day = timeee.getDate();
+                                int month = timeee.getMonth() + 1;
+                                int year = timeee.getYear();
+                                String datad = day + "." + month + "." + year;
+                                // Dodaj dane do wykresu
+                                barEntries.add(new BarEntry(index, distance.floatValue()));
+                                labels.add(datad); // Dodaj datę jako etykietę
+                                index++;
+
+
+                                // Wyświetl dane na wykresie
+                                showBarChart(barEntries, labels);
+                            }
+                        } else {
+                            Log.d("Firebase", "No documents found for UID: " + uid);
+                        }
+                    } else {
+                        Log.e("Firebase", "Error getting documents: ", task.getException());
+                    }
+                });
+    }
+
+    private void showBarChart(ArrayList<BarEntry> barEntries, ArrayList<String> labels) {
+        BarDataSet barDataSet = new BarDataSet(barEntries, "Distance");
+        barDataSet.setColor(getResources().getColor(android.R.color.holo_blue_light)); // Ustaw kolor słupków
+
+        BarData barData = new BarData(barDataSet);
+        barData.setBarWidth(0.5f); // Szerokość słupków
+
+        // Ustawienie danych wykresu
+        barChart.setData(barData);
+        barChart.setFitBars(true);
+
+        // Wyłączenie opisu wykresu
+        barChart.getDescription().setEnabled(false);
+
+        // Wyłączenie legendy
+        barChart.getLegend().setEnabled(false);
+
+        // Ustawienie etykiet na osi X
+        barChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
+        barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        barChart.getXAxis().setGranularity(1f);
+        barChart.getXAxis().setGranularityEnabled(true);
+
+        // Wyłączenie pionowych linii siatki na osi Y
+        barChart.getAxisLeft().setDrawGridLines(false);
+        barChart.getAxisRight().setDrawGridLines(false);
+
+        // Wyłączenie prawej osi Y (jeśli nie jest potrzebna)
+        barChart.getAxisRight().setEnabled(false);
+
+        // Dodanie jednostki "km" do osi Y
+        barChart.getAxisLeft().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return value + " km";  // Dodajemy jednostkę km do wartości
+            }
+        });
+
+        // Odświeżenie wykresu
+        barChart.invalidate();
+    }
 
 }

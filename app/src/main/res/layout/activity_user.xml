@@ -1,107 +1,56 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/colorBackground"
-    android:padding="16dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".MainActivity"
+    android:background="@color/colorBackground">
 
-
-    <LinearLayout
-        android:id="@+id/menuLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:orientation="vertical"
-        android:padding="8dp"
-        android:visibility="gone"
-        android:background="#D3FFFFFF">
-
-        <Button
-            android:id="@+id/userView"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Konto" />
-
-        <Button
-            android:id="@+id/buttonTelefon"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Telefony alarmowe" />
-
-        <Button
-            android:id="@+id/danger"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Zgłoś zagrożenie" />
-
-        <Button
-            android:id="@+id/btnmap"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Mapa" />
-
-        <Button
-            android:id="@+id/chart"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Wykres" />
-
-        <Button
-            android:id="@+id/logout"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:text="Wyloguj" />
-    </LinearLayout>
 
 
     <Button
-        android:id="@+id/showMenuButton"
-        android:layout_width="57dp"
-        android:layout_height="52dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
-        android:drawableBottom="@android:drawable/ic_menu_sort_by_size" />
+        android:id="@+id/logout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        style="@style/ButtonRed"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_below="@id/barChart"
+        android:text="Wyloguj" />
+
 
     <TextView
         android:id="@+id/welcomeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Witaj!"
-        android:textSize="24sp"
+        android:textSize="28sp"
+        android:layout_marginTop="20dp"
         android:textStyle="bold"
-        android:gravity="center" />
+        android:layout_centerHorizontal="true" />
 
-    <Button
-        android:id="@+id/buttonViewDangers"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/chartTextView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pokaż zgłoszenia" />
-
-
-    <Button
-        android:id="@+id/buttonMapa"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Mapa" />
+        android:text="Wykres twoich dystansów"
+        android:layout_marginTop="50dp"
+        android:textColor="#6B0404"
+        android:textSize="24sp"
+        android:layout_below="@id/welcomeTextView"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true" />
 
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/barChart"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="400dp"
+        android:layout_height="400dp"
+        android:layout_centerInParent="true"
+        android:layout_below="@id/chartTextView"
+        android:layout_margin="16dp"
+        android:background="#FFFF"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_dangers"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
 
     <LinearLayout
         android:id="@+id/route_input_layout"
@@ -112,17 +61,129 @@
         android:orientation="horizontal"
         android:visibility="gone">
 
-        <Button
-            android:id="@+id/buttonDanger"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Mapa" />
     </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/background"
+    <LinearLayout
+        android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible" />
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:background="#FFFFFF"
+        android:gravity="center">
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/btnmap"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/map"
+                app:tint="#000000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_1_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mapa"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/danger"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/warning"
+                app:tint="#000000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_2_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Zagrożenie"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/buttonTelefon"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/call"
+                app:tint="#000000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_3_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pomoc"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_margin="8dp">
+
+            <ImageButton
+                android:id="@+id/userView"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:scaleType="centerInside"
+                android:contentDescription="Button 2"
+                android:src="@drawable/person"
+                app:tint="#000000"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <TextView
+                android:id="@+id/bottom_btn_4_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Konto"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:textColor="#000000" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

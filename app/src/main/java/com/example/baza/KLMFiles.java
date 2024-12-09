@@ -113,40 +113,29 @@ public class KLMFiles {
         BitmapDescriptor icon = null;
         File folder = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), folderName);
 
-        // Sprawdź, czy folder istnieje i jest katalogiem
         if (folder.exists() && folder.isDirectory()) {
             File[] files = folder.listFiles();
             if (files != null) {
                 for (File file : files) {
-                    // Sprawdź, czy plik jest plikiem .kml
                     if (file.isFile() && file.getName().endsWith(".kml")) {
-                        Log.d(TAG, "Znalazłem plik: " + file.getAbsolutePath());
-                        // Odczytaj zawartość pliku KML
-                        //addMarkerFromKML(file);
-                        Log.d("nazwa", file.getName());
                         switch (file.getName()) {
                             case "stawy.kml":
                                 iconBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.location_pin);
-                                resizedBitmap = Bitmap.createScaledBitmap(iconBitmap, 100, 100, false); // Rozmiar 100x100 pikseli
+                                resizedBitmap = Bitmap.createScaledBitmap(iconBitmap, 100, 100, false);
                                 icon = BitmapDescriptorFactory.fromBitmap(resizedBitmap);
                                 stawy = addMarkersFromKML(file.getAbsolutePath(),icon);
                                 break;
                             case "szczyty.kml":
                                 iconBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.snowed_mountains);
-                                resizedBitmap = Bitmap.createScaledBitmap(iconBitmap, 100, 100, false); // Rozmiar 100x100 pikseli
+                                resizedBitmap = Bitmap.createScaledBitmap(iconBitmap, 100, 100, false);
                                 icon = BitmapDescriptorFactory.fromBitmap(resizedBitmap);
                                 szczyty = addMarkersFromKML(file.getAbsolutePath(), icon);
                                 break;
                             case "schroniska.kml":
-                                Log.d("qqqqq", "marker.getTitle()");
                                 iconBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.tent);
-                                resizedBitmap = Bitmap.createScaledBitmap(iconBitmap, 100, 100, false); // Rozmiar 100x100 pikseli
+                                resizedBitmap = Bitmap.createScaledBitmap(iconBitmap, 100, 100, false);
                                 icon = BitmapDescriptorFactory.fromBitmap(resizedBitmap);
                                 schroniska = addMarkersFromKML(file.getAbsolutePath(), icon);
-                                //for (Marker marker : schroniska){
-                                Log.d("qqqqq", String.valueOf(schroniska.get(6).getTitle()));
-                                    Log.d("qqqqq", String.valueOf(schroniska.size()));
-                                //}
                                 break;
 
                         }
@@ -210,22 +199,13 @@ public class KLMFiles {
     private void readAndProcessKMLFile1(File file) {
         try {
             FileInputStream fileInputStream = new FileInputStream(file);
-            // Wczytaj warstwę KML
             KmlLayer kmlLayer = new KmlLayer(mMap, fileInputStream, context);
-            // Dodaj warstwę KML do mapy
             kmlLayer.addLayerToMap();
-
-            //kmlLayer.setMap(mMap);
-
-            // Iteracja po kontenerach KML i placemarkach
             for (KmlContainer container : kmlLayer.getContainers()) {
                 for (KmlPlacemark placemark : container.getPlacemarks()) {
-                    // Pobierz nazwę placemarka
                     String name = placemark.getProperty("name");
-                    Log.d("KML", "Nazwa: " + name);
 
-                    // Określ kolor na podstawie nazwy
-                    int color = Color.GRAY; // Domyślny kolor
+                    int color = Color.GRAY;
                     if (name != null) {
                         if (name.contains("czerwony")) {
                             color = Color.RED;
@@ -240,28 +220,18 @@ public class KLMFiles {
                         }
                     }
 
-                    // Tworzymy PolylineOptions z odpowiednim kolorem
                     PolylineOptions polylineOptions = new PolylineOptions()
                             .color(color)
                             .width(5f);
 
-                    // Sprawdzenie, czy geometria placemarka to KmlLineString
                     if (placemark.getGeometry() instanceof KmlLineString) {
                         KmlLineString lineString = (KmlLineString) placemark.getGeometry();
                         List<LatLng> coordinates = lineString.getGeometryObject();
-                        Log.d("KML", coordinates.toString());
-
-                        // Dodajemy współrzędne do PolylineOptions
                         polylineOptions.addAll(coordinates);
-
-                        // Dodajemy Polyline na mapie
                         mMap.addPolyline(polylineOptions);
                     }
                 }
             }
-
-            // Możesz także dodać inną funkcjonalność, np. rysowanie innych elementów KML
-
         } catch (IOException | XmlPullParserException e) {
             Log.e(TAG, "Błąd podczas odczytu pliku: " + e.getMessage());
         }
@@ -272,8 +242,6 @@ public class KLMFiles {
 
         try {
             InputStream kmlInputStream = new FileInputStream(absolutePath);
-
-            // Analiza KML
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             factory.setNamespaceAware(true);
             XmlPullParser parser = factory.newPullParser();
@@ -304,30 +272,22 @@ public class KLMFiles {
                     case XmlPullParser.END_TAG:
                         if ("Placemark".equals(tagName)) {
                             if (coordinates != null) {
-                                // Dodanie markera na mapę z niestandardową ikoną
                                 Marker marker = mMap.addMarker(new MarkerOptions()
                                         .position(coordinates)
                                         .title(name)
                                         .snippet(description)
                                         .visible(false)
-                                        .icon(icon)); // Użyj ikony z drawable
+                                        .icon(icon));
                                 coordinates = null;
                                 if (marker != null) {
                                     markersList.add(marker);
-                                    Log.d(marker.getTitle(),"sdfghj");
                                 }
 
                             }
                         }
                         break;
                 }
-
                 eventType = parser.next();
-            }
-
-            // Ustawienie kamery na pierwszy marker
-            if (mMap != null && coordinates != null) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 10));
             }
 
         } catch (Exception e) {
@@ -335,5 +295,4 @@ public class KLMFiles {
         }
         return markersList;
     }
-
 }

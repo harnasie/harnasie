@@ -59,7 +59,6 @@ public class ChartActivity extends AppCompatActivity {
         Log.d("iertyu",uid);
         fetchAndDisplayData(uid);}
 
-        btnchart = findViewById(R.id.chart);
         btnuser = findViewById(R.id.userView);
         btnTelefon = findViewById(R.id.buttonTelefon);
         btndanger = findViewById(R.id.danger);

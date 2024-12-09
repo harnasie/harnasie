@@ -72,7 +72,6 @@ public class DangerAdapter extends ArrayAdapter<Map<String, Object>> {
     }
 
     private void acceptDanger(String dangerId) {
-        // Zmieniamy status "accepted" na true
         db.collection("dangers").document(dangerId)
                 .update("accepted", true)
                 .addOnSuccessListener(aVoid -> {
@@ -85,20 +84,16 @@ public class DangerAdapter extends ArrayAdapter<Map<String, Object>> {
 
 
     private void markerDanger(String dangerId) {
-        // Pobieramy dokument konkretnego ucznia z kolekcji "students" na podstawie ID
         db.collection("dangers").document(dangerId)
-                .get()  // Pobieramy dokument
+                .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        // Jeśli dokument istnieje, sprawdzamy, czy ma pole "location"
                         Map<String, Object> location = (Map<String, Object>) documentSnapshot.get("location");
 
                         if (location != null) {
-                            // Jeśli pole "location" istnieje, pobieramy współrzędne
                             double latitude = (double) location.get("latitude");
                             double longitude = (double) location.get("longitude");
 
-                            // Wyświetlamy współrzędne w logu
                             Log.d("Location", "Latitude: " + latitude + ", Longitude: " + longitude);
                         } else {
                             Log.e("Location", "Brak lokalizacji w zgłoszeniu.");
@@ -110,7 +105,5 @@ public class DangerAdapter extends ArrayAdapter<Map<String, Object>> {
                 .addOnFailureListener(e -> {
                     Log.e("FirestoreError", "Błąd przy pobieraniu dokumentu: " + e.getMessage());
                 });
-
     }
-
 }
