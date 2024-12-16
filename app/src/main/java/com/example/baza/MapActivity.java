@@ -590,7 +590,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     }
 
 
-    private String getDirectionsUrl(LatLng origin, LatLng dest) {
+    protected static String getDirectionsUrl(LatLng origin, LatLng dest) {
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
         String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
         String mode = "mode=walking";
