@@ -16,6 +16,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.onesignal.OSNotification;
+import com.onesignal.OSNotificationOpenedResult;
+import com.onesignal.OneSignal;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,12 +28,32 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private FirebaseStorage storage;
     private static final String TAG = "KMLDownloader";
+    private static final String ONESIGNAL_APP_ID = "cf851d9a-5124-45fb-be68-591645364d51";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
+/*
+        OneSignal.initWithContext(this);
+        OneSignal.setAppId(ONESIGNAL_APP_ID);
+        OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
 
+        OneSignal.promptForPushNotifications();
+
+        OneSignal.setNotificationWillShowInForegroundHandler(notificationReceivedEvent -> {
+            OSNotification notification = notificationReceivedEvent.getNotification();
+            Log.d("Powiadomienie", "Treść powiadomienia: " + notification.getBody());
+
+            // Możesz kontrolować, czy powiadomienie powinno być wyświetlane
+            notificationReceivedEvent.complete(notification);
+        });
+
+        OneSignal.setNotificationOpenedHandler(result -> {
+            OSNotificationOpenedResult openedResult = result;
+            Log.d("Powiadomienie", "Użytkownik otworzył powiadomienie: " + openedResult.getNotification().getBody());
+        });
+*/
         storage = FirebaseStorage.getInstance();
 
         Button btnSignUp = findViewById(R.id.btn_sign_up);
@@ -121,7 +144,6 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
 
-
     private void downloadFile(StorageReference fileRef, File localFile) {
         fileRef.getFile(localFile)
                 .addOnSuccessListener(taskSnapshot -> {
@@ -186,8 +208,6 @@ public class WelcomeActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-
-
 
     private void logOutUser() {
         FirebaseAuth.getInstance().signOut();

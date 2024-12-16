@@ -7,6 +7,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
@@ -65,6 +66,7 @@ import com.google.maps.android.data.kml.KmlLineString;
 import com.google.maps.android.data.kml.KmlPlacemark;
 import java.io.IOException;
 import java.util.Map;
+import android.Manifest;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -341,6 +343,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             }
         });
 
+        startLocationService();
+
         skad_et = findViewById(R.id.place1);
         dokad_et = findViewById(R.id.place2);
         btnuser = findViewById(R.id.userView);
@@ -524,19 +528,24 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         KLMFiles kmlfiles = new KLMFiles(this,mMap);
         kmlfiles.processKMLFiles();
         szlaki = kmlfiles.getSzlaki();
-        for(String file : szlaki){
+        for (String file : szlaki) {
             String name = file.substring(0, file.lastIndexOf('.'));
             String[] parts = name.split("_");
-            String part1 = parts[1].replace("&", " ");
-            String part2 = parts[2].replace("&", " ");
-            if(parts.length == 4){
-                String part3 = parts[3].replace("&", " ");
-                name =part1 + " - " + part2 + " (" + part3 + ")";//+ parts[2];
+
+            if (parts.length >= 3) { // Upewnij się, że są przynajmniej 3 części
+                String part1 = parts[1].replace("&", " ");
+                String part2 = parts[2].replace("&", " ");
+
+                if (parts.length == 4) {
+                    String part3 = parts[3].replace("&", " ");
+                    name = part1 + " - " + part2 + " (" + part3 + ")";
+                } else {
+                    name = part1 + " (" + part2 + ")";
+                }
+                szlakisp.add(name);
+            } else {
+                Log.e("MapActivity", "Niepoprawny format nazwy pliku: " + file);
             }
-            else{
-                name = part1 +  " (" + part2 + ")";
-            }
-            szlakisp.add(name);
         }
 
         szczytylist = kmlfiles.getSzczyty();
@@ -907,6 +916,39 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     Toast.makeText(MapActivity.this, "Błąd przy pobieraniu zgłoszeń: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     Log.e("FirestoreError", "Błąd przy pobieraniu zaakceptowanych zgłoszeń", e);
                 });
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Zatrzymanie serwisu, gdy aplikacja zostanie zamknięta
+        Intent serviceIntent = new Intent(this, LocationTrackingService.class);
+        stopService(serviceIntent);
+    }
+
+    private void startLocationService() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+        } else {
+            // Jeśli uprawnienia są przyznane, uruchom usługę
+            startService(new Intent(this, LocationTrackingService.class));
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Jeśli użytkownik przyznał uprawnienia, uruchom usługę
+                startService(new Intent(this, LocationTrackingService.class));
+            } else {
+                // Obsługa sytuacji, gdy użytkownik nie przyzna uprawnień
+                Toast.makeText(this, "Uprawnienia są wymagane do działania aplikacji", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
 }

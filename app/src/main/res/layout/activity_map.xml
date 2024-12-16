@@ -38,7 +38,8 @@
 
         <Button
             android:id="@+id/chooseszlak"
-            style="@style/ButtonRed"
+            android:textColor="@android:color/white"
+            android:background="@drawable/button_round"
             android:layout_width="120dp"
             android:layout_height="match_parent"
             android:text="Wybierz"
@@ -71,7 +72,8 @@
 
         <Button
             android:id="@+id/spinner"
-            style="@style/ButtonRed"
+            android:textColor="@android:color/white"
+            android:background="@drawable/button_round"
             android:layout_width="200dp"
             android:layout_weight="1"
             android:layout_height="50dp"
@@ -80,7 +82,8 @@
 
         <Button
             android:id="@+id/btnRoute"
-            style="@style/ButtonRed"
+            android:background="@drawable/button_round"
+            android:textColor="@android:color/white"
             android:layout_weight="1"
             android:layout_width="200dp"
             android:layout_height="50dp"
@@ -196,7 +199,8 @@
             android:id="@+id/topBarButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/ButtonRed"
+            android:textColor="@android:color/white"
+            android:background="@drawable/button_round"
             android:text="Ustaw"
             android:textSize="16sp" />
     </LinearLayout>
@@ -240,7 +244,8 @@
 
             <Button
                 android:id="@+id/btnstop1"
-                style="@style/ButtonRed"
+                android:textColor="@android:color/white"
+                android:background="@drawable/button_round"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -265,7 +270,8 @@
 
             <Button
                 android:id="@+id/btnstop2"
-                style="@style/ButtonRed"
+                android:textColor="@android:color/white"
+                android:background="@drawable/button_round"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -293,7 +299,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:text="usuń"
-                style="@style/ButtonRed"
+                android:background="@drawable/button_round"
+                android:textColor="@android:color/white"
                 android:visibility="gone"/>
         </LinearLayout>
 
@@ -313,7 +320,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="50dp"
         android:orientation="horizontal"
         android:background="#FFFFFF"
         android:gravity="center"
@@ -323,17 +330,19 @@
         <Button
             android:id="@+id/button_stop"
             android:layout_width="180dp"
-            android:layout_height="30dp"
-            style="@style/ButtonRed"
+            android:layout_height="40dp"
+            android:background="@drawable/button_round"
+            android:textColor="@android:color/white"
             android:layout_marginEnd="10dp"
             android:layout_gravity="center"
             android:text="Dodaj przystanek" />
 
         <Button
             android:id="@+id/btnConfirm"
-            style="@style/ButtonRed"
+            android:textColor="@android:color/white"
+            android:background="@drawable/button_round"
             android:layout_width="180dp"
-            android:layout_height="30dp"
+            android:layout_height="40dp"
             android:layout_gravity="center"
             android:layout_marginStart="10dp"
             android:text="Zatwierdź" />
@@ -359,7 +368,8 @@
             android:layout_height="50dp"
             android:text="Usuń trasę"
             android:layout_marginEnd="10dp"
-            style="@style/ButtonRed" />
+            android:background="@drawable/button_round"
+            android:textColor="@android:color/white"/>
 
         <Button
             android:id="@+id/btn_Google"
@@ -367,7 +377,8 @@
             android:layout_height="50dp"
             android:text="--> google"
             android:layout_marginStart="10dp"
-            style="@style/ButtonRed"/>
+            android:background="@drawable/button_round"
+            android:textColor="@android:color/white"/>
 
         </LinearLayout>
 

@@ -23,6 +23,7 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -50,14 +51,20 @@ public class ChartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chart);
         setTitle("Wykres pokonanych dystansów");
+
         barChart = findViewById(R.id.barChart);
         db = FirebaseFirestore.getInstance();
-        if(userName == null || uid == null){
-        Intent getintent = getIntent();
-        userName = getintent.getStringExtra("username");
-        uid = getintent.getStringExtra("uid");
-        Log.d("iertyu",uid);
-        fetchAndDisplayData(uid);}
+
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            uid = currentUser.getUid();
+            Log.d("FirebaseAuth", "User UID: " + uid);
+
+            fetchAndDisplayData(uid);
+        } else {
+            Log.e("FirebaseAuth", "No user is logged in!");
+        }
+
 
         btnuser = findViewById(R.id.userView);
         btnTelefon = findViewById(R.id.buttonTelefon);
@@ -110,38 +117,30 @@ public class ChartActivity extends AppCompatActivity {
     }
 
 
-    private void fetchAndDisplayData(String uid){
-        db.collection("walking")
-                .whereEqualTo("uid", uid) // Filtrujemy po polu "uid"
+    private void fetchAndDisplayData(String uid) {
+        db.collection("daily_distances")
+                .whereEqualTo("uid", uid) // Filtruj po użytkowniku
+                .orderBy("date") // Posortuj według daty
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         ArrayList<BarEntry> barEntries = new ArrayList<>();
                         ArrayList<String> labels = new ArrayList<>();
                         int index = 0;
-                        // Sprawdzamy, czy znaleziono dokumenty
-                        if (!task.getResult().isEmpty()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                // Pobieramy wartość "distance"
-                                Double distance = document.getDouble("distance");
-                                Date timeee = document.getDate("date");
 
-                                int day = timeee.getDate();
-                                int month = timeee.getMonth() + 1;
-                                int year = timeee.getYear();
-                                String datad = day + "." + month + "." + year;
-                                    // Dodaj dane do wykresu
-                                    barEntries.add(new BarEntry(index, distance.floatValue()));
-                                    labels.add(datad); // Dodaj datę jako etykietę
-                                    index++;
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Double distance = document.getDouble("distance");
+                            String date = document.getString("date");
 
-
-                            // Wyświetl dane na wykresie
-                            showBarChart(barEntries, labels);
+                            if (distance != null && date != null) {
+                                barEntries.add(new BarEntry(index, distance.floatValue()));
+                                labels.add(date); // Dodaj datę jako etykietę
+                                index++;
                             }
-                        } else {
-                            Log.d("Firebase", "No documents found for UID: " + uid);
                         }
+
+                        // Wyświetl dane na wykresie
+                        showBarChart(barEntries, labels);
                     } else {
                         Log.e("Firebase", "Error getting documents: ", task.getException());
                     }
@@ -165,6 +164,8 @@ public class ChartActivity extends AppCompatActivity {
         }
         return dateString; // Zwracamy oryginalną datę w przypadku błędu
     }
+
+
 
     private void showBarChart(ArrayList<BarEntry> barEntries, ArrayList<String> labels) {
         BarDataSet barDataSet = new BarDataSet(barEntries, "Distance");

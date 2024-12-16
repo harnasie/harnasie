@@ -12,7 +12,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class AdminMenuActivity extends AppCompatActivity {
 
-    private Button btnPowiadomienia, btnZgloszenia, btnDodajKML, btnWyloguj;
+    private Button btnNowePowiadomienie, btnZgloszenia, btnDodajKML, btnWyloguj;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,15 +20,16 @@ public class AdminMenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_admin_menu);
         setTitle("Panel administratora");
 
-        btnPowiadomienia = findViewById(R.id.btnPowiadomieniaOgólne);
+        btnNowePowiadomienie = findViewById(R.id.btnPowiadomieniaOgólne);
         btnZgloszenia = findViewById(R.id.btnZgloszenia);
         btnDodajKML = findViewById(R.id.btnDodajKML);
         btnWyloguj = findViewById(R.id.btnWyloguj);
 
-        btnPowiadomienia.setOnClickListener(new View.OnClickListener() {
+        btnNowePowiadomienie.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(AdminMenuActivity.this, AdminDangerActivity.class);
+                startActivity(intent);
             }
         });
 

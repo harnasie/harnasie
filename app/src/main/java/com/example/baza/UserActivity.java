@@ -1,9 +1,11 @@
 package com.example.baza;
 
+import android.app.Application;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -39,6 +41,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.onesignal.OneSignal;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.ParseException;
@@ -82,11 +86,11 @@ public class UserActivity extends AppCompatActivity {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         //checkLocationPermission();
         // Odbieranie nazwy użytkownika przekazanej z LoginActivity
-        if(userName == null || uid == null){
+        if (userName == null || uid == null) {
             Intent getintent = getIntent();
             userName = getintent.getStringExtra("username");
             uid = getintent.getStringExtra("userId");
-            Log.d("iertyu",uid);
+            Log.d("iertyu", uid);
         }
 
         //Cursor res = dbHelper.getAllDistances();
@@ -127,6 +131,8 @@ public class UserActivity extends AppCompatActivity {
         btnTelefon = findViewById(R.id.buttonTelefon);
         btndanger = findViewById(R.id.danger);
         btnmap = findViewById(R.id.btnmap);
+
+
         btnmap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -148,6 +154,7 @@ public class UserActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(UserActivity.this, DangerActivity.class);
+                intent.putExtra("uid", uid);
                 startActivity(intent);
             }
         });
@@ -156,6 +163,7 @@ public class UserActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(UserActivity.this, UserActivity.class);
+                intent.putExtra("uid", uid);
                 startActivity(intent);
             }
         });

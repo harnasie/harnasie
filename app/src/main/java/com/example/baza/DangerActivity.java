@@ -27,6 +27,8 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -52,6 +54,13 @@ public class DangerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_danger);
         setTitle("Zgłoś zagrożenie");
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            uid = currentUser.getUid();
+            Log.d("FirebaseAuth", "User UID: " + uid);
+        } else {
+            Log.e("FirebaseAuth", "No user is logged in!");
+        }
 
         btnAddDanger = findViewById(R.id.buttonAddDanger);
         //btnViewDangers = findViewById(R.id.buttonViewDangers);
@@ -61,10 +70,7 @@ public class DangerActivity extends AppCompatActivity {
         sp = findViewById(R.id.spinnertype);
         db = FirebaseFirestore.getInstance();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        Intent intent = getIntent();
-        //String userName = intent.getStringExtra("username");
-        uid = intent.getStringExtra("uid");
-        Log.d("emmmmmmmmm" , String.valueOf(uid));
+
         /*btnViewDangers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

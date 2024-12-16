@@ -18,6 +18,12 @@ import androidx.annotation.Nullable;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+import com.onesignal.OneSignal;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
@@ -76,11 +82,43 @@ public class DangerAdapter extends ArrayAdapter<Map<String, Object>> {
                 .update("accepted", true)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(context, "Zagrożenie zaakceptowane.", Toast.LENGTH_SHORT).show();
+                    sendNotificationToNearbyUsers(dangerId);
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(context, "Błąd przy akceptacji zagrożenia: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
+    private void sendNotificationToNearbyUsers(String dangerId) {
+        db.collection("dangers").document(dangerId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Pobierz lokalizację jako Map
+                        Map<String, Object> locationMap = (Map<String, Object>) documentSnapshot.get("location");
+
+                        if (locationMap != null) {
+                            // Pobierz współrzędne z Mapy
+                            double latitude = (double) locationMap.get("latitude");
+                            double longitude = (double) locationMap.get("longitude");
+
+                            // Utwórz obiekt GeoPoint
+                            GeoPoint location = new GeoPoint(latitude, longitude);
+
+                            // Wywołaj funkcję do wysyłania powiadomień
+                            notifyNearbyUsers(location);
+                        } else {
+                            Log.e("LocationError", "Brak lokalizacji w zgłoszeniu.");
+                        }
+                    } else {
+                        Log.e("FirestoreError", "Dokument nie istnieje.");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("FirestoreError", "Błąd przy pobieraniu dokumentu: " + e.getMessage());
+                });
+    }
+
 
 
     private void markerDanger(String dangerId) {
@@ -105,5 +143,74 @@ public class DangerAdapter extends ArrayAdapter<Map<String, Object>> {
                 .addOnFailureListener(e -> {
                     Log.e("FirestoreError", "Błąd przy pobieraniu dokumentu: " + e.getMessage());
                 });
+
     }
+
+    public static void sendPushNotification(double latitude, double longitude, String message) {
+        try {
+            JSONObject notificationContent = new JSONObject();
+            notificationContent.put("contents", new JSONObject().put("en", message));
+
+            // Filtr lokalizacyjny – użytkownicy w promieniu 500 metrów
+            notificationContent.put("filters", new org.json.JSONArray()
+                    .put(new JSONObject()
+                            .put("field", "location")
+                            .put("radius", 0.5)
+                            .put("latitude", latitude)
+                            .put("longitude", longitude)));
+
+            OneSignal.postNotification(
+                    notificationContent,
+                    new OneSignal.PostNotificationResponseHandler() {
+                        @Override
+                        public void onSuccess(JSONObject response) {
+                            Log.d("OneSignal", "Powiadomienie wysłane: " + response.toString());
+                        }
+
+                        @Override
+                        public void onFailure(JSONObject error) {
+                            Log.e("OneSignal", "Błąd wysyłania powiadomienia: " + error.toString());
+                        }
+                    }
+            );
+        } catch (JSONException e) {
+            Log.e("OneSignal", "Błąd tworzenia JSON: " + e.getMessage());
+        }
+    }
+
+    private void notifyNearbyUsers(GeoPoint location) {
+        String message = "Zgłoszono nowe zagrożenie w Twojej okolicy!";
+
+        try {
+            JSONObject notificationContent = new JSONObject();
+            notificationContent.put("contents", new JSONObject().put("en", message));
+            notificationContent.put("included_segments", new JSONArray().put("All")); // Wysyła do wszystkich użytkowników
+
+            // Dodaj dane lokalizacyjne (opcjonalnie, jeśli chcesz filtrować po stronie klienta)
+            JSONObject data = new JSONObject();
+            data.put("latitude", location.getLatitude());
+            data.put("longitude", location.getLongitude());
+            notificationContent.put("data", data);
+
+            OneSignal.postNotification(
+                    notificationContent,
+                    new OneSignal.PostNotificationResponseHandler() {
+                        @Override
+                        public void onSuccess(JSONObject response) {
+                            Toast.makeText(getContext(), "Powiadomienie wysłane!", Toast.LENGTH_SHORT).show();
+                            Log.d("OneSignalSuccess", response.toString());
+                        }
+
+                        @Override
+                        public void onFailure(JSONObject error) {
+                            Toast.makeText(getContext(), "Błąd wysyłania powiadomienia: " + error.toString(), Toast.LENGTH_SHORT).show();
+                            Log.e("OneSignalError", error.toString());
+                        }
+                    });
+        } catch (JSONException e) {
+            Log.e("NotificationError", "Błąd tworzenia powiadomienia: " + e.getMessage());
+        }
+    }
+
+
 }

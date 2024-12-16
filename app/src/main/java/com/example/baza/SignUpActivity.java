@@ -20,6 +20,14 @@ public class SignUpActivity extends AppCompatActivity {
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
+    public void setAuth(FirebaseAuth auth) {
+        this.auth = auth;
+    }
+
+    public void setDb(FirebaseFirestore db) {
+        this.db = db;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,13 +59,8 @@ public class SignUpActivity extends AppCompatActivity {
                             FirebaseUser user = auth.getCurrentUser();
                             if (user != null) {
                                 addUserToFirestore(user.getUid(), email, username);
-                                /*Intent intent = new Intent(SignUpActivity.this, UserActivity.class);
-                                intent.putExtra("username", username);
-                                startActivity(intent);
-                                finish();*/
                             }
                         } else {
-                            // Log the error to get details on why sign-up failed
                             String errorMessage = task.getException() != null ? task.getException().getMessage() : "Unknown error";
                             Log.e("SignUpError", "Sign-up failed: " + errorMessage);
                             Toast.makeText(SignUpActivity.this, "Rejestracja nie powiodła się: " + errorMessage, Toast.LENGTH_SHORT).show();
@@ -66,7 +69,7 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
-    private void addUserToFirestore(String uid, String email, String username) {
+    protected void addUserToFirestore(String uid, String email, String username) {
         if (uid == null || uid.isEmpty()) {
             Toast.makeText(SignUpActivity.this, "Błąd: UID jest null lub pusty", Toast.LENGTH_SHORT).show();
             return;
@@ -84,7 +87,6 @@ public class SignUpActivity extends AppCompatActivity {
 
                 )
                 .addOnFailureListener(e -> {
-                    // Log the error for debugging
                     Log.e("FirestoreError", "Error adding user", e);
                     Toast.makeText(SignUpActivity.this, "Błąd przy dodawaniu nowego użytkownika: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });

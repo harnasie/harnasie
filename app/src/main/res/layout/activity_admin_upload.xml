@@ -9,7 +9,9 @@
         android:id="@+id/openMyMapsButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Otwórz Google My Maps" />
+        android:text="Otwórz Google My Maps"
+        android:background="@drawable/button_round"
+        android:textColor="@android:color/white"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -22,13 +24,17 @@
         android:id="@+id/selectFileButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Wybierz plik" />
+        android:text="Wybierz plik"
+        android:background="@drawable/button_round"
+        android:textColor="@android:color/white"/>
 
     <Button
         android:id="@+id/uploadFileButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Prześlij plik" />
+        android:text="Prześlij plik"
+        android:background="@drawable/button_round"
+        android:textColor="@android:color/white"/>
 
     <Button
         android:id="@+id/openConverterButton"

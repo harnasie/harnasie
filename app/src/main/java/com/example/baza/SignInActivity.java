@@ -20,6 +20,14 @@ public class SignInActivity extends AppCompatActivity {
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
+    public void setAuth(FirebaseAuth auth) {
+        this.auth = auth;
+    }
+
+    public void setDb(FirebaseFirestore db) {
+        this.db = db;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,13 +96,11 @@ public class SignInActivity extends AppCompatActivity {
                             String id = document.getId();
 
                             if ("admin".equalsIgnoreCase(role)) {
-                                // Przekierowanie do widoku administratora
                                 Intent intent = new Intent(SignInActivity.this, AdminMenuActivity.class);
                                 intent.putExtra("username", username);
                                 intent.putExtra("uid", id);
                                 startActivity(intent);
                             } else {
-                                // Przekierowanie do widoku zwykłego użytkownika
                                 Intent intent = new Intent(SignInActivity.this, UserActivity.class);
                                 intent.putExtra("username", username);
                                 intent.putExtra("uid", id);

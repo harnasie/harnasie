@@ -3,7 +3,7 @@
     <string-array name="type_array">
         <item>Niedźwiedź w okolicy</item>
         <item>Powalone drzewo</item>
-       <item>Spadające kamienie</item>
+        <item>Spadające kamienie</item>
         <item>Wypadek</item>
         <item>Inne</item>
     </string-array>

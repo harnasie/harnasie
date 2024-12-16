@@ -19,22 +19,33 @@
         android:id="@+id/btnPowiadomieniaOgólne"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:text="Wyślij powiadomienie ogólne" />
+        android:text="Wyślij powiadomienie ogólne"
+        android:background="@drawable/button_round"
+        android:textColor="@android:color/white"
+        android:layout_margin="10dp"/>
     <Button
         android:id="@+id/btnZgloszenia"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:text="Pokaż wszystkie zgłoszenia" />
+        android:text="Pokaż wszystkie zgłoszenia"
+        android:background="@drawable/button_round"
+        android:textColor="@android:color/white"
+        android:layout_margin="10dp"/>
     <Button
         android:id="@+id/btnDodajKML"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:text="Dodaj trasę" />
+        android:text="Dodaj trasę"
+        android:background="@drawable/button_round"
+        android:textColor="@android:color/white"
+        android:layout_margin="10dp"/>
     <Button
         android:id="@+id/btnWyloguj"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:text="Wyloguj" />
-
+        android:text="Wyloguj"
+        android:background="@drawable/button_round"
+        android:textColor="@android:color/white"
+        android:layout_margin="10dp"/>
 
 </LinearLayout>
