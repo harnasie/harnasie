@@ -32,9 +32,10 @@
             android:id="@+id/spinnerszlak"
             android:layout_width="10dp"
             android:layout_height="wrap_content"
-            android:minHeight="48dp"
+            android:maxHeight="48dp"
             android:padding="8dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            style="@style/SpinnerStyle"/>
 
         <Button
             android:id="@+id/chooseszlak"
@@ -55,7 +56,8 @@
         android:layout_height="40dp"
         android:layout_centerHorizontal="true"
         android:text="--> google"
-        style="@style/ButtonRed"
+        android:background="@drawable/button_round"
+        android:textColor="@android:color/white"
         android:translationY="40dp"
         android:visibility="gone"/>
 

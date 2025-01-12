@@ -16,9 +16,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.onesignal.OSNotification;
-import com.onesignal.OSNotificationOpenedResult;
-import com.onesignal.OneSignal;
+//import com.onesignal.OSNotification;
+//import com.onesignal.OSNotificationOpenedResult;
+//import com.onesignal.OneSignal;
 
 import java.io.File;
 import java.io.FileInputStream;

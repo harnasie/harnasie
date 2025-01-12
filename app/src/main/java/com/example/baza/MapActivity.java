@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -284,6 +285,19 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 };
 
                 spiner.setAdapter(adapter);
+
+                try {
+                    Field popup = Spinner.class.getDeclaredField("mPopup");
+                    popup.setAccessible(true);
+
+                    android.widget.ListPopupWindow popupWindow = (android.widget.ListPopupWindow) popup.get(spiner);
+                    popupWindow.setHeight(900);
+                    popupWindow.setWidth(150);
+                    // Maksymalna wysokość rozwijanej listy w pikselach
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 spiner.setVisibility(View.VISIBLE);
                 spiner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
@@ -949,6 +963,4 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 Toast.makeText(this, "Uprawnienia są wymagane do działania aplikacji", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-}
+    }}

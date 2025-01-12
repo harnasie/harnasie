@@ -23,5 +23,6 @@
         android:layout_height="wrap_content"
         android:background="@drawable/button_round"
         android:textColor="@android:color/white"
+        android:layout_marginTop="20dp"
         android:text="Zaloguj" />
 </LinearLayout>

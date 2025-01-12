@@ -5,23 +5,29 @@
     android:padding="16dp">
 
     <EditText
+        android:id="@+id/et_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Login" />
+
+    <EditText
         android:id="@+id/et_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Email" />
+        android:hint="Email"
+        android:inputType="textPassword" />
 
     <EditText
         android:id="@+id/et_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Hasło"
-        android:inputType="textPassword" />
+        android:hint="Hasło" />
 
     <EditText
-        android:id="@+id/et_username"
+        android:id="@+id/et_user1name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nazwa użytkownika" />
+        android:hint="Potwierdź hasło" />
 
     <Button
         android:id="@+id/btn_register"
@@ -29,5 +35,6 @@
         android:layout_height="wrap_content"
         android:background="@drawable/button_round"
         android:textColor="@android:color/white"
+        android:layout_marginTop="20dp"
         android:text="Zarejestruj" />
 </LinearLayout>

@@ -238,7 +238,10 @@ public class KLMFiles {
     }
 
     private List<Marker> addMarkersFromKML(String absolutePath, BitmapDescriptor icon) {
-        List<Marker> markersList = new ArrayList<>();
+        String name = null;
+        String description = null;
+        LatLng coordinates = null;
+        List<Marker> markersList = new ArrayList<>();   //inicjalizacja zmiennych name, description, coordinates, markerList
 
         try {
             InputStream kmlInputStream = new FileInputStream(absolutePath);
@@ -247,52 +250,36 @@ public class KLMFiles {
             XmlPullParser parser = factory.newPullParser();
             parser.setInput(kmlInputStream, "UTF-8");
 
-            String name = null;
-            String description = null;
-            LatLng coordinates = null;
-
             int eventType = parser.getEventType();
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 String tagName = parser.getName();
 
                 switch (eventType) {
                     case XmlPullParser.START_TAG:
-                        if ("name".equals(tagName)) {
-                            name = parser.nextText();
-                        } else if ("description".equals(tagName)) {
-                            description = parser.nextText();
-                        } else if ("coordinates".equals(tagName)) {
+                        if ("name".equals(tagName)) { name = parser.nextText(); }
+                        else if ("description".equals(tagName)) { description = parser.nextText(); }
+                        else if ("coordinates".equals(tagName)) {
                             String[] coord = parser.nextText().split(",");
                             double lng = Double.parseDouble(coord[0]);
-                            double lat = Double.parseDouble(coord[1]);
+                            double lat = Double.parseDouble(coord[1]);      //rozdzielenie współrzędnych
                             coordinates = new LatLng(lat, lng);
-                        }
-                        break;
+                        } break;
 
                     case XmlPullParser.END_TAG:
                         if ("Placemark".equals(tagName)) {
                             if (coordinates != null) {
-                                Marker marker = mMap.addMarker(new MarkerOptions()
-                                        .position(coordinates)
+                                Marker marker = mMap.addMarker(new MarkerOptions() .position(coordinates)
                                         .title(name)
                                         .snippet(description)
                                         .visible(false)
-                                        .icon(icon));
+                                        .icon(icon));   //dodanie markera na mapę
                                 coordinates = null;
-                                if (marker != null) {
-                                    markersList.add(marker);
-                                }
-
+                                if (marker != null) { markersList.add(marker); }
                             }
-                        }
-                        break;
-                }
-                eventType = parser.next();
+                        } break;
+                } eventType = parser.next();
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) { e.printStackTrace();  }
         return markersList;
     }
 }

@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DangerActivity extends AppCompatActivity {
-    private Button btnAddDanger;//, btnViewDangers, btnDelete, btnMapa, btnTelephone, btnDanger;
+    private Button btnAddDanger;
     TextView type_tv, description_tv;
     private FusedLocationProviderClient mFusedLocationClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 101;
@@ -44,9 +44,7 @@ public class DangerActivity extends AppCompatActivity {
     private LatLng currentLocation = null;
     private FirebaseFirestore db;
     private String uid = null;
-    private LinearLayout menuLayout;
-    private FrameLayout background;
-    private ImageButton btnchart, btndanger, btnTelefon, btnmap, btnuser;
+    private ImageButton  btndanger, btnTelefon, btnmap, btnuser;
 
 
     @Override
@@ -63,21 +61,12 @@ public class DangerActivity extends AppCompatActivity {
         }
 
         btnAddDanger = findViewById(R.id.buttonAddDanger);
-        //btnViewDangers = findViewById(R.id.buttonViewDangers);
         type_tv = findViewById(R.id.type_tv);
         description_tv = findViewById(R.id.description_tv);
         editDescription = findViewById(R.id.editTextDescription);
         sp = findViewById(R.id.spinnertype);
         db = FirebaseFirestore.getInstance();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-        /*btnViewDangers.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(DangerActivity.this, ViewDangerActivity.class);
-                startActivity(intent);
-            }
-        });*/
 
         sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -87,44 +76,22 @@ public class DangerActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // Niezbędna metoda, ale nie musimy nic robić, jeśli nic nie jest wybrane
             }
         });
-        Log.d("emmmmm111mmmm" , String.valueOf(8));
-
 
         btnAddDanger.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String description = editDescription.getText().toString();
-                //String name = userName;
                 String type = sp.getSelectedItem().toString();
                 if (description.isEmpty()) {
                     Toast.makeText(DangerActivity.this, "Pole opis nie może być puste", Toast.LENGTH_SHORT).show();
                 }
-                // Sprawdzanie poprawności formatu e-mail
                 else {
                     addDanger(description,type,uid);
-                    // Jeśli walidacja jest poprawna, dodaj użytkownika do bazy danych
-                    /*boolean isInserted = dbHelper.addDanger(type, location, description, name);
-                    if (isInserted) {
-                        Toast.makeText(UserActivity.this, "Dodano zgłoszenie", Toast.LENGTH_SHORT).show();
-                        editDescription.setText("");
-                        editLocation.setText("");
-                    } else {
-                        Toast.makeText(UserActivity.this, "Błąd przy dodawaniu zgłoszenia", Toast.LENGTH_SHORT).show();
-                    }*/
                 }
             }
         });
-
-        /*btnViewDangers.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(DangerActivity.this, ViewDangerActivity.class);
-                startActivity(intent);
-            }
-        });*/
 
 
         btnuser = findViewById(R.id.userView);
@@ -170,19 +137,18 @@ public class DangerActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         if (isInternetAvailable()) {
-            sendStoredDanger();  // Jeśli połączenie jest dostępne, próbujemy wysłać zgłoszenie zapisane lokalnie
+            sendStoredDanger();  // jeśli połączenie jest dostępne, zgłoszenie zapisane lokalnie
         }
     }
 
     private void addDanger(String description, String type, String uid) {
-        if (!isInternetAvailable()) {
-            saveDangerLocally(description, type, uid);
-        } else {
+        if (!isInternetAvailable()) { saveDangerLocally(description, type, uid);}
+        else {
             checkLocationPermission();
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Brak uprawnień do lokalizacji.", Toast.LENGTH_SHORT).show();
                 return;
-            }
+            }   //sprawdzenie dostępu do lokalizacji
             mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
                 if (location != null) {
                     currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
@@ -192,20 +158,18 @@ public class DangerActivity extends AppCompatActivity {
                             Map<String, Object> userMap = new HashMap<>();
                             userMap.put("email", userDoc.getString("email"));
                             userMap.put("username", userDoc.getString("username"));
-                            userMap.put("uid", uid);
-
+                            userMap.put("uid", uid);    //pozostałe dane usera
                             Map<String, Object> danger = new HashMap<>();
                             danger.put("description", description);
                             danger.put("location", currentLocation);
                             danger.put("type", type);
                             danger.put("user", userMap);
                             danger.put("createdAt", Timestamp.now());
-                            danger.put("accepted", false);
+                            danger.put("accepted", false);      //pozostałe dane zgłoszenia
 
                             db.collection("dangers").add(danger)
                                     .addOnSuccessListener(documentReference -> {
                                         Toast.makeText(DangerActivity.this, "Dodano zagrożenie z ID: " + documentReference.getId(), Toast.LENGTH_SHORT).show();
-                                        Log.d("Firestore", "Dodano dokument o ID: " + documentReference.getId());
                                     })
                                     .addOnFailureListener(e -> {
                                         Log.e("FirestoreError", "Błąd przy dodawaniu zagrożenia", e);
@@ -216,14 +180,11 @@ public class DangerActivity extends AppCompatActivity {
                         }
                     }).addOnFailureListener(e -> {Toast.makeText(this, "Błąd przy pobieraniu danych użytkownika: " + e.getMessage(), Toast.LENGTH_SHORT).show();});
                 } else {Toast.makeText(DangerActivity.this, "Nie można uzyskać bieżącej lokalizacji.", Toast.LENGTH_SHORT).show();}
-            });
-        }
-    }
+            });}}
 
 
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Jeśli brak uprawnienia, prosimy o jego przyznanie
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
@@ -236,14 +197,11 @@ public class DangerActivity extends AppCompatActivity {
 
         if (description != null && type != null && uid != null) {
             long timestamp = preferences.getLong("timestamp", 0);
-            if (System.currentTimeMillis() - timestamp > 60000) {  // Przykładowa logika: jeżeli zgłoszenie było zapisane dłużej niż minutę, to nie wysyłaj
+            if (System.currentTimeMillis() - timestamp > 60000) {
                 return;
             }
 
-            // Wywołanie addDanger, by spróbować wysłać zgłoszenie do Firestore
             addDanger(description, type, uid);
-
-            // Po udanym wysłaniu, usuwamy zapisane dane lokalne
             preferences.edit().clear().apply();
         }
     }
@@ -260,7 +218,6 @@ public class DangerActivity extends AppCompatActivity {
     }
 
     private boolean isInternetAvailable() {
-        // Sprawdzanie dostępności internetu
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork != null && activeNetwork.isConnected();
