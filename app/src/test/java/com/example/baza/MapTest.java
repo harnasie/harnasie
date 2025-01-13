@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 
 public class MapTest {
     @Test
-    @DisplayName("Url")
+    @org.junit.jupiter.api.DisplayName("Url")
     public void testGetDirectionsUrl() {
         LatLng origin =  new LatLng(51.250945,22.5747267);
         String expectedUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=" +

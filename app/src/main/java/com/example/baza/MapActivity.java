@@ -1,5 +1,6 @@
 package com.example.baza;
 
+import android.app.AlertDialog;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -113,13 +114,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         setTitle("Mapa");
         db = FirebaseFirestore.getInstance();
 
-        // Inicjalizacja mapy
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.id_map);
         mapFragment.getMapAsync(this);
 
-        // Inicjalizacja klienta lokalizacji
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        // Inicjalizacja Text-to-Speech
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
                 tts.setLanguage(Locale.UK);
@@ -134,7 +132,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             ileszczyty++;
             widoczne = ileszczyty % 2 == 0;
 
-            // Zaktualizuj widoczność wszystkich markerów
             for (Marker marker : szczytylist) {
                 marker.setVisible(widoczne);
             }
@@ -144,7 +141,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             ilestawy++;
             widoczne = ilestawy % 2 == 0;
 
-            // Zaktualizuj widoczność wszystkich markerów
             for (Marker marker : stawylist) {
                 marker.setVisible(widoczne);
             }
@@ -155,7 +151,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             ile++;
             widoczne = ile % 2 == 0;
 
-            // Zaktualizuj widoczność wszystkich markerów
             for (Marker marker : schroniskalist) {
                 marker.setVisible(widoczne);
             }
@@ -164,9 +159,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         ImageButton LayerButton = findViewById(R.id.btnLayer);
         LayerButton.setOnClickListener(v -> {
             if (mMap.getMapType() == GoogleMap.MAP_TYPE_SATELLITE) {
-                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL); // Zmiana na normalny widok
+                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
             } else {
-                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE); // Zmiana na satelitę
+                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
             }
 
         });
@@ -186,11 +181,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 });
             }
 
-            // To jest zewnętrzny click listener dla RouteButton
             if (routeInputLayout.getVisibility() == View.GONE) {
-                routeInputLayout.setVisibility(View.VISIBLE); // Pokazuje layout
+                routeInputLayout.setVisibility(View.VISIBLE);
             } else {
-                routeInputLayout.setVisibility(View.GONE); // Ukrywa layout
+                routeInputLayout.setVisibility(View.GONE);
             }
             szlak_route.setVisibility(View.GONE);
             google_clear.setVisibility(View.GONE);
@@ -215,15 +209,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     LatLng cam = kmlFiles.getRouteStartEnd(selectedFile).get(2);
                     float bearing = calculateBearing(start, cam);
 
-                    // Tworzenie pozycji kamery z odpowiednim bearing
                     CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(start)  // Punkt początkowy
-                            .zoom(20)     // Ustawiona wcześniej wartość zoomu
-                            .bearing(bearing)  // Obrót kamery w stronę punktu ennn
-                            .tilt(45)     // Opcjonalne: pochylanie kamery (wartość w stopniach)
+                            .target(start)
+                            .zoom(20)
+                            .bearing(bearing)
+                            .tilt(45)
                             .build();
 
-                    // Przesunięcie kamery
+
                     mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                     googlesz.setText(nameselectedFile + " --> GOOGLE");
                     googlesz.setVisibility(View.VISIBLE);
@@ -236,25 +229,22 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 spine.setVisibility(View.VISIBLE);
                 spiner = findViewById(R.id.spinnerszlak);
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(MapActivity.this, R.layout.spinner_with_square,szlakisp){
-                // Niestandardowy adapter dla Spinnera z zielonym kwadratem
                     @Override
                     public View getView(int position, View convertView, ViewGroup parent) {
-                        // Inflacja układu dla elementu Spinnera
                         LayoutInflater inflater = LayoutInflater.from(getContext());
                         View view = inflater.inflate(R.layout.spinner_with_square, parent, false);
 
-                        // Znalezienie i ustawienie tekstu w TextView
                         TextView textView = view.findViewById(R.id.spinner_item_text);
                         textView.setText(getItem(position));
                         View square = view.findViewById(R.id.square_view);
                         if (szlaki.get(position).toLowerCase().contains("czerwony")) {
-                            square.setBackgroundColor(Color.RED); // Ustaw kolor czerwony
+                            square.setBackgroundColor(Color.RED);
                         } else if (szlaki.get(position).toLowerCase().contains("niebieski")){
-                            square.setBackgroundColor(Color.BLUE); // Domyślny kolor np. zielony
+                            square.setBackgroundColor(Color.BLUE);
                         } else if (szlaki.get(position).toLowerCase().contains("czarny")){
-                            square.setBackgroundColor(Color.BLACK); // Domyślny kolor np. zielony
+                            square.setBackgroundColor(Color.BLACK);
                         } else if (szlaki.get(position).toLowerCase().contains("zolty")){
-                            square.setBackgroundColor(Color.YELLOW); // Domyślny kolor np. zielony
+                            square.setBackgroundColor(Color.YELLOW);
                         }
 
                         return view;
@@ -262,22 +252,20 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
                     @Override
                     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                        // Inflacja układu dla rozwiniętej listy Spinnera
                         LayoutInflater inflater = LayoutInflater.from(getContext());
                         View view = inflater.inflate(R.layout.spinner_with_square, parent, false);
 
-                        // Znalezienie i ustawienie tekstu w TextView
                         TextView textView = view.findViewById(R.id.spinner_item_text);
                         textView.setText(getItem(position));
                         View square = view.findViewById(R.id.square_view);
                         if (szlaki.get(position).toLowerCase().contains("czerwony")) {
-                            square.setBackgroundColor(Color.RED); // Ustaw kolor czerwony
+                            square.setBackgroundColor(Color.RED);
                         } else if (szlaki.get(position).toLowerCase().contains("niebieski")){
-                            square.setBackgroundColor(Color.BLUE); // Domyślny kolor np. zielony
+                            square.setBackgroundColor(Color.BLUE);
                         } else if (szlaki.get(position).toLowerCase().contains("czarny_")){
-                            square.setBackgroundColor(Color.BLACK); // Domyślny kolor np. zielony
+                            square.setBackgroundColor(Color.BLACK);
                         } else if (szlaki.get(position).toLowerCase().contains("żółty")){
-                            square.setBackgroundColor(Color.YELLOW); // Domyślny kolor np. zielony
+                            square.setBackgroundColor(Color.YELLOW);
                         }
 
                         return view;
@@ -293,7 +281,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     android.widget.ListPopupWindow popupWindow = (android.widget.ListPopupWindow) popup.get(spiner);
                     popupWindow.setHeight(900);
                     popupWindow.setWidth(150);
-                    // Maksymalna wysokość rozwijanej listy w pikselach
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -302,7 +289,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 spiner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        // Pobieranie wybranego elementu
                         nameselectedFile = szlakisp.get(position);
                         selectedFile = szlaki.get(position);
                         Toast.makeText(MapActivity.this, "Wybrano: " + selectedFile, Toast.LENGTH_SHORT).show();
@@ -310,7 +296,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
-                        // Obsługa braku wyboru
                     }
                 });
 
@@ -322,7 +307,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
         topBarButton.setOnClickListener(v -> {
             LatLng stopLocation = null;
-            // Ukrywanie paska i markera po kliknięciu przycisku
             addMarkerAtCurrentPosition(false);
             routeInputLayout.setVisibility(View.VISIBLE);
             for(int i =0; i<point.length; i++){
@@ -491,7 +475,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                             }
                         });
                         buttons[i].setVisibility(View.VISIBLE);
-                        // Musisz stworzyć lokalną zmienną, aby nie stracić odniesienia w lambdach
                         buttons[i].setOnClickListener(v1 -> {
                             stops[index].setVisibility(View.GONE);
                             buttons[index].setVisibility(View.GONE);
@@ -512,7 +495,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 }
 
                 for (Location location : locationResult.getLocations()) {
-                    // Update the map with the user's location
                     LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
                     mMap.addMarker(new MarkerOptions().position(userLocation).title("You are here"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
@@ -570,7 +552,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     }
 
     private void openGoogleMapsWithRoute(String url) {
-        // Tworzymy intent z URL Google Maps
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         intent.setPackage("com.google.android.apps.maps");
         startActivity(intent);
@@ -674,33 +655,29 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             List<Address> addresses = geocoder.getFromLocation(place.latitude, place.longitude, 1);
             if (addresses != null && !addresses.isEmpty()) {
                 Address address = addresses.get(0);
-                String street = address.getThoroughfare(); // Ulica
-                String city = address.getLocality(); // Miasto
+                String street = address.getThoroughfare();
+                String city = address.getLocality();
 
-                // Sprawdzenie, czy miasto jest dostępne
                 if (city != null) {
                     addressString.append(city);
                 } else {
-                    return "Nieznane miejsce"; // Jeśli miasto jest niedostępne
+                    return "Nieznane miejsce";
                 }
 
-                // Dodanie ulicy, jeśli dostępna
                 if (street != null) {
                     addressString.append(", ").append(street);
                 }
             } else {
-                return "Brak adresu dla podanych współrzędnych"; // Jeśli brak adresu
+                return "Brak adresu dla podanych współrzędnych";
             }
         } catch (IOException e) {
             e.printStackTrace();
             return "Błąd przy uzyskiwaniu adresu";
         }
 
-        return addressString.toString(); // Zwraca adres jako string
+        return addressString.toString();
     }
 
-
-    // Funkcja do kodowania wartości lat/long w formacie odpowiednim dla URL
     private String encodeLatLng(LatLng point) {
         return point.latitude + "," + point.longitude;
     }
@@ -825,7 +802,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             szlak_route.setVisibility(View.VISIBLE);
 
         }
-        markerView.setTranslationX(0); // Przesunięcie w osi X
+        markerView.setTranslationX(0);
         markerView.setTranslationY(0);
     }
 
@@ -852,7 +829,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
         LatLng endPoint = routePoints.get(startIndex + 1);
 
-        // Sprawdzanie i zmiana koloru poprzednich odcinków na szary
         if (lastTraversedIndex >= 0) {
             for (int i = 0; i <= lastTraversedIndex; i++) {
                 Polyline polyline = routePolylines.get(i);
@@ -860,7 +836,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             }
         }
 
-        // Dodajemy nowy odcinek trasy jako niebieski
         PolylineOptions options = new PolylineOptions()
                 .add(closestPoint)
                 .add(endPoint)
@@ -870,7 +845,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         Polyline newPolyline = mMap.addPolyline(options);
         routePolylines.add(newPolyline);
 
-        // Aktualizowanie indeksu ostatniego pokonanego odcinka
         lastTraversedIndex = startIndex;
     }
 
@@ -918,8 +892,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
                                     LatLng location = new LatLng(latitude, longitude);
                                     locations.add(location);
-
                                     Log.d("Accepted Danger", "Location: " + latitude + ", " + longitude);
+
+                                    double distance = calculateDistance(currentLocation, location);
+                                    if (distance <= 200) {
+                                        String type = documentSnapshot.getString("type");
+                                        String description = documentSnapshot.getString("description");
+                                        showDangerPopup(type, description, distance);
+                                    }
                                 }}}
                         if (!locations.isEmpty()) {
                             updateMapWithAcceptedDangers(locations);
@@ -931,11 +911,33 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     Log.e("FirestoreError", "Błąd przy pobieraniu zaakceptowanych zgłoszeń", e);
                 });
     }
+
+    private double calculateDistance(LatLng userLocation, LatLng dangerLocation) {
+        Location userLoc = new Location("userLocation");
+        userLoc.setLatitude(userLocation.latitude);
+        userLoc.setLongitude(userLocation.longitude);
+
+        Location dangerLoc = new Location("dangerLocation");
+        dangerLoc.setLatitude(dangerLocation.latitude);
+        dangerLoc.setLongitude(dangerLocation.longitude);
+
+        return userLoc.distanceTo(dangerLoc);
+    }
+
+    private void showDangerPopup(String type, String description, double distance) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Ostrzeżenie: " + type)
+                .setMessage("Opis: " + description + "\nOdległość: " + (int) distance + " m")
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .create()
+                .show();
+    }
+
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        // Zatrzymanie serwisu, gdy aplikacja zostanie zamknięta
         Intent serviceIntent = new Intent(this, LocationTrackingService.class);
         stopService(serviceIntent);
     }
@@ -946,7 +948,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
         } else {
-            // Jeśli uprawnienia są przyznane, uruchom usługę
             startService(new Intent(this, LocationTrackingService.class));
         }
     }
@@ -956,10 +957,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Jeśli użytkownik przyznał uprawnienia, uruchom usługę
                 startService(new Intent(this, LocationTrackingService.class));
             } else {
-                // Obsługa sytuacji, gdy użytkownik nie przyzna uprawnień
                 Toast.makeText(this, "Uprawnienia są wymagane do działania aplikacji", Toast.LENGTH_SHORT).show();
             }
         }

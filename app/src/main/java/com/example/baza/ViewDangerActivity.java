@@ -51,6 +51,4 @@ public class ViewDangerActivity extends AppCompatActivity {
                     }
                 });
     }
-
-
 }
