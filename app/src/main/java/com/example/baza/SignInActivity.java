@@ -28,7 +28,6 @@ public class SignInActivity extends AppCompatActivity {
         this.db = db;
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

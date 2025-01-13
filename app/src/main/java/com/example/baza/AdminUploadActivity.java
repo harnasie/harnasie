@@ -27,7 +27,7 @@ public class AdminUploadActivity extends AppCompatActivity {
         openMyMapsButton = findViewById(R.id.openMyMapsButton);
         selectFileButton = findViewById(R.id.selectFileButton);
         uploadFileButton = findViewById(R.id.uploadFileButton);
-        openConverterButton = findViewById(R.id.openConverterButton); // Nowy przycisk
+        openConverterButton = findViewById(R.id.openConverterButton);
 
         openMyMapsButton.setOnClickListener(v -> {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/d/u/0/"));
@@ -49,7 +49,6 @@ public class AdminUploadActivity extends AppCompatActivity {
             }
         });
 
-        // Akcja dla nowego przycisku
         openConverterButton.setOnClickListener(v -> {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://mygeodata.cloud/converter/"));
             startActivity(browserIntent);

@@ -79,7 +79,6 @@ public class ChartActivity extends AppCompatActivity {
             }
         });
 
-
         btnchart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,8 +94,6 @@ public class ChartActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-
 
         btndanger.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,12 +112,10 @@ public class ChartActivity extends AppCompatActivity {
         });
 
     }
-
-
     private void fetchAndDisplayData(String uid) {
         db.collection("daily_distances")
-                .whereEqualTo("uid", uid) // Filtruj po użytkowniku
-                .orderBy("date") // Posortuj według daty
+                .whereEqualTo("uid", uid)
+                .orderBy("date")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -134,12 +129,11 @@ public class ChartActivity extends AppCompatActivity {
 
                             if (distance != null && date != null) {
                                 barEntries.add(new BarEntry(index, distance.floatValue()));
-                                labels.add(date); // Dodaj datę jako etykietę
+                                labels.add(date);
                                 index++;
                             }
                         }
 
-                        // Wyświetl dane na wykresie
                         showBarChart(barEntries, labels);
                     } else {
                         Log.e("Firebase", "Error getting documents: ", task.getException());
@@ -148,64 +142,53 @@ public class ChartActivity extends AppCompatActivity {
     }
 
     private String formatDate(String dateString) {
-        // Definiowanie formatu daty, który pasuje do zapisanego formatu w Firebase
         SimpleDateFormat firebaseDateFormat = new SimpleDateFormat("MMMM dd, yyyy 'at' hh:mm:ss a z", Locale.getDefault());
-        firebaseDateFormat.setTimeZone(TimeZone.getTimeZone("UTC")); // Ustawiamy strefę czasową na UTC
+        firebaseDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-        SimpleDateFormat displayDateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault()); // Format wyświetlania
+        SimpleDateFormat displayDateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
 
         try {
             Date date = firebaseDateFormat.parse(dateString);
             if (date != null) {
-                return displayDateFormat.format(date); // Zwracamy datę w formacie "dd MMM yyyy"
+                return displayDateFormat.format(date);
             }
         } catch (ParseException e) {
             Log.e("DateError", "Error parsing date", e);
         }
-        return dateString; // Zwracamy oryginalną datę w przypadku błędu
+        return dateString;
     }
-
-
 
     private void showBarChart(ArrayList<BarEntry> barEntries, ArrayList<String> labels) {
         BarDataSet barDataSet = new BarDataSet(barEntries, "Distance");
-        barDataSet.setColor(getResources().getColor(android.R.color.holo_blue_light)); // Ustaw kolor słupków
+        barDataSet.setColor(getResources().getColor(android.R.color.holo_blue_light));
 
         BarData barData = new BarData(barDataSet);
-        barData.setBarWidth(0.5f); // Szerokość słupków
+        barData.setBarWidth(0.5f);
 
-        // Ustawienie danych wykresu
         barChart.setData(barData);
         barChart.setFitBars(true);
 
-        // Wyłączenie opisu wykresu
         barChart.getDescription().setEnabled(false);
 
-        // Wyłączenie legendy
         barChart.getLegend().setEnabled(false);
 
-        // Ustawienie etykiet na osi X
         barChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
         barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         barChart.getXAxis().setGranularity(1f);
         barChart.getXAxis().setGranularityEnabled(true);
 
-        // Wyłączenie pionowych linii siatki na osi Y
         barChart.getAxisLeft().setDrawGridLines(false);
         barChart.getAxisRight().setDrawGridLines(false);
 
-        // Wyłączenie prawej osi Y (jeśli nie jest potrzebna)
         barChart.getAxisRight().setEnabled(false);
 
-        // Dodanie jednostki "km" do osi Y
         barChart.getAxisLeft().setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                return value + " km";  // Dodajemy jednostkę km do wartości
+                return value + " km";
             }
         });
 
-        // Odświeżenie wykresu
         barChart.invalidate();
     }
 

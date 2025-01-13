@@ -34,26 +34,7 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
-/*
-        OneSignal.initWithContext(this);
-        OneSignal.setAppId(ONESIGNAL_APP_ID);
-        OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
 
-        OneSignal.promptForPushNotifications();
-
-        OneSignal.setNotificationWillShowInForegroundHandler(notificationReceivedEvent -> {
-            OSNotification notification = notificationReceivedEvent.getNotification();
-            Log.d("Powiadomienie", "Treść powiadomienia: " + notification.getBody());
-
-            // Możesz kontrolować, czy powiadomienie powinno być wyświetlane
-            notificationReceivedEvent.complete(notification);
-        });
-
-        OneSignal.setNotificationOpenedHandler(result -> {
-            OSNotificationOpenedResult openedResult = result;
-            Log.d("Powiadomienie", "Użytkownik otworzył powiadomienie: " + openedResult.getNotification().getBody());
-        });
-*/
         storage = FirebaseStorage.getInstance();
 
         Button btnSignUp = findViewById(R.id.btn_sign_up);
@@ -86,7 +67,7 @@ public class WelcomeActivity extends AppCompatActivity {
             String userId = preferences.getString("userId", null);
 
             if (userId != null) {
-                fetchRoleAndRedirect(userId); // Wszystko obsługiwane w tej funkcji
+                fetchRoleAndRedirect(userId);
             } else {
                 Log.e(TAG, "Nie można znaleźć userId w SharedPreferences, wylogowuję...");
                 logOutUser();
@@ -94,8 +75,6 @@ public class WelcomeActivity extends AppCompatActivity {
         } else {
             Log.d(TAG, "Użytkownik nie jest zalogowany, przekierowanie do ekranu logowania.");
         }
-
-
     }
 
     public void downloadAllKMLFiles(String filename) {
@@ -175,21 +154,17 @@ public class WelcomeActivity extends AppCompatActivity {
         db.collection("users").document(userId).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        // Pobranie roli i nazwy użytkownika z dokumentu
                         String role = documentSnapshot.getString("role");
                         String username = documentSnapshot.getString("username");
 
-                        // Przekierowanie do odpowiedniej aktywności z przekazaniem userId i username
                         redirectToActivity(role, username, userId);
                     } else {
-                        // Jeśli dokument użytkownika nie istnieje
-                        Toast.makeText(this, "User profile not found", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Nie znaleziono profilu użytkownika o podanych danych.", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    // Obsługa błędu w przypadku niepowodzenia zapytania
                     Log.e("FetchRole", "Error fetching user data: " + e.getMessage());
-                    Toast.makeText(this, "Error fetching user data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Błąd przy pobieraniu danych użytkownika: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 

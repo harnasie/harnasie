@@ -78,14 +78,11 @@ public class UserActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user);
         setTitle("Konto użytkownika");
         barChart = findViewById(R.id.barChart);
-        // Znalezienie TextView do wyświetlania wiadomości powitalnej
         welcomeTextView = findViewById(R.id.welcomeTextView);
         routeInputLayout = findViewById(R.id.route_input_layout);
         btnWyloguj = findViewById(R.id.logout);
         db = FirebaseFirestore.getInstance();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        //checkLocationPermission();
-        // Odbieranie nazwy użytkownika przekazanej z LoginActivity
         if (userName == null || uid == null) {
             Intent getintent = getIntent();
             userName = getintent.getStringExtra("username");
@@ -93,15 +90,6 @@ public class UserActivity extends AppCompatActivity {
             Log.d("iertyu", uid);
         }
 
-        //Cursor res = dbHelper.getAllDistances();
-        /*dbHelper.addDistance("Magda", "1000", "2023-09-01");
-        dbHelper.addDistance("Magda", "4000", "2023-09-02");
-        dbHelper.addDistance("Magda", "9000", "2023-09-03");
-*/
-        /*        Cursor res = dbHelper.getAllDistances();
-
-         */
-        // Wyświetlenie powitania z nazwą użytkownika
         if (userName != null) {
             welcomeTextView.setText("Witaj, " + userName + "!");
             fetchAndDisplayData(uid);
@@ -174,14 +162,11 @@ public class UserActivity extends AppCompatActivity {
                 logoutAndRedirect();
             }
         });
-
-
     }
 
 
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Jeśli brak uprawnienia, prosimy o jego przyznanie
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
@@ -264,32 +249,27 @@ public class UserActivity extends AppCompatActivity {
             return;
         }
 
-        // Pobieramy ostatnią lokalizację
         mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
             if (location != null) {
                 currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
                 Log.d("lokalizacja", String.valueOf(currentLocation));
 
-                // Pobieramy dokument użytkownika, aby uzyskać jego dane
                 db.collection("users").document(uid).get().addOnSuccessListener(userDoc -> {
                     if (userDoc.exists()) {
-                        // Tworzymy mapę `userMap` z danymi użytkownika
                         Map<String, Object> userMap = new HashMap<>();
                         userMap.put("email", userDoc.getString("email"));
                         userMap.put("username", userDoc.getString("username"));
                         userMap.put("uid", uid);
 
-                        // Tworzymy mapę danych dla `danger`
                         Map<String, Object> danger = new HashMap<>();
                         danger.put("description", description);
                         danger.put("location", currentLocation);
                         danger.put("type", type);
-                        danger.put("user", userMap); // Zagnieżdżamy obiekt `userMap` w `danger`
+                        danger.put("user", userMap);
                         danger.put("createdAt", Timestamp.now());
                         danger.put("accepted", false);
 
 
-                        // Zapisujemy dane do kolekcji "dangers" w Firestore
                         db.collection("dangers").add(danger)
                                 .addOnSuccessListener(documentReference -> {
                                     Toast.makeText(UserActivity.this, "Dodano zagrożenie z ID: " + documentReference.getId(), Toast.LENGTH_SHORT).show();
@@ -327,17 +307,15 @@ public class UserActivity extends AppCompatActivity {
 
     private void fetchAndDisplayData(String uid){
         db.collection("walking")
-                .whereEqualTo("uid", uid) // Filtrujemy po polu "uid"
+                .whereEqualTo("uid", uid)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         ArrayList<BarEntry> barEntries = new ArrayList<>();
                         ArrayList<String> labels = new ArrayList<>();
                         int index = 0;
-                        // Sprawdzamy, czy znaleziono dokumenty
                         if (!task.getResult().isEmpty()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                // Pobieramy wartość "distance"
                                 Double distance = document.getDouble("distance");
                                 Date timeee = document.getDate("date");
 
@@ -345,13 +323,10 @@ public class UserActivity extends AppCompatActivity {
                                 int month = timeee.getMonth() + 1;
                                 int year = timeee.getYear();
                                 String datad = day + "." + month + "." + year;
-                                // Dodaj dane do wykresu
                                 barEntries.add(new BarEntry(index, distance.floatValue()));
-                                labels.add(datad); // Dodaj datę jako etykietę
+                                labels.add(datad);
                                 index++;
 
-
-                                // Wyświetl dane na wykresie
                                 showBarChart(barEntries, labels);
                             }
                         } else {
@@ -368,41 +343,32 @@ public class UserActivity extends AppCompatActivity {
         barDataSet.setColor(getResources().getColor(android.R.color.holo_blue_light)); // Ustaw kolor słupków
 
         BarData barData = new BarData(barDataSet);
-        barData.setBarWidth(0.5f); // Szerokość słupków
+        barData.setBarWidth(0.5f);
 
-        // Ustawienie danych wykresu
         barChart.setData(barData);
         barChart.setFitBars(true);
 
-        // Wyłączenie opisu wykresu
         barChart.getDescription().setEnabled(false);
 
-        // Wyłączenie legendy
         barChart.getLegend().setEnabled(false);
 
-        // Ustawienie etykiet na osi X
         barChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
         barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         barChart.getXAxis().setGranularity(1f);
         barChart.getXAxis().setGranularityEnabled(true);
 
-        // Wyłączenie pionowych linii siatki na osi Y
         barChart.getAxisLeft().setDrawGridLines(false);
         barChart.getAxisRight().setDrawGridLines(false);
 
-        // Wyłączenie prawej osi Y (jeśli nie jest potrzebna)
         barChart.getAxisRight().setEnabled(false);
 
-        // Dodanie jednostki "km" do osi Y
         barChart.getAxisLeft().setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                return value + " km";  // Dodajemy jednostkę km do wartości
+                return value + " km";
             }
         });
 
-        // Odświeżenie wykresu
         barChart.invalidate();
     }
-
 }

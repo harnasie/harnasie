@@ -93,7 +93,6 @@ public class DangerActivity extends AppCompatActivity {
             }
         });
 
-
         btnuser = findViewById(R.id.userView);
         btnTelefon = findViewById(R.id.buttonTelefon);
         btndanger = findViewById(R.id.danger);
@@ -113,8 +112,6 @@ public class DangerActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-
 
         btndanger.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,7 +134,7 @@ public class DangerActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         if (isInternetAvailable()) {
-            sendStoredDanger();  // jeśli połączenie jest dostępne, zgłoszenie zapisane lokalnie
+            sendStoredDanger();
         }
     }
 
@@ -148,7 +145,7 @@ public class DangerActivity extends AppCompatActivity {
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Brak uprawnień do lokalizacji.", Toast.LENGTH_SHORT).show();
                 return;
-            }   //sprawdzenie dostępu do lokalizacji
+            }
             mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
                 if (location != null) {
                     currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
@@ -158,14 +155,14 @@ public class DangerActivity extends AppCompatActivity {
                             Map<String, Object> userMap = new HashMap<>();
                             userMap.put("email", userDoc.getString("email"));
                             userMap.put("username", userDoc.getString("username"));
-                            userMap.put("uid", uid);    //pozostałe dane usera
+                            userMap.put("uid", uid);
                             Map<String, Object> danger = new HashMap<>();
                             danger.put("description", description);
                             danger.put("location", currentLocation);
                             danger.put("type", type);
                             danger.put("user", userMap);
                             danger.put("createdAt", Timestamp.now());
-                            danger.put("accepted", false);      //pozostałe dane zgłoszenia
+                            danger.put("accepted", false);
 
                             db.collection("dangers").add(danger)
                                     .addOnSuccessListener(documentReference -> {

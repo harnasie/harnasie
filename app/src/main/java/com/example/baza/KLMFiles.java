@@ -75,8 +75,6 @@ public class KLMFiles {
         return szlaki;
     }
 
-
-    // Funkcja do pobierania i przetwarzania plików .kml z folderów szlaki i szlaki2
     public void processKMLFiles() {
         processKMLFilesFromFolder("szlaki");
         processKMLFilesFromFolderMarker("marker");
@@ -85,14 +83,12 @@ public class KLMFiles {
     private void processKMLFilesFromFolder(String folderName) {
         File folder = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), folderName);
 
-        // Sprawdź, czy folder istnieje i jest katalogiem
         if (folder.exists() && folder.isDirectory()) {
             File[] files = folder.listFiles();
             if (files != null) {
                 for (File file : files) {
                     if (file.isFile() && file.getName().endsWith(".kml")) {
                         Log.d(TAG, "Znalazłem plik: " + file.getAbsolutePath());
-                        // Odczytaj zawartość pliku KML
                         readAndProcessKMLFile1(file);
                         szlaki.add(file.getName());
                         Log.d(TAG, "Znalazłem plik: " + szlaki.size());
@@ -153,22 +149,18 @@ public class KLMFiles {
     public static List<LatLng> getRouteStartEnd(String filename) {
         List<LatLng> coordinates = new ArrayList<>();
         try {
-            // Load the KML file from the given file path
             File file = new File("/storage/emulated/0/Android/data/com.example.baza/files/Documents/szlaki/"+filename);
             InputStream inputStream = new FileInputStream(file);
 
-            // Parse the KML file
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(inputStream);
 
-            // Find <coordinates> tags
             NodeList coordinatesNodes = document.getElementsByTagName("coordinates");
 
             for (int i = 0; i < coordinatesNodes.getLength(); i++) {
                 String coordinatesText = coordinatesNodes.item(i).getTextContent().trim();
 
-                // Split into individual coordinate entries
                 String[] points = coordinatesText.split("\\s+");
                 for (String point : points) {
                     String[] latLngAlt = point.split(",");
@@ -188,8 +180,8 @@ public class KLMFiles {
 
         List<LatLng> result = new ArrayList<>();
         if (!coordinates.isEmpty()) {
-            result.add(coordinates.get(0)); // Start
-            result.add(coordinates.get(coordinates.size() - 1)); // End
+            result.add(coordinates.get(0));
+            result.add(coordinates.get(coordinates.size() - 1));
             result.add(coordinates.get(27));
         }
         return result;
@@ -241,7 +233,7 @@ public class KLMFiles {
         String name = null;
         String description = null;
         LatLng coordinates = null;
-        List<Marker> markersList = new ArrayList<>();   //inicjalizacja zmiennych name, description, coordinates, markerList
+        List<Marker> markersList = new ArrayList<>();
 
         try {
             InputStream kmlInputStream = new FileInputStream(absolutePath);
@@ -261,7 +253,7 @@ public class KLMFiles {
                         else if ("coordinates".equals(tagName)) {
                             String[] coord = parser.nextText().split(",");
                             double lng = Double.parseDouble(coord[0]);
-                            double lat = Double.parseDouble(coord[1]);      //rozdzielenie współrzędnych
+                            double lat = Double.parseDouble(coord[1]);
                             coordinates = new LatLng(lat, lng);
                         } break;
 
@@ -272,7 +264,7 @@ public class KLMFiles {
                                         .title(name)
                                         .snippet(description)
                                         .visible(false)
-                                        .icon(icon));   //dodanie markera na mapę
+                                        .icon(icon));
                                 coordinates = null;
                                 if (marker != null) { markersList.add(marker); }
                             }

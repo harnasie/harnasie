@@ -83,12 +83,12 @@ public class LocationTrackingService extends Service {
                         Log.d("LocationTrackingService", "Lokalizacja: " + location);
 
                         if (lastLocation != null) {
-                            double distance = calculateDistance(location); // Funkcja obliczająca dystans
-                            dailyDistance += distance; // Dodaj do dziennego dystansu
+                            double distance = calculateDistance(location);
+                            dailyDistance += distance;
                         }
 
                         lastLocation = location;
-                        saveLocationToFirestore(location, calculateDistance(location)); //zapisywanie każdej lokalizacji użytkownika co 5 sekund
+                        saveLocationToFirestore(location, calculateDistance(location));
                         saveDailyDistanceToFirestore();
                     }
                 }
@@ -102,8 +102,8 @@ public class LocationTrackingService extends Service {
 
     private void startLocationUpdates() {
         LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(60000); // Częstotliwość aktualizacji: co 5 sekund
-        locationRequest.setFastestInterval(30000); // Najszybszy interwał: co 2 sekundy
+        locationRequest.setInterval(60000);
+        locationRequest.setFastestInterval(30000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         try {
@@ -171,7 +171,6 @@ public class LocationTrackingService extends Service {
             Log.e("FirebaseAuth", "No user is logged in!");
         }
 
-
         if (currentDate == null || !currentDate.equals(today)) {
             currentDate = today;
             dailyDistance = 0.0;
@@ -188,7 +187,6 @@ public class LocationTrackingService extends Service {
                 .addOnSuccessListener(aVoid -> Log.d("Firestore", "Dzienny dystans zapisany"))
                 .addOnFailureListener(e -> Log.e("Firestore", "Błąd zapisu dziennego dystansu", e));
     }
-
 
     @Override
     public void onDestroy() {
