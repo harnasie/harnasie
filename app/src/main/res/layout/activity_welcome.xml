@@ -38,16 +38,16 @@
         android:layout_marginTop="16dp"
         android:layout_centerHorizontal="true"/>
 
-    <Button
-        android:id="@+id/btn_map"
-        android:textColor="@android:color/white"
-        android:background="@drawable/button_round"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btn_sign_in"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:text="Mapa" />
+<!--    <Button-->
+<!--        android:id="@+id/btn_map"-->
+<!--        android:textColor="@android:color/white"-->
+<!--        android:background="@drawable/button_round"-->
+<!--        android:layout_width="200dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_below="@id/btn_sign_in"-->
+<!--        android:layout_centerHorizontal="true"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:text="Mapa" />-->
 
     
 </RelativeLayout>
