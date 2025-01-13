@@ -1,6 +1,5 @@
 package com.example.baza;
 
-import android.app.AlertDialog;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -114,10 +113,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         setTitle("Mapa");
         db = FirebaseFirestore.getInstance();
 
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.id_map);
         mapFragment.getMapAsync(this);
 
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
                 tts.setLanguage(Locale.UK);
@@ -132,6 +134,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             ileszczyty++;
             widoczne = ileszczyty % 2 == 0;
 
+
             for (Marker marker : szczytylist) {
                 marker.setVisible(widoczne);
             }
@@ -140,6 +143,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         StawyButton.setOnClickListener(v -> {
             ilestawy++;
             widoczne = ilestawy % 2 == 0;
+
 
             for (Marker marker : stawylist) {
                 marker.setVisible(widoczne);
@@ -150,6 +154,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         SchroniskaButton.setOnClickListener(v -> {
             ile++;
             widoczne = ile % 2 == 0;
+
 
             for (Marker marker : schroniskalist) {
                 marker.setVisible(widoczne);
@@ -215,7 +220,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                             .bearing(bearing)
                             .tilt(45)
                             .build();
-
 
                     mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                     googlesz.setText(nameselectedFile + " --> GOOGLE");
@@ -386,7 +390,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             public void onClick(View v) {
                 if(url != ""){
                     url = getDirectionsUrlGoogle(skad_location,dokad_location);
-                openGoogleMapsWithRoute(url);}
+                    openGoogleMapsWithRoute(url);}
 
             }
         });
@@ -495,6 +499,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 }
 
                 for (Location location : locationResult.getLocations()) {
+                    // Update the map with the user's location
                     LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
                     mMap.addMarker(new MarkerOptions().position(userLocation).title("You are here"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
@@ -552,6 +557,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     }
 
     private void openGoogleMapsWithRoute(String url) {
+        // Tworzymy intent z URL Google Maps
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         intent.setPackage("com.google.android.apps.maps");
         startActivity(intent);
@@ -678,6 +684,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         return addressString.toString();
     }
 
+
     private String encodeLatLng(LatLng point) {
         return point.latitude + "," + point.longitude;
     }
@@ -790,8 +797,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     }
 
     private void addMarkerAtCurrentPosition(boolean sign) {
-        // Wyświetlenie widoku markera w odpowiedniej pozycji na mapie
-        // Przeliczanie współrzędnych GPS na pozycję na ekranie
         if (sign) {
             markerView.setVisibility(View.VISIBLE);
             topBar.setVisibility(View.VISIBLE);
@@ -845,6 +850,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         Polyline newPolyline = mMap.addPolyline(options);
         routePolylines.add(newPolyline);
 
+        // Aktualizowanie indeksu ostatniego pokonanego odcinka
         lastTraversedIndex = startIndex;
     }
 
@@ -892,14 +898,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
                                     LatLng location = new LatLng(latitude, longitude);
                                     locations.add(location);
-                                    Log.d("Accepted Danger", "Location: " + latitude + ", " + longitude);
 
-                                    double distance = calculateDistance(currentLocation, location);
-                                    if (distance <= 200) {
-                                        String type = documentSnapshot.getString("type");
-                                        String description = documentSnapshot.getString("description");
-                                        showDangerPopup(type, description, distance);
-                                    }
+                                    Log.d("Accepted Danger", "Location: " + latitude + ", " + longitude);
                                 }}}
                         if (!locations.isEmpty()) {
                             updateMapWithAcceptedDangers(locations);
@@ -911,33 +911,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     Log.e("FirestoreError", "Błąd przy pobieraniu zaakceptowanych zgłoszeń", e);
                 });
     }
-
-    private double calculateDistance(LatLng userLocation, LatLng dangerLocation) {
-        Location userLoc = new Location("userLocation");
-        userLoc.setLatitude(userLocation.latitude);
-        userLoc.setLongitude(userLocation.longitude);
-
-        Location dangerLoc = new Location("dangerLocation");
-        dangerLoc.setLatitude(dangerLocation.latitude);
-        dangerLoc.setLongitude(dangerLocation.longitude);
-
-        return userLoc.distanceTo(dangerLoc);
-    }
-
-    private void showDangerPopup(String type, String description, double distance) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Ostrzeżenie: " + type)
-                .setMessage("Opis: " + description + "\nOdległość: " + (int) distance + " m")
-                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
-                .create()
-                .show();
-    }
-
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         Intent serviceIntent = new Intent(this, LocationTrackingService.class);
         stopService(serviceIntent);
     }
