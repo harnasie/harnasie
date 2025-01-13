@@ -41,8 +41,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.onesignal.OneSignal;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.ParseException;
@@ -97,23 +95,7 @@ public class UserActivity extends AppCompatActivity {
             welcomeTextView.setText("Witaj, użytkowniku!");
         }
 
-        /*ArrayList<Entry> entries = new ArrayList<>();
-        for (int x = -10; x <= 10; x++) {
-            float y = x * x;  // Funkcja y = x^2
-            entries.add(new Entry(x, y));
-        }
 
-        // Tworzenie zestawu danych
-        LineDataSet lineDataSet = new LineDataSet(entries, "y = x^2");
-        lineDataSet.setColor(getResources().getColor(R.color.purple_200));
-        lineDataSet.setLineWidth(2f);
-
-        // Dodanie danych do wykresu
-        LineData lineData = new LineData(lineDataSet);
-        lineChart.setData(lineData);
-
-        // Odśwież wykres
-        lineChart.invalidate();*/
         btnuser = findViewById(R.id.userView);
         btnuser = findViewById(R.id.userView);
         btnTelefon = findViewById(R.id.buttonTelefon);
@@ -171,77 +153,6 @@ public class UserActivity extends AppCompatActivity {
         }
     }
 
-    // Metoda do wczytywania danych do wykresu
-    /*private void loadDistanceDataForChart() {
-        // Pobierz dane dystansów i dat z bazy danych
-        Cursor cursor = dbHelper.getAllDistances(); // Zakładam, że masz metodę, która pobiera wszystkie rekordy
-        Log.e("dziala", String.valueOf(4));
-
-        // Lista Entry do trzymania danych wykresu
-        List<Entry> entries = new ArrayList<>();
-
-        // Indeks do używania w Entry (numer dnia)
-        int index = 5; // Rozpocznij numerację dni od 5
-
-        // Sprawdzenie, czy cursor ma dane
-        if (cursor.moveToFirst()) {
-            // Indeks kolumny, upewnij się, że są różne od -1
-            int distanceIndex = cursor.getColumnIndex("DISTANCE");
-            int dateIndex = cursor.getColumnIndex("DAY");
-
-            // Sprawdzamy, czy indeksy są poprawne (czy nie są -1)
-            if (distanceIndex != -1) {
-                do {
-                    // Pobieranie wartości z bazy danych
-                    int distance = cursor.getInt(distanceIndex); // Pobieranie wartości dystansu
-                    Log.e("dismag", String.valueOf(distance));
-
-                    // Dodanie punktu na wykresie: oś X to numer dnia, oś Y to dystans
-                    entries.add(new Entry(index, distance));
-                    index++; // Zwiększ numer dnia
-
-                } while (cursor.moveToNext() && index <= 10); // Pętla działa tylko do 10. dnia
-            } else {
-                // Obsługa błędu, jeśli któryś z indeksów jest -1
-                Log.e("UserActivity", "Błąd: Kolumna 'DISTANCE' nie została znaleziona.");
-                Toast.makeText(this, "Błąd: Kolumny w bazie danych nie zostały znalezione.", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        // Tworzenie zbioru danych dla wykresu
-        LineDataSet dataSet = new LineDataSet(entries, "Dystans (metry)");
-        dataSet.setColors(ColorTemplate.COLORFUL_COLORS); // Ustawienie kolorów dla linii
-        dataSet.setLineWidth(2f); // Grubość linii
-        dataSet.setValueTextSize(10f); // Rozmiar tekstu na wykresie
-        dataSet.setDrawCircles(true); // Ustawienie widocznych punktów na linii
-        dataSet.setCircleColor(ColorTemplate.COLORFUL_COLORS[0]); // Kolor punktów na linii
-
-        // Tworzenie danych dla wykresu
-        LineData data = new LineData(dataSet);
-        Log.e("dane", String.valueOf(data));
-
-        // Tworzenie i ustawienie danych na wykresie
-        lineChart.setData(data);
-        lineChart.invalidate(); // Odśwież wykres
-
-        // Ustawienia osi X (numer dnia)
-        XAxis xAxis = lineChart.getXAxis();
-        xAxis.setAxisMinimum(5f);  // Minimum na osi X (5. dzień)
-        xAxis.setAxisMaximum(10f); // Maksimum na osi X (10. dzień)
-        xAxis.setGranularity(1f);  // Zapewnienie, że każda jednostka na osi X to jeden dzień
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM); // Oś X na dole wykresu
-
-        // Ustawienia osi Y (dystans)
-        YAxis leftAxis = lineChart.getAxisLeft();
-        leftAxis.setAxisMinimum(0f);   // Minimum na osi Y (dystans = 0)
-        leftAxis.setAxisMaximum(2000f); // Maksimum na osi Y (dystans = 2000)
-        leftAxis.setGranularity(500f);  // Skok co 500 jednostek (opcjonalnie)
-
-        // Ustawienia prawej osi Y, jeśli nie chcesz jej używać
-        YAxis rightAxis = lineChart.getAxisRight();
-        rightAxis.setEnabled(false); // Wyłączenie prawej osi Y (opcjonalne)
-    }
-*/
     private void addDanger(String description, String type, String uid) {
         checkLocationPermission();
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
