@@ -72,8 +72,6 @@ dependencies {
     implementation ("com.google.firebase:firebase-storage")
     implementation ("com.google.firebase:firebase-messaging")
     implementation ("com.google.auth:google-auth-library-oauth2-http:1.19.0")
-    implementation ("com.onesignal:OneSignal:4.8.6")
-    implementation ("com.android.volley:volley:1.2.1")
 
 }
 

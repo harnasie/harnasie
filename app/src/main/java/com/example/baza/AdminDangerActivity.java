@@ -9,11 +9,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.volley.Request;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-import com.onesignal.OneSignal;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
